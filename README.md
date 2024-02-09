@@ -53,4 +53,4 @@ docker push bluespice/formula:4.4.1
 ```
 
 ## Testing
-Install `trivy` and run `trivy bluespice/formula:latest` to check for vulnerabilities.
+Install `trivy` and run `trivy image bluespice/formula` to check for vulnerabilities.
