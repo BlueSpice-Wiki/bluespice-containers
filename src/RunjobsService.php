@@ -2,6 +2,7 @@
 
 namespace BlueSpice\Service\ParallelRunJobs;
 
+use Exception;
 use mysqli;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
@@ -13,6 +14,15 @@ class RunjobsService {
 
 	/** @var OutputInterface */
 	private $output;
+
+	/** @var string */
+	private $sqlHost;
+
+	/** @var string */
+	private $sqlUser;
+
+	/** @var string */
+	private $sqlPass;
 
 	public function __construct( array $config, OutputInterface $output ) {
 		$this->config = $config;
@@ -126,7 +136,7 @@ class RunjobsService {
 			if ( !file_exists( $instancePath . DIRECTORY_SEPARATOR . 'SUSPENDED' ) && file_exists( $instancePath . DIRECTORY_SEPARATOR . 'LocalSettings.php' ) ) {
 				$this->output->writeln( "<\info>farm instance '$instance' is not suspended and has LocalSettings.php<\info>" );
 
-				$jobCount = $this->count_jobs( $instance, $this->config, $this->sqlHost, $this->sqlUser, $this->sqlPass );
+				$jobCount = $this->count_jobs( $instance );
 
 				if ( $jobCount > 0 ) {
 					$this->output->writeln( "<\info>farm instance '$instance' has $jobCount pending jobs<\info>" );
