@@ -87,8 +87,7 @@ class RunjobsService
 		$sql->close();
 		$db->close();
 
-		// return $value;
-		return 345345;
+		return $value;
 	}
 
 	private function generate_instance_list()

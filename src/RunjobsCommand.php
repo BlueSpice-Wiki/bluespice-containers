@@ -12,6 +12,9 @@ class RunjobsCommand extends Command
 {
 	protected static $defaultName = 'runjobs';
 
+	/** @var OutputInterface */
+	private $output;
+
 	protected function configure()
 	{
 		$this
@@ -39,8 +42,6 @@ class RunjobsCommand extends Command
 			throw new \RuntimeException("The '--config' option cannot be used along with other options.");
 		}
 
-		$config;
-		$configFilePath;
 		// Check if the config file was provided; if not, use provided options as config
 		if (!$input->getOption('config')) {
 			$this->validateMandatoryOptions($input);
