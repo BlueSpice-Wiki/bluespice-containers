@@ -7,7 +7,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 class RunjobsService {
+
+	/** @var array */
 	private $config;
+
+	/** @var OutputInterface */
+	private $output;
 
 	public function __construct( array $config, OutputInterface $output ) {
 		$this->config = $config;
