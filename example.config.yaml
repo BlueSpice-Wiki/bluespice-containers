@@ -1,0 +1,18 @@
+wiki:
+    type: "farm"    # standalone or farm
+    path: "/var/www/bluespice/w"
+    reference: "LocalSettings.php" # LocalSettings.php for DB credentials
+runjobs:
+    percentage: 50      # Maximum percentage of total jobs. (Per wiki, per cycle)
+    maxtime: 10         # Maximum life time of a runJobs.php (Per wiki, per cycle) - Seconds
+    cooldown: 3        # Wait time after each cycle - Seconds
+    maxforkprocesses: 5 # Maximum number of sub processes that can be spawned for parallel processing
+
+# Following list should be mutually exclusive, otherwise an exception is raised
+# "exclude_instances" contains list of comma separated farm instances name for which 
+# the runjobs should not be run 
+exclude-instances: []
+# "include-instances" contains list of comma separated farm instances name for which 
+# the runjobs should be run, if left empty, all the farm instances will be considered
+# except the ones in "exclude_instances" list
+include-instances: []

@@ -1,0 +1,7 @@
+__pycache__/
+venv
+!logs/.gitkeep
+logs/*
+config.yaml
+vendor/
+build/parallel-runjobs-service

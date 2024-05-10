@@ -1,0 +1,22 @@
+{
+	"name": "bluespice/parallel-runjobs-service",
+	"description": "This executes runjobs service parallely for multiple wiki farm instances as well as non-farm instances.",
+	"autoload": {
+		"psr-4": {
+			"BlueSpice\\Service\\ParallelRunJobs\\": "src/"
+		}
+	},
+	"require": {
+		"symfony/console": "^5.0",
+		"symfony/yaml": "^5.0",
+		"symfony/process": "^6.0"
+	},
+	"authors": [
+		{
+			"name": "jas",
+			"email": "support@hallowelt.com"
+		}
+	],
+	"minimum-stability": "stable",
+	"prefer-stable": true
+}

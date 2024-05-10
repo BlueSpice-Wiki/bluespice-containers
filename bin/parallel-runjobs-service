@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use BlueSpice\Service\ParallelRunJobs\RunjobsCommand;
+
+$application = new Application('Parallel RunJobs Service', '1.0.0');
+$application->add(new RunjobsCommand());
+$application->setDefaultCommand('runjobs', true);
+
+$application->run();
