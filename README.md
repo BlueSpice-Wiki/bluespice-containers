@@ -4,7 +4,7 @@ This currently is just a regular Memcached server. In the future we may switch t
 
 ## Using it within BlueSpice or MediaWiki
 
-Given you have this service running at `http://localhost:11211/`, you can configure the BlueSpice cache like this:
+Given you have this service running at `localhost:11211`, you can configure the BlueSpice cache like this:
 
 ```php
 $GLOBALS['wgMemCachedServers'] = [ 'localhost:11211' ];
