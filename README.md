@@ -7,7 +7,7 @@ This currently is just a regular DrawIO server.
 Given you have this service running at `http://localhost:8080/`, you can configure the BlueSpice diagram like this:
 
 ```php
-$GLOBALS['DrawioEditorBackendUrl'] = 'http://localhost:8080';
+$GLOBALS['wgDrawioEditorBackendUrl'] = 'http://localhost:8080';
 ```
 
 ## How to release a new version

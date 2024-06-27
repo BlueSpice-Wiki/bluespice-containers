@@ -1,1 +1,1 @@
-FROM jgraph/drawio
+FROM jgraph/drawio:latest
