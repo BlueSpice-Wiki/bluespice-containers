@@ -14,7 +14,7 @@ RUN apk update && apk add --no-cache librsvg
 RUN mkdir -p /opt/mathoid
 
 COPY --from=builder /tmp/mathoid /opt/mathoid
-COPY ./opt/init.sh /opt/init.sh
+COPY ./root-fs/opt/init.sh /opt/init.sh
 
 EXPOSE 10044
 
