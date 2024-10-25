@@ -1,18 +1,20 @@
+environment:
+    php: "/usr/bin/php" # Optional, defaults to /usr/bin/php
 wiki:
-    type: "farm"    # standalone or farm
-    path: "/var/www/bluespice/w"
-    reference: "LocalSettings.php" # LocalSettings.php for DB credentials
+    type: "standalone" # "standalone" or "farm", optional, defaults to "standalone"
+    path: "/var/www/html/w"
+database:
+    dbserver: "127.0.0.1" # Optional, defaults to localhost
+    dbport: 3306 # Optional, defaults to 3306
+    dbname: "w"
+    dbuser: "root"
+    dbpassword: "password"
+    dbprefix: "" # Optional, defaults to ""
 runjobs:
-    percentage: 50      # Maximum percentage of total jobs. (Per wiki, per cycle)
-    maxtime: 10         # Maximum life time of a runJobs.php (Per wiki, per cycle) - Seconds
-    cooldown: 3        # Wait time after each cycle - Seconds
-    maxforkprocesses: 5 # Maximum number of sub processes that can be spawned for parallel processing
-
-# Following list should be mutually exclusive, otherwise an exception is raised
-# "exclude_instances" contains list of comma separated farm instances name for which 
-# the runjobs should not be run 
-exclude-instances: []
-# "include-instances" contains list of comma separated farm instances name for which 
-# the runjobs should be run, if left empty, all the farm instances will be considered
-# except the ones in "exclude_instances" list
-include-instances: []
+    maxtime: 30         # Maximum TTL of a runJobs.php (Per wiki, per cycle) - Seconds, optional
+    maxjobs: 50        # Maximum number of jobs to run in a single call, optional
+    maxparallel: 1      # Maximum number of jobs to run in parallel (default: 1 for standalone, 10 for farm), optional
+farm: # Whole section is optional
+    # Exclude list has priority over include list
+    include-instances: []
+    exclude-instances: []

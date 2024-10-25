@@ -4,4 +4,5 @@ venv
 logs/*
 config.yaml
 vendor/
-build/parallel-runjobs-service
+.idea/
+.vscode/

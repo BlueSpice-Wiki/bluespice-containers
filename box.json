@@ -13,6 +13,3 @@
 	"main": "bin/parallel-runjobs-service",
 	"output": "build/parallel-runjobs-service"
 }
-
-
-

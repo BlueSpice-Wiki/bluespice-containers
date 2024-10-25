@@ -2,11 +2,13 @@
 
 namespace BlueSpice\Service\ParallelRunJobs;
 
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
+use Throwable;
 
 class RunjobsCommand extends Command {
 
@@ -36,18 +38,12 @@ class RunjobsCommand extends Command {
 		$this->output = $output->section();
 		$runjobsOutputSection = $output->section();
 
-		if ( $input->getOption( 'config' ) && $this->hasOtherOptions( $input ) ) {
-			throw new \RuntimeException( "The '--config' option cannot be used along with other options." );
+		if ( !$input->hasOption( 'config' ) ) {
+			$this->output->writeln( '<error>No configuration file provided</error>' );
+			return Command::INVALID;
 		}
-
-		// Check if the config file was provided; if not, use provided options as config
-		if ( !$input->getOption( 'config' ) ) {
-			$this->validateMandatoryOptions( $input );
-			$config = $this->buildConfigFromOptions( $input );
-		} else {
-			$configFilePath = $input->getOption( 'config' );
-			$config = $this->loadConfig( $configFilePath );
-		}
+		$configFilePath = $input->getOption( 'config' );
+		$config = $this->loadConfig( $configFilePath );
 
 		$this->output->writeln( '<info>Started executing runjobs service</info>' );
 
@@ -57,51 +53,21 @@ class RunjobsCommand extends Command {
 		return Command::SUCCESS;
 	}
 
-	protected function loadConfig( string $configFilePath ) {
+	/**
+	 * @param string $configFilePath
+	 * @return Config
+	 */
+	protected function loadConfig( string $configFilePath ): Config {
 		if ( !file_exists( $configFilePath ) ) {
-			throw new \RuntimeException( "Configuration file not found at: $configFilePath" );
+			throw new RuntimeException( "Configuration file not found at: $configFilePath" );
+		}
+		try {
+			$values = Yaml::parseFile( $configFilePath );
+		} catch ( Throwable $ex ) {
+			throw new RuntimeException( "Error parsing configuration file: " . $ex->getMessage() );
 		}
 
-		return Yaml::parseFile( $configFilePath );
-	}
 
-	protected function validateMandatoryOptions( InputInterface $input ) {
-		$mandatoryOptions = [ 'wiki-type', 'wiki-path' ];
-
-		foreach ( $mandatoryOptions as $option ) {
-			if ( !$input->getOption( $option ) ) {
-				throw new \RuntimeException( "The '--$option' option is mandatory when no config file is provided." );
-			}
-		}
-	}
-
-	protected function buildConfigFromOptions( InputInterface $input ) {
-		return [
-			'wiki' => [
-				'type' => $input->getOption( 'wiki-type' ),
-				'path' => $input->getOption( 'wiki-path' ),
-				'reference' => $input->getOption( 'wiki-reference' ) ?? 'LocalSettings.php',
-			],
-			'runjobs' => [
-				'percentage' => $input->getOption( 'runjobs-percentage' ) ?? 50,
-				'maxtime' => $input->getOption( 'runjobs-maxtime' ) ?? 10,
-				'cooldown' => $input->getOption( 'runjobs-cooldown' ) ?? 3,
-				'maxforkprocesses' => $input->getOption( 'runjobs-maxforkprocesses' ) ?? 5,
-			],
-			'exclude-instances' => $input->getOption( 'exclude-instances' ) ?? [],
-			'include-instances' => $input->getOption( 'include-instances' ) ?? [],
-		];
-	}
-
-	protected function hasOtherOptions( InputInterface $input ) {
-		$otherOptions = [ 'wiki-type', 'wiki-path', 'wiki-reference', 'runjobs-percentage', 'runjobs-maxtime', 'runjobs-cooldown', 'runjobs-maxforkprocesses', 'exclude-instances', 'include-instances' ];
-
-		foreach ( $otherOptions as $option ) {
-			if ( $input->getOption( $option ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		return Config::newFromValues( $values );
 	}
 }

@@ -9,7 +9,9 @@
 	"require": {
 		"symfony/console": "^5.0",
 		"symfony/yaml": "^5.0",
-		"symfony/process": "^6.0"
+		"symfony/process": "^6.0",
+		"php": "^8.0",
+		"ext-mysqli": "*"
 	},
 	"require-dev": {
 		"mediawiki/mediawiki-codesniffer": "43.0.0",
