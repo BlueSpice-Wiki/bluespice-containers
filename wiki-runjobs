@@ -1,18 +1,18 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          farm-runjobs
+# Provides:          wiki-runjobs
 # Required-Start:    $local_fs $network $named $time $syslog
 # Required-Stop:     $local_fs $network $named $time $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Description:       This executes runjobs service parallely for multiple wiki farm instances.
+# Description:       Executes runjobs for a single instance or a farm, depending on config
 ### END INIT INFO
 
 SCRIPT=<COMMAND>
-RUNAS=root
 
-PIDFILE=/var/run/farm-runjobs.pid
-LOG_FILE="/var/log/farm-runjobs.log"
+NAME=parallel-runjobs-service
+PIDFILE=/var/run/wiki-runjobs.pid
+LOG_FILE="/var/log/wiki-runjobs.log"
 MAX_LOG_SIZE=10 # in MB
 ROTATION_INTERVAL=600 # in seconds
 
@@ -23,13 +23,11 @@ start() {
   fi
   echo 'Starting service…' >&2
   local CMD="$SCRIPT >> $LOG_FILE 2>&1 & echo \$!"
-  su -c "$CMD" $RUNAS > "$PIDFILE"
+  sh -c "$CMD" > "$PIDFILE"
   rotate_logs &
-  # Try with this command line instead of above if not workable
-  # su -s /bin/sh $RUNAS -c "$CMD" > "$PIDFILE"
   sleep 2
   PID=$(cat $PIDFILE)
-    if pgrep -u $RUNAS -f $NAME > /dev/null
+    if pgrep -f $NAME > /dev/null
     then
       echo "$NAME is now running, the PID is $PID"
     else
