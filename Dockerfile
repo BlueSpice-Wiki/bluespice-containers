@@ -1,4 +1,6 @@
-FROM alpine:3.20.3 AS builder
+ARG BASE_IMAGE=alpine:3.20.3
+
+FROM $BASE_IMAGE AS builder
 
 ARG SHA256SUM_1=f799541380bfff2b674cefd86c5376d2d7d566b3a2e7c4579d2b491de8ec6c36
 ARG SHA256SUM_2=89417f1e6e0b1498ea22d7ebb9ec3bed126719c0a1b9a1cb76ac31020027e6ee
@@ -16,22 +18,22 @@ RUN wget https://github.com/jgraph/drawio/releases/download/v24.7.17/draw.war \
     && rm -rf draw.war
 
 
-FROM alpine:3.20.3
+FROM $BASE_IMAGE AS main
 
-ENV JAVA_OPTS="-Xverify:none"
-
-ARG USER=tomcat
+ARG JAVA_OPTS="-Xverify:none"
+ENV JAVA_OPTS=$JAVA_OPTS
+ENV USER=tomcat
 ARG UID=1000
-ARG GROUPNAME=tomcat
-RUN apk add openjdk21
-COPY --from=builder /opt/tomcat /opt/tomcat
+ENV UID=$UID
+
 COPY ./root-fs/usr/local/bin/startup.sh /usr/local/bin/
-RUN addgroup -g $UID $GROUPNAME \
-    && adduser -G $GROUPNAME -u $UID --disabled-password --gecos "" $USER \
-    && chown -R tomcat:tomcat /opt/tomcat \
+
+RUN apk add --no-cache openjdk21 \
+    && addgroup -g $UID $USER \
+    && adduser -G $USER -u $UID --disabled-password --gecos "" $USER \
     && chmod +x /usr/local/bin/startup.sh
 
+COPY --from=builder --chown=tomcat:tomcat /opt/tomcat /opt/tomcat
 EXPOSE 8080
 USER $USER
 ENTRYPOINT [ "/usr/local/bin/startup.sh" ]
-
