@@ -34,3 +34,4 @@ RUN addgroup -g $UID $GROUPNAME \
 EXPOSE 8080
 USER $USER
 ENTRYPOINT [ "/usr/local/bin/startup.sh" ]
+
