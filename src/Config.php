@@ -29,6 +29,7 @@ class Config {
 
 		$jobs = $values['runjobs'] ?? [];
 		$farm = $values['farm'] ?? [];
+		$farm['maxparallel'] = (int)( $farm['maxparallel'] ?? 10 );
 
 		static::assertRequiredValues( [ 'path' ], $wiki );
 		$db = $values['database'] ?? [];
@@ -44,12 +45,10 @@ class Config {
 			];
 		}
 
-
-
 		$jobs = [
 			'maxtime' => (int)( $jobs['maxtime'] ?? 30 ),
-			'maxjobs' => (int)($jobs['maxjobs'] ?? 100 ),
-			'maxparallel' => (int)( $jobs['maxparallel'] ?? ( $wiki['type'] === 'farm' ? 10 : 1 ) ),
+			'maxjobs' => (int)( $jobs['maxjobs'] ?? 100 ),
+			'cooldown' => (int)( $jobs['cooldown'] ?? 1 ),
 		];
 		$environment = [
 			'php' => $environment['php'] ?? '/usr/bin/php',
@@ -142,7 +141,6 @@ class Config {
 	public function getEnvironment(): array {
 		return $this->environment;
 	}
-
 
 	/**
 	 * @return string

@@ -67,7 +67,6 @@ class RunjobsCommand extends Command {
 			throw new RuntimeException( "Error parsing configuration file: " . $ex->getMessage() );
 		}
 
-
 		return Config::newFromValues( $values );
 	}
 }

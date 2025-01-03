@@ -28,6 +28,7 @@ class RunjobsService {
 
 	public function run() {
 		while ( true ) {
+			$this->output->writeln( "<info>Starting run</info>" );
 			$this->output->clear();
 			if ( $this->config->isFarmingEnvironment() ) {
 				$this->assertManagementConnection();
@@ -41,7 +42,8 @@ class RunjobsService {
 					$this->output->writeln( "<error>Process failed" . $process->getErrorOutput() . "</error>" );
 				}
 			}
-			sleep( 1 );
+			$this->output->writeln( "<info>Cooldown for " . $this->config->getJobConfig()['cooldown'] . " seconds</info>" );
+			sleep( $this->config->getJobConfig()['cooldown'] );
 		}
 	}
 
@@ -50,7 +52,7 @@ class RunjobsService {
 	 * @return Process
 	 */
 	private function getProcess( array $args = [] ): Process {
-		return new Process( array_merge ( [
+		return new Process( array_merge( [
 			$this->config->getPhpPath(),
 			$this->config->getRunJobsPath(),
 			'--maxtime=' . $this->config->getJobConfig()['maxtime'],
@@ -62,40 +64,52 @@ class RunjobsService {
 	 * @return void
 	 */
 	private function runInParallel() {
-		$maxParallel = $this->config->getJobConfig()['maxparallel'];
+		$maxParallel = $this->config->getFarmConfig()['maxparallel'];
 		$this->output->writeln( "<info>Running in parallel, $maxParallel at a time</info>" );
 
-
 		$instances = $this->getInstances();
-		/** @var Process[] $running */
-		$running = [];
 		$pending = array_keys( $instances );
 		$execCount = 0;
+		$processes = [];
 
-		while( count( $pending ) ) {
-			foreach ( $running as $instance => $process ) {
-				if ( !$process->isRunning() ) {
+		foreach ( $pending as $instance ) {
+			$processes[$instance] = $this->getProcess( [ '--sfr=' . $instance ] );
+		}
+		$currentlyRunning = 0;
+		while ( true ) {
+			$finished = true;
+			foreach ( $processes as $instance => $process ) {
+				if ( !$process->isStarted() ) {
+					// If process not started...
+					if ( $currentlyRunning < $maxParallel ) {
+						// ... and can start, start it
+						$this->output->writeln( "<info>Starting for \"$instances[$instance]\"</info>" );
+						$process->start();
+						$currentlyRunning++;
+					}
+					$finished = false;
+					continue;
+				}
+				if ( $process->isRunning() ) {
+					$finished = false;
+				} else {
+					// Finished
+					$this->output->writeln( "<info>Finished for \"$instances[$instance]\"</info>" );
 					$this->output->write( $process->getOutput() );
 					if ( $process->getExitCode() !== 0 ) {
 						$this->output->writeln( "<error>Process failed\n" . $process->getErrorOutput() . "</error>" );
 					}
-					unset( $running[$instance] );
+					$currentlyRunning--;
+					$execCount++;
+					unset( $processes[$instance] );
 				}
 			}
-
-			while( count( $running ) < $maxParallel && count( $pending ) ) {
-				$instance = array_shift( $pending );
-				$display = $instances[$instance];
-				$this->output->writeln( "<info>Starting for \"$display\"</info>" );
-				$process = $this->getProcess( [ '--sfr=' . $instance ] );
-				$process->start();
-				$execCount++;
-				$running[$instance] = $process;
+			if ( $finished ) {
+				$this->output->writeln( "<info>Finished a run for $execCount instances</info>" );
+				return;
 			}
-
-			sleep( 1 );
+			usleep( 500000 );
 		}
-		$this->output->writeln( "<info>Finished a run for $execCount instances</info>" );
 	}
 
 	/**
@@ -103,8 +117,8 @@ class RunjobsService {
 	 */
 	private function getInstances(): array {
 		$table = $this->config->getDbConnection()['dbprefix'] . 'simple_farmer_instances';
-		$include = $this->config->getFarmConfig()['include-instances'];
-		$exclude = $this->config->getFarmConfig()['exclude-instances'];
+		$include = $this->config->getFarmConfig()['include-instances'] ?? [];
+		$exclude = $this->config->getFarmConfig()['exclude-instances'] ?? [];
 		$include = array_diff( $include, $exclude );
 
 		$rows = $this->managementDb->query( "SELECT sfi_path, sfi_display_name FROM $table WHERE sfi_status = 'ready'" );
@@ -123,7 +137,6 @@ class RunjobsService {
 		}
 
 		return $instances;
-
 	}
 
 	/**
