@@ -73,7 +73,11 @@ class RunjobsService {
 		$processes = [];
 
 		foreach ( $pending as $instance ) {
-			$processes[$instance] = $this->getProcess( [ '--sfr=' . $instance ] );
+			if ( $instance === 'w' ) {
+				$processes[$instance] = $this->getProcess();
+			} else {
+				$processes[$instance] = $this->getProcess( [ '--sfr=' . $instance ] );
+			}
 		}
 		$currentlyRunning = 0;
 		while ( true ) {
@@ -136,6 +140,7 @@ class RunjobsService {
 			$instances[$path] = "$display ($path)";
 		}
 
+		$instances['w'] = "Root instance";
 		return $instances;
 	}
 
