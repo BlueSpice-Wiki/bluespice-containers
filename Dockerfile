@@ -14,7 +14,7 @@ RUN apk add --no-cache wget tar \
 
 RUN wget https://github.com/jgraph/drawio/releases/download/v24.7.17/draw.war \
     && echo "$SHA256SUM_2  draw.war" | sha256sum -c - \
-    && unzip draw.war /opt/tomcat/webapps/_diagram \
+    && unzip draw.war -d /opt/tomcat/webapps/_diagram \
     && rm -rf draw.war
 
 
