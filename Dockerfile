@@ -17,7 +17,6 @@ RUN wget https://github.com/jgraph/drawio/releases/download/v24.7.17/draw.war \
         && rm -fr /opt/tomcat/webapps/* \
     && unzip draw.war -d /opt/tomcat/webapps/_diagram \
     && ln -sf /opt/tomcat/webapps/_diagram /opt/tomcat/webapps/ROOT \
-    && unzip draw.war -d /opt/tomcat/webapps/_diagram \
     && rm -rf draw.war
 
 
