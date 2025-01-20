@@ -14,7 +14,9 @@ RUN apk add --no-cache wget tar \
 
 RUN wget https://github.com/jgraph/drawio/releases/download/v24.7.17/draw.war \
     && echo "$SHA256SUM_2  draw.war" | sha256sum -c - \
+        && rm -fr /opt/tomcat/webapps/* \
     && unzip draw.war -d /opt/tomcat/webapps/_diagram \
+    && ln -sf /opt/tomcat/webapps/_diagram /opt/tomcat/webapps/ROOT \
     && rm -rf draw.war
 
 
@@ -26,14 +28,11 @@ ENV USER=tomcat
 ARG UID=1000
 ENV UID=$UID
 
-COPY ./root-fs/usr/local/bin/startup.sh /usr/local/bin/
-
 RUN apk add --no-cache openjdk21 \
     && addgroup -g $UID $USER \
-    && adduser -G $USER -u $UID --disabled-password --gecos "" $USER \
-    && chmod +x /usr/local/bin/startup.sh
+    && adduser -G $USER -u $UID --disabled-password --gecos "" $USER
 
 COPY --from=builder --chown=tomcat:tomcat /opt/tomcat /opt/tomcat
 EXPOSE 8080
 USER $USER
-ENTRYPOINT [ "/usr/local/bin/startup.sh" ]
+ENTRYPOINT ["/opt/tomcat/bin/catalina.sh","run" ]
