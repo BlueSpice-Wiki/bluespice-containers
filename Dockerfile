@@ -28,12 +28,9 @@ ENV USER=tomcat
 ARG UID=1000
 ENV UID=$UID
 
-COPY ./root-fs/usr/local/bin/startup.sh /usr/local/bin/
-
 RUN apk add --no-cache openjdk21 \
     && addgroup -g $UID $USER \
-    && adduser -G $USER -u $UID --disabled-password --gecos "" $USER \
-    && chmod +x /usr/local/bin/startup.sh
+    && adduser -G $USER -u $UID --disabled-password --gecos "" $USER
 
 COPY --from=builder --chown=tomcat:tomcat /opt/tomcat /opt/tomcat
 EXPOSE 8080
