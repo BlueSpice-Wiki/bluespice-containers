@@ -243,7 +243,7 @@ class WikiBackup extends Command {
 			foreach ( $activeInstances as $instanceName ) {
 				$this->instanceName = $instanceName;
 				$this->mediawikiRoot = "$instancesDir/$instanceName";
-				if ( $this->setupSingleFarmInstance( $this->farmSettingsReader, $instanceName ) ) {
+				if ( $this->setupSingleFarmInstance( $instanceName ) ) {
 					try {
 						$this->doBackup();
 					} catch ( Exception $ex ) {
