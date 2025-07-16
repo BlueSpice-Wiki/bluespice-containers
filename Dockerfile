@@ -7,10 +7,10 @@ ARG SHA512SUM_2=baccaf655966144ae1d62607cda5e0098c9b200da37ac7deec2aa449543d08b4
 
 RUN apk add --no-cache wget tar \
     && wget https://archive.apache.org/dist/tomcat/tomcat-10/v10.1.43/bin/apache-tomcat-10.1.43.tar.gz \
-    && echo "$SHA512SUM_1  apache-tomcat-10.1.41.tar.gz" | sha512sum -c - \
+    && echo "$SHA512SUM_1  apache-tomcat-10.1.43.tar.gz" | sha512sum -c - \
     && mkdir -p /opt/tomcat \
-    && tar xzf apache-tomcat-10.1.41.tar.gz -C /opt/tomcat --strip-components 1 \
-    && rm apache-tomcat-10.1.41.tar.gz
+    && tar xzf apache-tomcat-10.1.43.tar.gz -C /opt/tomcat --strip-components 1 \
+    && rm apache-tomcat-10.1.43.tar.gz
 
 RUN wget https://github.com/jgraph/drawio/releases/download/v28.0.4/draw.war \
     && echo "$SHA512SUM_2  draw.war" | sha512sum -c - \
