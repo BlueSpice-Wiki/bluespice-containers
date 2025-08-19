@@ -6,7 +6,6 @@ wfLoadExtensions( [
 	'LDAPAuthentication2',
 	'LDAPAuthorization',
 	'LDAPGroups',
-	'LDAPProvider',
 	'LDAPUserInfo',
 	'PluggableAuth'
 ] );
