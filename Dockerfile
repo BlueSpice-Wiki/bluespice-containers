@@ -5,7 +5,7 @@ ENV LC_ALL=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
         && apt-get update  \
-        && apt-get -y install --no-install-recommends gnupg2 curl  \
+        && apt-get -y install --no-install-recommends gnupg2  \
         && touch /etc/apt/sources.list.d/trixie.list && printf "deb http://deb.debian.org/debian trixie main" > /etc/apt/sources.list.d/trixie.list \
         && apt-get update \
         && apt-get --only-upgrade install zlib1g
@@ -19,7 +19,8 @@ RUN apt update \
 	apache2-utils=2.4.62-1~deb12u2 \
 	apache2=2.4.62-1~deb12u2 \
 	libapache2-mod-proxy-uwsgi=2.4.62-1~deb12u2 \
-	libapache2-mod-auth-gssapi
+	libapache2-mod-auth-gssapi \
+	liblzma5 
 RUN a2enmod proxy proxy_http proxy_balancer lbmethod_byrequests headers
 COPY root-fs/etc/apache2/sites-available/kerberos-proxy.conf /etc/apache2/sites-available/000-default.conf
 COPY root-fs/app /app
