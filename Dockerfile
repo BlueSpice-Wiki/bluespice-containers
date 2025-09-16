@@ -8,7 +8,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
         && apt-get -y install --no-install-recommends gnupg2  \
         && touch /etc/apt/sources.list.d/trixie.list && printf "deb http://deb.debian.org/debian trixie main" > /etc/apt/sources.list.d/trixie.list \
         && apt-get update \
-        && apt-get --only-upgrade install zlib1g
+        && apt-get --only-upgrade install zlib1g \
+	&& apt-get install -y curl
 FROM  base AS finish
 RUN apt update \
 	&& apt-get install -y krb5-config \
@@ -20,7 +21,8 @@ RUN apt update \
 	apache2=2.4.62-1~deb12u2 \
 	libapache2-mod-proxy-uwsgi=2.4.62-1~deb12u2 \
 	libapache2-mod-auth-gssapi \
-	liblzma5 
+	liblzma5 \ 
+	&& apt-get upgrade -y
 RUN a2enmod proxy proxy_http proxy_balancer lbmethod_byrequests headers
 COPY root-fs/etc/apache2/sites-available/kerberos-proxy.conf /etc/apache2/sites-available/000-default.conf
 COPY root-fs/app /app
