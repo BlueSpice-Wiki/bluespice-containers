@@ -1,0 +1,53 @@
+name: bluespice
+
+x-common-environment: &common-environment
+  VERSION: ${VERSION}
+  EDITION: ${EDITION}
+  TZ: ${TZ:-UTC}
+
+  WIKI_NAME: ${WIKI_NAME}
+  WIKI_LANG: ${WIKI_LANG}
+  WIKI_PASSWORDSENDER: ${WIKI_PASSWORDSENDER}
+  WIKI_EMERGENCYCONTACT: ${WIKI_EMERGENCYCONTACT}
+  WIKI_HOST: ${WIKI_HOST}
+  WIKI_PORT: ${WIKI_PORT}
+  WIKI_PROTOCOL: ${WIKI_PROTOCOL}
+  WIKI_BASE_PATH: ${WIKI_BASE_PATH:-/}
+
+
+  DB_USER: ${DB_USER}
+  DB_PASS: ${DB_PASS}
+  DB_ROOT_USER: ${DB_ROOT_USER}
+  DB_ROOT_PASS: ${DB_ROOT_PASS}
+  DB_HOST: ${DB_HOST}
+  DB_NAME: ${DB_NAME}
+  DB_PREFIX: ${DB_PREFIX}
+
+  SMTP_HOST: ${SMTP_HOST}
+  SMTP_PORT: ${SMTP_PORT}
+  SMTP_USER: ${SMTP_USER}
+  SMTP_PASS: ${SMTP_PASS}
+  SMTP_ID_HOST: ${SMTP_ID_HOST}
+
+services:
+  wiki-web:
+    image: ${BLUESPICE_WIKI_IMAGE}
+    container_name: bluespice-wiki-web
+    restart: unless-stopped
+    environment:
+      <<: *common-environment
+    command: start-web
+
+    volumes:
+      - ${DATADIR}/wiki:/data
+
+  wiki-task:
+    image: ${BLUESPICE_WIKI_IMAGE}
+    container_name: bluespice-wiki-task
+    restart: unless-stopped
+    command: ["start-task --runAll"]
+    environment:
+      <<: *common-environment
+      BACKUP_HOUR: ${BACKUP_HOUR}
+    volumes:
+      - ${DATADIR}/wiki:/data
