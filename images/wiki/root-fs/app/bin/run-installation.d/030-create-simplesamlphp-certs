@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Create the SimpleSAMLphp certificates
+if [ ! -f /data/simplesamlphp/certs/saml.crt ] || [ ! -f /data/simplesamlphp/certs/saml.pem ]; then
+	echo "#############################################"
+	echo "📜 Creating SimpleSAMLphp certificates"
+	openssl req -newkey rsa:3072 -new -x509 -days 3652 -nodes \
+		-out /data/simplesamlphp/certs/saml.crt \
+		-keyout /data/simplesamlphp/certs/saml.pem \
+		-subj "/CN=$WIKI_HOST"
+fi

@@ -1,0 +1,22 @@
+{
+    "db-options": {
+        "connection": {
+			"dbserver": "###DB_HOST###",
+			"dbuser": "###DB_USER###",
+			"dbpassword": "###DB_PASS###",
+            "dbname": "###DB_NAME###"
+		},
+        "skip-tables": [
+            "object_cache",
+            "l10n_cache",
+            "job"
+        ]
+    },
+    "fs-options": {
+        "skip-image-paths": [
+            "cache",
+            "temp",
+            "thumb"
+        ]
+    }
+}

@@ -1,0 +1,17 @@
+environment:
+    php: "/usr/bin/php"
+wiki:
+    type: "###EDITION###"
+    path: "/app/bluespice/w"
+database:
+    dbserver: "###DB_HOST###"
+    dbport: 3306
+    dbname: "###DB_NAME###"
+    dbuser: "###DB_USER###"
+    dbpassword: "###DB_PASS###"
+    dbprefix: "###DB_PREFIX###"
+runjobs:
+    cooldown: 5
+farm:
+    include-instances: []
+    exclude-instances: []

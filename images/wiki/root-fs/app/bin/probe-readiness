@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Must be run like this, where <type> can be "web" or "task"
+# docker exec -it <container_name> probe-readiness <type>
+
+type=$1
+
+if [[ $type == "web" ]]; then
+	# Check if the web server is running
+	if curl -s --head http://localhost:9090/ | grep "200 OK" > /dev/null; then
+		exit 0
+	else
+		exit 1
+	fi
+fi
+if [[ $type == "task" ]]; then
+	if grep -q "ready" /tmp/state; then
+		exit 0
+	else
+		exit 1
+	fi
+fi

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#We can not use `set -o errexit` here, as we need to check for a potentially failing command
+set -o nounset
+set -o pipefail
+
+parallel_runjobs_pid=0
+while true; do
+	# Check if the process is not running
+	ps -p $parallel_runjobs_pid > /dev/null 2>&1
+	if [[ $? -ne 0 ]]; then
+		/app/bin/parallel-runjobs-service \
+		--config /app/bin/config/runJobs_conf.yaml \
+		&
+		parallel_runjobs_pid=$!
+	fi
+	sleep 60
+done

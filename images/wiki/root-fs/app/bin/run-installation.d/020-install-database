@@ -1,0 +1,44 @@
+#!/bin/bash
+
+installdbuser=${DB_USER}
+installdbpass=${DB_PASS}
+lang=${WIKI_LANG:-en}
+
+echo "Installing database with values:"
+echo "dbserver: $DB_HOST"
+echo "dbname: $DB_NAME"
+echo "dbuser: $DB_USER"
+echo "dbpass: ${DB_PASS:0:1}********${DB_PASS: -1}"
+echo "installdbuser: $installdbuser"
+echo "installdbpass: ${installdbpass:0:1}********${installdbpass: -1}"
+echo "lang: $lang"
+echo "admin user: $adminUserName"
+echo "pass: ${adminPass:0:1}********${adminPass: -1}"
+echo "wiki name: $WIKI_NAME"
+echo ""
+
+# If there is for whatever reason a LocalSettings.php file in the appDir, we need to remove it
+# before we run the installation script. This is because the installation script will
+# not run if there is a LocalSettings.php file present.
+if [ -f $appDir/LocalSettings.php ]; then
+	mv $appDir/LocalSettings.php $appDir/LocalSettings.$timestamp.php
+fi
+
+php $appDir/maintenance/install.php \
+	--dbserver=$DB_HOST \
+	--dbname=$DB_NAME \
+	--installdbuser=$installdbuser \
+	--installdbpass=$installdbpass \
+	--dbuser=$DB_USER \
+	--dbpass=$DB_PASS \
+	--pass=$adminPass \
+	--lang=$lang \
+	--scriptpath=/w \
+	"$WIKI_NAME" \
+	"$adminUserName" \
+	| tee -a /data/bluespice/logs/install-$timestamp.log
+
+# We don't need the default LocalSettings.php file, as we have one hardwired in this container
+if [ -f $appDir/LocalSettings.php ]; then
+	rm $appDir/LocalSettings.php
+fi

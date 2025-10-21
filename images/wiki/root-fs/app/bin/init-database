@@ -1,0 +1,51 @@
+#!/bin/php
+<?php
+
+$dbHost = getenv('DB_HOST');
+$dbUser = getenv('DB_USER');
+$dbName = getenv('DB_NAME');
+$dbNamePrefix = getenv('WIKI_FARM_DB_PREFIX') ?: 'sfr_';
+// Attention: In contrast to the `install-database` script, we must not fall
+// back to `DB_USER`/`DB_PASS` here, as these operations require real root privileges.
+$dbRootUser = getenv('DB_ROOT_USER');
+$dbRootPass = getenv('DB_ROOT_PASS');
+
+if ( !$dbRootUser || !$dbRootPass ) {
+	// If no root user is set, we can't create a database or set permissions
+	exit( 0 );
+}
+
+echo "#############################################\n";
+echo "Initializing database '$dbName' on $dbHost ... \n";
+
+try {
+	$pdo = new PDO(
+		"mysql:host=$dbHost",
+		$dbRootUser,
+		$dbRootPass
+	);
+	$pdo->setAttribute(
+		PDO::ATTR_ERRMODE,
+		PDO::ERRMODE_EXCEPTION
+	);
+
+	# Create the database
+	$pdo->exec( "CREATE DATABASE IF NOT EXISTS `$dbName`" );
+
+	# Grant all privileges all databases with given prefix
+	$pdo->exec( "GRANT ALL PRIVILEGES ON `$dbName`.* TO `$dbUser`@`%`" );
+	if ( !getenv( 'WIKI_FARM_USE_SHARED_DB' ) ) {
+		$pdo->exec( "GRANT ALL PRIVILEGES ON `$dbNamePrefix%`.* TO `$dbUser`@`%`" );
+	}
+	$pdo->exec( "FLUSH PRIVILEGES" );
+
+	echo "OK\n";
+	exit( 0 );
+} catch ( PDOException $e ) {
+	$message = $e->getMessage();
+	echo "FAILED\n$message\n";
+	echo "User: $dbRootUser\n";
+	echo "Pass: " . substr( $dbRootPass, 0, 1 ) . "..." . substr( $dbRootPass, -1 ) . "\n";
+	echo "Host: $dbHost\n";
+	exit( 2 );
+}

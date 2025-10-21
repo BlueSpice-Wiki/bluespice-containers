@@ -1,0 +1,57 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+echo ""
+echo "#############################################"
+echo "Init data directory"
+
+directories=(
+  /data/bluespice/cache
+  /data/bluespice/extensions/BlueSpiceFoundation/data
+  /data/bluespice/images
+  /data/bluespice/logs/postupdate
+  /data/bluespice/logs/preupdate
+  /data/bluespice/logs
+  /data/simplesamlphp/cache
+  /data/simplesamlphp/certs
+  /data/simplesamlphp/data
+  /data/simplesamlphp/logs
+)
+
+if [ "${EDITION}" == "farm" ]; then
+	directories=(
+  /data/bluespice/cache
+  /data/bluespice/extensions/BlueSpiceFoundation/data
+  /data/bluespice/images
+  /data/bluespice/farm-instances
+  /data/bluespice/farm-archive
+  /data/bluespice/logs/postupdate
+  /data/bluespice/logs/preupdate
+  /data/bluespice/logs
+  /data/simplesamlphp/cache
+  /data/simplesamlphp/certs
+  /data/simplesamlphp/data
+  /data/simplesamlphp/logs
+  )
+fi
+
+for directory in "${directories[@]}"; do
+  if [ ! -d "$directory" ]; then
+    mkdir -p "$directory"
+  fi
+done
+
+declare -A files
+files[/data/bluespice/pre-init-settings.php]="<?php"
+files[/data/bluespice/post-init-settings.php]="<?php"
+files[/data/bluespice/logs/postupdate/README.md]="Do not delete files from this directory!"
+files[/data/bluespice/logs/preupdate/README.md]="Do not delete files from this directory!"
+
+for file in "${!files[@]}"; do
+  if [ ! -f "$file" ]; then
+    echo -e "${files[$file]}" > "$file"
+  fi
+done
+echo "Done"

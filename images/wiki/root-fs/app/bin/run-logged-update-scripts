@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+type=$1
+scriptDir=/app/bin/$type.d
+logDir=/data/bluespice/logs/$type
+timestamp=$(date +%Y%m%d%H%M%S)
+
+echo "Running $type scripts"
+
+for f in "$scriptDir"/*; do
+	set -o errexit
+	scriptName=$(basename $f)
+	logFile=/data/bluespice/logs/$type/$scriptName.log
+	errorLogFile=/data/bluespice/logs/$type/$scriptName.$timestamp.error.log
+        if [ ! -f "$f" ]; then
+                continue
+        fi
+	if [ -f "$logFile" ]; then
+		continue
+	fi
+
+	echo ""
+	echo "$f"
+	set +o errexit
+	"$f" | tee -a $logFile
+	if [ $? -ne 0 ]; then
+	       echo "Error running $f"
+	       mv $logFile $errorLogFile
+	       exit 1
+	fi
+done

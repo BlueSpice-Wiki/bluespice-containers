@@ -1,0 +1,46 @@
+#!/bin/php
+<?php
+# Call me like ./substitutePlaceholders /app/bluespice/w/LocalSettings.php
+
+$file = $argv[1];
+
+echo "\n";
+echo "#############################################\n";
+echo "Substitute placeholders in '$file'\n";
+
+if (!file_exists($file)) {
+	echo "File $file does not exist\n";
+	exit( 1 );
+}
+
+$contents = file_get_contents( $file );
+$pattern = '/###([A-Z_]+)(\|[^#]+)?###/';
+$printedVars= [];
+
+$modifiedContents = preg_replace_callback(
+	$pattern,
+	function( $matches ) use (&$printedVars) {
+		$envVarName = $matches[1];
+		$defaultValue = $matches[2] ?? '';
+		$defaultValue = substr( $defaultValue, 1 );
+		$envVarValue = getenv( $envVarName );
+
+		if ( $envVarValue === false ) {
+			$envVarValue = $defaultValue;
+		}
+
+		if ( !in_array($envVarName, $printedVars) ) {
+			$outputValue = $envVarValue;
+			if ( strpos( $envVarName, 'PASS' ) !== false ) {
+				$outputValue = str_repeat( '*', strlen( $envVarValue ) );
+			}
+			echo "###$envVarName### -> $outputValue\n";
+			$printedVars[] = $envVarName;
+		}
+
+		return $envVarValue;
+	},
+	$contents
+);
+
+file_put_contents( $file, $modifiedContents );

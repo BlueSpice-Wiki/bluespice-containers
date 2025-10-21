@@ -1,0 +1,103 @@
+#Raise ServerLimits ERM#44157
+	fastcgi_read_timeout 600;
+    proxy_read_timeout 600;
+
+server {
+	server_name _;
+	listen 9090 default_server;
+	root /app/bluespice;
+	client_max_body_size 1024m;
+	access_log /proc/1/fd/1;
+	error_log /proc/1/fd/2 ###WIKI_LOG_LEVEL###;
+	server_tokens off;
+	
+	rewrite ^###WIKI_BASE_PATH|/###_sp/(.*)$ ###WIKI_BASE_PATH|/###_sp/$1 last;
+	rewrite ^###WIKI_BASE_PATH|/###webdav/(.*)$ ###WIKI_BASE_PATH|/###w/webdav.php/$1?$args last;
+	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/webdav/(.*)$ ###WIKI_BASE_PATH|/###w/webdav.php/$2?sfr=$1&$args last;
+	rewrite ^###WIKI_BASE_PATH|/###wiki/(.*?).php/(.+)$ ###WIKI_BASE_PATH|/###w/$1.php?sfr=w&title=$2 last;
+	rewrite ^###WIKI_BASE_PATH|/###wiki/(.+)$ ###WIKI_BASE_PATH|/###w/index.php?title=$1&sfr=w last;
+	rewrite ^###WIKI_BASE_PATH|/###wiki/([^/]+)/?$ ###WIKI_BASE_PATH|/###w/index.php?title=$1&sfr=w last;
+	rewrite ^###WIKI_BASE_PATH|/###w/(.*?)$ ###WIKI_BASE_PATH|/###w/$1?sfr=w last;
+	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/index.php/(.+)$ ###WIKI_BASE_PATH|/###w/$2.php?sfr=$1&title=$3 last;
+	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/(.*?).php/(.+)$ ###WIKI_BASE_PATH|/###w/$2.php/$3?sfr=$1 last;
+	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/(.*?).php ###WIKI_BASE_PATH|/###w/$2.php?sfr=$1 last;
+	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/wiki/(.+)$ ###WIKI_BASE_PATH|/###w/index.php?title=$2&sfr=$1 last;
+	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/(.+)$ ###WIKI_BASE_PATH|/###w/$2 last;
+	rewrite ^###WIKI_BASE_PATH|/###([^/]+)/?$ ###WIKI_BASE_PATH|/###w/index.php?sfr=$1 last;
+
+	if (-f /data/maintenance) {
+		return 503;
+	}
+
+	error_page 503 /maintenance.html;
+	location = /maintenance.html {
+		root /var/www/html;
+		internal;
+		add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+		add_header Pragma "no-cache";
+		add_header Expires "0";
+	}
+
+	error_page 500 502 504 505 /error.html;
+	location = /var/www/html {
+		root /var/www/error_pages;
+		internal;
+		add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+		add_header Pragma "no-cache";
+		add_header Expires "0";
+	}
+
+	location /w {
+		deny all;
+	}
+
+	location ~ ^###WIKI_BASE_PATH|/###w/(api|dynamic_file|index|load|opensearch_desc|thumb_handler|thumb)\.php$ {
+		include fastcgi.conf;
+		fastcgi_split_path_info ^(.+?\.php)(/.+)$;
+		fastcgi_param PATH_INFO $fastcgi_path_info;
+		fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+		fastcgi_pass unix:/var/run/php/php-fpm.sock;
+	}
+
+	location ~ ^(.*?)/(img_auth|nsfr_img_auth|rest|webdav)\.php(/.*?)$ {
+		include fastcgi.conf;
+		fastcgi_split_path_info ^(.+?\.php)(/.+)$;
+		fastcgi_param PATH_INFO $fastcgi_path_info;
+		fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+		fastcgi_pass unix:/var/run/php/php-fpm.sock;
+	}
+
+	location ~ ###WIKI_BASE_PATH|/###w/BUILDINFO {
+		allow all;
+	}
+
+	location ~ ^###WIKI_BASE_PATH|/###w/skins/BlueSpiceDiscovery/resources/images/favicon\.ico$ {
+		allow all;
+	}
+
+	location ^~ ###WIKI_BASE_PATH|/###_sp {
+			alias /app/simplesamlphp/public;
+				location ~^(?<prefix>/_sp)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
+					include fastcgi_params;
+					fastcgi_pass unix:/var/run/php/php-fpm.sock;
+					fastcgi_param SCRIPT_FILENAME $document_root$phpfile;
+					fastcgi_param SCRIPT_NAME /_sp/$phpfile;
+					fastcgi_param PATH_INFO $pathinfo if_not_empty;
+				}
+			break;
+		}
+
+	location ~ ^###WIKI_BASE_PATH|/###w/resources/(assets|lib|src) {
+		add_header Cache-Control "public";
+		expires 7d;
+	}
+
+	location ~ ^###WIKI_BASE_PATH|/###w/(skins|extensions)/.+\.(css|js|gif|jpg|jpeg|png|svg|woff|woff2|ttf)$ {
+		add_header Cache-Control "public";
+		expires 7d;
+	}
+
+	location = / {
+		return 301 ###WIKI_BASE_PATH|/###wiki;
+	}
+}

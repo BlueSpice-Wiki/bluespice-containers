@@ -1,0 +1,43 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+echo ""
+echo "#############################################"
+echo "Rebuilding search index"
+
+if [[ ( "$1" == "--help" ) || ( "$1" == "-h" ) ]]; then
+	echo "use without Argument for rebuilding main BS"
+	echo "use with --all/-a for all Subinstances"
+	echo "use with --sfr aa bb cc  to rebuild Instances aa , bb ,cc"
+	echo "no check for false arguments"
+fi
+
+
+if [[ ($1 == "--main" ) || ( $1 == "--all" ) || ( $1 == "-a" ) ]]; then
+	run-maintenance BlueSpiceExtendedSearch:purgeIndexes --quick
+	run-maintenance BlueSpiceExtendedSearch:initBackends --quick
+	run-maintenance BlueSpiceExtendedSearch:rebuildIndex --quick
+fi
+
+if [[ ( $1 == "--all" ) || ( $1 == "-a" ) ]]; then
+	run-maintenance BlueSpiceWikiFarm:RunForAll --script=extensions/BlueSpiceExtendedSearch/maintenance/purgeIndexes.php --args='--quick'
+	run-maintenance BlueSpiceWikiFarm:RunForAll --script=extensions/BlueSpiceExtendedSearch/maintenance/initBackends.php --args='--quick'
+	run-maintenance BlueSpiceWikiFarm:RunForAll --script=extensions/BlueSpiceExtendedSearch/maintenance/rebuildIndex.php --args='--quick'
+fi
+
+if [[ $1 == "--sfr" ]];	then
+	shift 1
+	i=1;
+	j=$#;
+	while [ $i -le $j ]
+	do
+		run-maintenance BlueSpiceExtendedSearch:purgeIndexes --quick --sfr=$1
+		run-maintenance BlueSpiceExtendedSearch:initBackends --quick --sfr=$1
+		run-maintenance BlueSpiceExtendedSearch:rebuildIndex --quick --sfr=$1
+		i=$((i + 1));
+		shift 1;
+	done
+fi

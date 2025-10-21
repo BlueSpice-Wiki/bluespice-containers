@@ -1,0 +1,66 @@
+#!/bin/bash 
+
+# Call me like ./runBackup /data/bluespice /data/backup/ /data/bluespice/farm-instances
+set -o errexit
+set -o nounset
+set -o pipefail
+
+
+mediaWikiRoot=/data/bluespice
+backupDest=/data/backup
+instancesRoot=/data/bluespice/farm-instances
+hour=$(date +"%H")
+minute=$(date +"%M")
+
+if [ $hour != ${BACKUP_HOUR:-1} ]; then
+	exit 1
+fi
+backupDest=/data/backup
+	if [ ! -d "$backupDest" ]; then
+		mkdir -p $backupDest
+	fi
+
+if [ $minute == 01 ]; then
+	##mediawiki-adm is not able to get Systemvariables from /app/conf/LocalSettings.php
+	TempSettingsFile=/tmp/LocalSettings.local.php 
+	echo "<?php" > $TempSettingsFile
+	echo "\$wgSitename = \"${WIKI_NAME}\";" | tee  -a  $TempSettingsFile
+	substitutePlaceholders /app/bin/config/mediawiki_adm_backup_conf.json
+	mediawiki-adm \
+			wiki-backup \
+			--mediawiki-root $mediaWikiRoot \
+			--dest $backupDest \
+			--max-backup-files 4 \
+			--profile /app/bin/config/mediawiki_adm_backup_conf.json
+
+	if [ ! -d "$instancesRoot" ]; then
+		exit 1
+	fi
+
+	BSDIRLIST="/tmp/bs_dirlist.dat"
+	/usr/bin/find $instancesRoot -maxdepth 1 -type d -printf "%f\n"  > $BSDIRLIST
+
+	while IFS= read -r subdir 
+	do 
+		local_settings_file="${instancesRoot}/${subdir}/LocalSettings.php"
+		suspended_file="${instancesRoot}/${subdir}/SUSPENDED"
+
+		if [ ! -f "$local_settings_file" ]; then
+			continue
+		fi
+
+		if [ -f "$suspended_file" ]; then
+			continue
+		fi
+	
+		mediawiki-adm \
+			wiki-backup \
+			--mediawiki-root ${instancesRoot}/${subdir} \
+			--dest ${backupDest}/${subdir} \
+			--max-backup-files 4 \
+			--profile /app/bin/config/mediawiki_adm_backup_conf.json
+
+	done < "$BSDIRLIST" &
+	rm -fr $BSDIRLIST
+	rm -fr $TempSettingsFile
+fi

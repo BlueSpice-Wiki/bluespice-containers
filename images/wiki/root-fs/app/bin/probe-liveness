@@ -1,0 +1,13 @@
+#!/bin/bash
+
+while IFS= read -r line; do
+	if [[ -z "$line" ]]; then
+		continue
+	fi
+	if pgrep -f "$line" > /dev/null; then
+		echo "$line is running"
+	else
+		echo "$line is not running"
+		exit 1
+	fi
+done < /tmp/healthcheck

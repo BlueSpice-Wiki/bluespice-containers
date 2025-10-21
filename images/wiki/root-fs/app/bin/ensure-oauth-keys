@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Create public and private keys for OAuth2
+if [ ! -f /data/bluespice/oauth_public.key ] || [ ! -f /data/bluespice/oauth_private.key ]; then
+	echo "#############################################"
+	echo "🔑 Creating OAuth2 keys"
+	openssl genrsa \
+		-out /data/bluespice/oauth_private.key 2048
+	openssl rsa \
+		-in /data/bluespice/oauth_private.key \
+		-pubout \
+		-out /data/bluespice/oauth_public.key
+fi

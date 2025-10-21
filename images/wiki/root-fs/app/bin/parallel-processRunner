@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+appDir=/app/bluespice/w
+processRunnerScript=$appDir/vendor/mwstake/mediawiki-component-processmanager/maintenance/processRunner.php
+
+while true; do
+	php \
+	$processRunnerScript \
+	$appDir/maintenance/Maintenance.php \
+	--max-processes=100 \
+	--wait \
+	&
+	sleep 60
+done

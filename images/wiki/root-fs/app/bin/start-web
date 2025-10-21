@@ -1,0 +1,41 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+WIKI_LOG_LEVEL="${WIKI_LOG_LEVEL:-error}"
+export WIKI_LOG_LEVEL
+
+case "${WIKI_LOG_LEVEL}" in
+  debug)
+    export WIKI_ERROR_REPORTING="E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED"
+    ;;
+  warn)
+    export WIKI_ERROR_REPORTING="E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_PARSE & ~E_DEPRECATED & ~E_USER_DEPRECATED"
+    ;;
+  error)
+    export WIKI_ERROR_REPORTING="E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR"
+    ;;
+  *)
+    export WIKI_ERROR_REPORTING="E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR"
+    export WIKI_LOG_LEVEL="error"
+    ;;
+esac
+
+substitutePlaceholders /app/conf/90-bluespice-overrides.ini
+substitutePlaceholders /app/conf/nginx_bluespice
+
+if [[ "${WIKI_BASE_PATH:-/}" != "/" ]]; then
+	mkdir -p /app/bluespice${WIKI_BASE_PATH}
+	ln -sf /app/bluespice/w /app/bluespice${WIKI_BASE_PATH}w
+fi
+
+echo ""
+echo "#############################################"
+echo "🌐 Starting WebFrontend"
+
+echo "" > /tmp/healthcheck
+echo "php-fpm" >> /tmp/healthcheck # Process name is `php-fpm`, not `php-fpm8.4`
+echo "nginx" >> /tmp/healthcheck
+
+php-fpm -D && nginx -g "daemon off;"

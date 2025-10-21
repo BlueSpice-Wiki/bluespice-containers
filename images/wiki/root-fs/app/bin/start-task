@@ -1,0 +1,77 @@
+#!/bin/bash
+
+check-database
+if [ $? -ne 0 ]; then
+	date > /data/maintenance
+	run-installation
+	if [ $? -ne 0 ]; then
+		echo "Installation failed"
+		exit 1
+	fi
+	rm /data/maintenance
+fi
+
+##add Variables to Scripts
+substitutePlaceholders /app/bin/config/mediawiki_adm_backup_conf.json
+substitutePlaceholders /app/bin/config/runJobs_conf.yaml
+
+WIKI_LOG_LEVEL="${WIKI_LOG_LEVEL:-error}"
+
+case "${WIKI_LOG_LEVEL}" in
+  debug)
+    export WIKI_ERROR_REPORTING="E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED"
+    ;;
+  warn)
+    export WIKI_ERROR_REPORTING="E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_PARSE & ~E_DEPRECATED & ~E_USER_DEPRECATED"
+    ;;
+  error)
+    export WIKI_ERROR_REPORTING="E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR"
+    ;;
+  *)
+    export WIKI_ERROR_REPORTING="E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR"
+    export WIKI_LOG_LEVEL="error"
+    ;;
+esac
+
+substitutePlaceholders /app/conf/90-bluespice-overrides.ini
+
+echo ""
+echo "#############################################"
+
+if [[ ($1 == "--runAll") ]]; then
+	echo "🏇 Starting TaskRunner"
+fi
+
+echo "" > /tmp/healthcheck
+if [[ ($1 == "--runJobs" ) || ( "$1" == "--runAll" ) ]]; then
+	echo "Starting update"
+	date > /data/maintenance
+	run-updates
+	rm /data/maintenance
+
+	echo "Starting runJobs"
+	echo "parallel-runJobsService" >> /tmp/healthcheck
+	/app/bin/parallel-runJobsService > /proc/1/fd/1 2>&1 &
+fi
+if [[ ( $1 == "--runProcessRunner" ) || ( "$1" == "--runAll" ) ]]; then
+	echo "Starting ProcessRunner"
+	echo "parallel-processRunner" >> /tmp/healthcheck
+	/app/bin/parallel-processRunner > /proc/1/fd/1 2>&1 &
+fi
+
+if [[ ( $1 == "--runBackup" ) || ( "$1" == "--runAll" ) ]] && [[ ( ${BACKUP_HOUR:-1} != -1 ) ]]; then
+	echo "Starting Backup-Agent"
+	echo "Backup daily at" ${BACKUP_HOUR:-1}
+	echo "backup-loop" >> /tmp/healthcheck
+	/app/bin/backup-loop > /proc/1/fd/1 2>&1  &
+fi
+if [[ ( $1 == "--runSnapshotStatistics" ) || ( "$1" == "--runAll" ) ]]; then
+	echo "Starting SnapshotStatistics cronjobs"
+	echo "supercronic" >> /tmp/healthcheck
+	/usr/bin/supercronic /app/cron/snapshot-statistics > /proc/1/fd/1 2>&1  &
+fi
+
+echo "ready" > /tmp/state
+
+sleep inf
+

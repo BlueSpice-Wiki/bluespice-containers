@@ -1,0 +1,38 @@
+#!/bin/bash
+
+cat <<EOF
+  ____  _            ____        _
+ | __ )| |_   _  ___/ ___| _ __ (_) ___ ___
+ |  _ \| | | | |/ _ \___ \| '_ \| |/ __/ _ \\
+ | |_) | | |_| |  __/___) | |_) | | (_|  __/
+ |____/|_|\__,_|\___|____/| .__/|_|\___\___|
+                          |_|
+EOF
+blueSpiceVersion=$(cat /app/bluespice/w/BLUESPICE-VERSION)
+blueSpiceEdition=$(cat /app/bluespice/w/BLUESPICE-EDITION)
+blueSpiceBuildInfo=$(cat /app/bluespice/w/BUILDINFO)
+echo "🚀 BlueSpice $blueSpiceEdition $blueSpiceVersion+$blueSpiceBuildInfo"
+echo "---------------------------------------------"
+echo ""
+
+if [ -z "$WIKI_PROXY" ]; then
+  export WIKI_PROXY=$(getent hosts proxy | awk '{ print $1 ; exit }')
+fi
+
+export PATH=$PATH:/app/bin
+substitutePlaceholders /app/bin/config/clamd.conf
+
+init-datadirectory
+
+if [ -f /data/.wikienv ]; then
+  set -a
+  source /data/.wikienv
+  set +a
+fi
+if [ -f /app/.env ]; then
+  set -a
+  source /app/.env
+  set +a
+fi
+
+exec sh -c "$@"

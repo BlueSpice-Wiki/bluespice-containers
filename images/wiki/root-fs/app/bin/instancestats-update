@@ -1,0 +1,8 @@
+#!/bin/bash
+
+run-maintenance BlueSpiceUsageTracker:usageTrackerUpdate
+# Conditionally run for farm setups
+if [ "${EDITION}" == "farm" ]; then
+	run-maintenance BlueSpiceWikiFarm:RunForAll \
+		--script='extensions/BlueSpiceUsageTracker/maintenance/usageTrackerUpdate.php'
+fi

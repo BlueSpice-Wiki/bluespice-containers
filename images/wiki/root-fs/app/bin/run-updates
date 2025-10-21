@@ -1,0 +1,47 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+timestamp=$(date +%Y%m%d%H%M%S)
+appDir=/app/bluespice/w
+
+baseVersion=""
+if [ -f /data/bluespice/logs/baseversion ]; then
+	baseVersion=$(cat /data/bluespice/logs/baseversion)
+fi
+version=$(cat $appDir/BLUESPICE-VERSION)
+
+if [ "$baseVersion" == "$version" ]; then
+	echo "No version change, skipping updates"
+	exit 0
+fi
+
+echo "Running updates"
+echo "Version: $version"
+
+run-logged-update-scripts preupdate
+
+for f in /app/bin/run-updates.d/*; do
+	if [ -f "$f" ]; then
+		echo ""
+		echo "🔧 Running $f"
+		$f
+	fi
+done
+
+run-maintenance update \
+	--quick \
+	--doshared \
+	| tee -a /data/bluespice/logs/update-$timestamp.log
+
+echo $version > /data/bluespice/logs/baseversion
+
+if [ "${EDITION}" == "farm" ]; then
+	run-maintenance BlueSpiceWikiFarm:RunForAll \
+		--script='maintenance/update.php' \
+		--args='--quick --doshared' \
+		| tee -a /data/bluespice/logs/update-$timestamp.log
+fi
+
+run-logged-update-scripts postupdate

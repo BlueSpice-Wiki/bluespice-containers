@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$1" == "--randomize" ]; then
+	shift
+	sleep $((RANDOM % 600))
+fi
+
+run-maintenance BlueSpiceExtendedStatistics:generateSnapshot "$@"

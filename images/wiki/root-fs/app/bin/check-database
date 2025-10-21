@@ -1,0 +1,40 @@
+#!/bin/php
+<?php
+
+$dbHost = getenv('DB_HOST');
+$dbUser = getenv('DB_USER');
+$dbPass = getenv('DB_PASS');
+$dbName = getenv('DB_NAME');
+
+echo "\n";
+echo "#############################################\n";
+echo "Checking for database '$dbName' on $dbHost ... \n";
+
+try {
+	$pdo = new PDO(
+		"mysql:host=$dbHost;dbname=$dbName",
+		$dbUser,
+		$dbPass
+	);
+	$pdo->setAttribute(
+		PDO::ATTR_ERRMODE,
+		PDO::ERRMODE_EXCEPTION
+	);
+
+	# Check if the database is empty
+	$tables = $pdo->query( "SHOW TABLES" );
+	if ( $tables->rowCount() == 0 ) {
+		echo "FAILED\nDatabase is empty\n";
+		exit( 1 );
+	}
+	echo "OK\n";
+	exit( 0 );
+} catch ( PDOException $e ) {
+	$message = $e->getMessage();
+	echo "FAILED\n$message\n";
+	echo "User: $dbUser\n";
+	echo "Pass: " . substr( $dbPass, 0, 1 ) . "..." . substr( $dbPass, -1 ) . "\n";
+	echo "Host: $dbHost\n";
+	echo "Name: $dbName\n";
+	exit( 2 );
+}
