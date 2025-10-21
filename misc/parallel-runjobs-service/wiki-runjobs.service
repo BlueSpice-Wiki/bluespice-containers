@@ -1,0 +1,14 @@
+[Unit]
+Description=Mediawiki RunJobs Service
+After=network.target
+
+[Service]
+ExecStart=/etc/init.d/wiki-runjobs start
+ExecReload=/etc/init.d/wiki-runjobs restart
+ExecStop=/etc/init.d/wiki-runjobs stop
+Restart=on-failure
+User=root
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

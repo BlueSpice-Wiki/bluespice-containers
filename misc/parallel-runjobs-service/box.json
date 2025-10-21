@@ -1,0 +1,15 @@
+{
+	"directories": [
+		"src"
+	],
+	"finder": [
+		{
+			"name": "*.php",
+			"exclude": ["tests"],
+			"in": "vendor"
+		}
+	],
+	"git-version": "package_version",
+	"main": "bin/parallel-runjobs-service",
+	"output": "build/parallel-runjobs-service"
+}

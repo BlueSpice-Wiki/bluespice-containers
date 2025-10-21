@@ -1,0 +1,20 @@
+environment:
+    php: "/usr/bin/php" # Optional, defaults to /usr/bin/php
+wiki:
+    type: "standalone" # "standalone" or "farm", optional, defaults to "standalone"
+    path: "/var/www/html/w"
+database:
+    dbserver: "127.0.0.1" # Optional, defaults to localhost
+    dbport: 3306 # Optional, defaults to 3306
+    dbname: "w"
+    dbuser: "root"
+    dbpassword: "password"
+    dbprefix: "" # Optional, defaults to ""
+runjobs:
+    maxtime: 30         # Maximum TTL of a runJobs.php (Per wiki, per cycle) - Seconds, optional
+    maxjobs: 50        # Maximum number of jobs to run in a single call, optional
+    maxparallel: 1      # Maximum number of jobs to run in parallel (default: 1 for standalone, 10 for farm), optional
+farm: # Whole section is optional
+    # Exclude list has priority over include list
+    include-instances: []
+    exclude-instances: []
