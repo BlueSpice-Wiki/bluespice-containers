@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/../vendor/autoload.php';
+
+use MWStake\MediaWiki\CliAdm\Commands;
+use Symfony\Component\Console\Application;
+
+$application = new Application( 'MWStake MediaWiki CLI Admin', '@package_version@' );
+
+$application->add( new Commands\WikiBackup() );
+$application->add( new Commands\WikiRestore() );
+
+$application->run();
