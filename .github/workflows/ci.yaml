@@ -1,0 +1,112 @@
+name: Build and Push Container Images
+
+on:
+#  push:
+#    branches: [ 'main' ]
+#  pull_request:
+#    branches: [ 'main' ]
+  workflow_dispatch:
+
+env:
+  VERSION: ${{ github.event.inputs.version || '5.1.4-alpha' }}
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.discover.outputs.images }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Discover images
+        id: discover
+        run: |
+          images=$(find images -maxdepth 1 -type d -name "*" ! -name "images" | sed 's|images/||' | jq -R -s -c 'split("\n")[:-1]')
+          echo "images=${images}" >> $GITHUB_OUTPUT
+  
+  build-oci-images:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ${{ fromJson(needs.discover.outputs.images) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare build environment
+        run: ./maintenance.sh --prepare
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build OCI images
+        uses: docker/build-push-action@v5
+        with:
+          context: images/${{ matrix.image }}
+          platforms: linux/amd64,linux/arm64
+          push: false
+          tags: ${{ matrix.image }}:${{ env.VERSION }}
+          outputs: type=oci,dest=/tmp/${{ matrix.image }}-${{ env.VERSION }}.oci.tar.gz,compression=gzip
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test images
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo
+          skopeo copy --override-os linux oci-archive:/tmp/${{ matrix.image }}-${{ env.VERSION }}.oci.tar.gz docker-daemon:${{ matrix.image }}:${{ env.VERSION }}
+          docker images
+          echo "✅ Successfully built ${{ matrix.image }}:${{ env.VERSION }}"
+
+#      - name: Upload image artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ${{ matrix.image }}-${{ env.VERSION }}
+#          path: /tmp/${{ matrix.image }}-${{ env.VERSION }}.oci.tar.gz
+#          retention-days: 7
+
+  build-docker-images:
+    if: false
+    # This job is intentionally disabled
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ${{ fromJson(needs.discover.outputs.images) }}
+        platform: [amd64, arm64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare build environment
+        run: ./maintenance.sh --prepare
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker images
+        uses: docker/build-push-action@v5
+        with:
+          context: images/${{ matrix.image }}
+          platforms: linux/${{ matrix.platform }}
+          push: false
+          tags: ${{ matrix.image }}:${{ env.VERSION }}
+          outputs: type=docker,dest=/tmp/${{ matrix.image }}-${{ env.VERSION }}-${{ matrix.platform }}.tar.gz,compression=gzip
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test images
+        run: |
+          docker load -i /tmp/${{ matrix.image }}-${{ env.VERSION }}-${{ matrix.platform }}.tar.gz
+          docker images
+          echo "✅ Successfully built ${{ matrix.image }}:${{ env.VERSION }}-${{ matrix.platform }}"
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.image }}-${{ env.VERSION }}-${{ matrix.platform }}
+          path: /tmp/${{ matrix.image }}-${{ env.VERSION }}-${{ matrix.platform }}.tar.gz
+          retention-days: 7
+
