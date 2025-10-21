@@ -1,0 +1,461 @@
+/**
+ * This file contains style definitions for MediaWiki classes and ids as well as
+ * default element stylings.
+ */
+
+body {
+	font-size: 10pt;
+	color: black;
+	margin: 0;
+	padding: 0;
+	background-color: transparent !important;
+	background-image: none !important;
+}
+
+.center {
+	text-align: center;
+	width: 100%;
+}
+
+.center * {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#toc,
+.toc {
+	padding: 0.3cm 0.5cm 0cm 0.5cm;
+	margin-bottom: 1cm;
+	border: 1px solid #D9D9D9;
+	clear: both;
+	page-break-after: always;
+}
+
+#toc .toctitle,
+.toc .toctitle {
+	text-align: left;
+	margin-bottom: 0.5cm;
+}
+
+#toc .toctitle h2,
+.toc .toctitle h2 {
+	font-size: 14pt;
+	font-weight: normal;
+	display: inline;
+	margin: 0;
+	padding-right: 1em;
+	border-bottom: none;
+}
+
+#toc ul,
+.toc ul {
+	margin-left: 0;
+	padding-left: 0;
+	line-height: 1.5em;
+}
+
+.toc li {
+	list-style: none;
+	margin-top: 0;
+}
+
+.toc span.tocnumber,
+.toc span.toctext {
+	font-size: 9pt;
+	padding-right: 0.25em;
+	color: #0060DF;
+}
+
+#toc ul ul,
+.toc ul ul {
+	margin-left: 0.1cm;
+}
+
+#toc a:after,
+.toc a:after {
+	color: #0060DF;
+	content: leader('.') target-counter(attr(href), page);
+}
+
+/* headlines */
+#firstHeading {
+	font-weight: 500;
+	font-size: 14pt;
+	border-bottom: none;
+	margin-top: 1.25em;
+	margin-bottom: 1.5em;
+	line-height: 3.2em;
+	padding-bottom: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	border-bottom: none;
+	page-break-after: avoid;
+}
+
+h1 {
+	font-weight: 700;
+	font-size: 14pt;
+	margin-bottom: 0.9375em;
+	margin-top: 1em;
+}
+
+h2 {
+	font-size: 13pt;
+	font-weight: 500;
+	margin-top: 1em;
+	margin-bottom: 0.9375em;
+	background-color: transparent;
+	border-bottom: 1px solid rgb( 51, 51, 51 );
+}
+
+h3 {
+	font-size: 12pt;
+	font-weight: 700;
+	margin-top: 1em;
+	margin-bottom: 0.9375em;
+}
+
+h4 {
+	font-size: 11pt;
+	font-weight: 500;
+	margin-top: 1em;
+	margin-bottom: 0.9375em;
+}
+
+h5 {
+	font-size: 10pt;
+	font-weight: 500;
+	margin-top: 1.25em;
+}
+
+h6 {
+	font-size: 10pt;
+	font-weight: 700;
+	margin-top: 1.0625em;
+}
+
+/* text elements */
+hr {
+	border: 0;
+	border-top: 1px solid #EEEEEE;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+a {
+	text-decoration: none;
+	font-size: inherit;
+}
+
+a,
+a:hover,
+a:visited {
+	color :#0060DF;
+}
+
+a.new,
+a.new:hover,
+a.new:visited {
+	color :#B73A3A;
+}
+
+div {
+	font-size: 10pt;
+	font-weight: normal;
+	line-height: 1.5em;
+}
+
+p {
+	font-size: 10pt;
+	font-weight: normal;
+	/* mediawiki.css */
+	margin: 1em 0 .5em 0;
+	line-height: 1.5em;
+}
+
+code {
+	background-color: #F9F9F9;
+	border: 1px solid #DDDDDD;
+	border-radius: 2px;
+	padding: 1px 4px;
+}
+
+pre {
+	padding: 1em;
+	border: 1px dashed #DDDDDD;
+	color: black;
+	background-color: #F9F9F9;
+	line-height: 1.1em;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+q::before,
+q::after {
+	content: '"';
+}
+
+blockquote {
+	padding: 10px 20px;
+	margin: 0 0 20px;
+	border-left: 5px solid #EEEEEE;
+}
+
+abbr,
+acronym,
+.explain {
+	border-bottom: 0.1mm dotted black;
+	color: black;
+	background: none;
+	cursor: help;
+}
+
+img.tex {
+	vertical-align: middle;
+}
+
+span.texhtml {
+	font-family: serif;
+}
+
+/* list elements */
+ul,
+ol {
+	margin: 0 0 0 2em;
+	padding: 0;
+	line-height: 1.5em;
+}
+
+ul li {
+	list-style-type: disc;
+}
+
+ul ul li {
+	list-style-type: circle;
+}
+
+ul ul ul li {
+	list-style-type: square;
+}
+
+li {
+	margin-bottom: .1em;
+}
+
+dl {
+	margin-top: .2em;
+	margin-bottom: .5em;
+}
+
+dt {
+	font-weight: bold;
+	margin-bottom: .1em;
+}
+
+dd {
+	line-height: 1.5em;
+	margin-left: 1.6em;
+	margin-bottom: .1em;
+}
+
+.floatleft + ul,
+.floatleft + ol {
+	display: inline-block;
+}
+
+/* floating elements */
+div.floatright,
+table.floatright {
+	clear: right;
+	float: right;
+	position: relative;
+	margin: 0 0 .5em .5em;
+	border: 0;
+}
+
+div.floatright p {
+	font-style: italic;
+}
+
+div.floatleft,
+table.floatleft {
+	float: left;
+	clear: left;
+	position: relative;
+	margin: 0 .5em .5em 0;
+	border: 0;
+}
+
+div.floatleft p {
+	font-style: italic;
+}
+
+/* images */
+img {
+	border: none;
+	vertical-align: middle;
+}
+
+p img {
+	margin: 0;
+}
+
+/* thumbnails */
+div.tright {
+	margin-right: 10px !important;
+}
+
+div.tleft {
+	margin-right: 10px !important;
+}
+
+div.thumb {
+	margin-bottom: .5em;
+	border-style: solid;
+	border-color: white;
+	width: auto;
+	max-width: 98%;
+}
+
+div.thumbinner {
+	border: 0.1mm solid #ccc;
+	padding: 3px !important;
+	background-color: white;
+	font-size: 94%;
+	text-align: center;
+	overflow: hidden;
+	max-width: 99.9% !important;
+}
+
+div.thumbinner a.image {
+	max-width: 99% !important;
+}
+
+div.thumbinner a.image > img {
+	max-width: 99%;
+}
+
+div.magnify {
+	display: none;
+}
+
+.thumbimage {
+	border: 0.1mm solid #ccc;
+}
+
+.thumbcaption {
+	border: none;
+	text-align: left;
+	line-height: 1.4em;
+	padding: 3px !important;
+	font-size: 94%;
+}
+
+div.tright {
+	clear: right;
+	float: right;
+	border-width: .5em 0 .8em 1.4em;
+}
+
+div.tleft {
+	float: left;
+	clear: left;
+	margin-right: .5em;
+	border-width: .5em 1.4em .8em 0;
+}
+
+/* Galleries */
+li.gallerybox {
+	vertical-align: top;
+	background-color: #f9f9f9;
+	border: solid 0.2mm white;
+	display: -moz-inline-box;
+}
+
+ul.gallery, li.gallerybox {
+	display: inline-block;
+	zoom: 1;
+	*display: inline;
+}
+
+ul.gallery {
+	margin: 2px;
+	padding: 2px;
+	display: block;
+}
+
+li.gallerycaption {
+	font-weight: bold;
+	text-align: center;
+	display: block;
+	word-wrap: break-word;
+}
+
+li.gallerybox div.thumb {
+	text-align: center;
+	border: 0.2mm solid #ccc;
+	margin: 2px;
+}
+
+div.gallerytext {
+	overflow: hidden;
+	font-size: 94%;
+	padding: 2px 4px;
+	word-wrap: break-word;
+}
+
+ /* boxes */
+.bluebox {
+	border: 0.1mm solid #608E91;
+	margin: 1em 0em 1em 0em;
+	empty-cells:show;
+	padding:3px;
+	background-color: #EFF6F9;
+}
+
+.box-green {
+	 margin: 0;
+	 margin-bottom:10px;
+	 border: 0.1mm solid #237E14;
+	 padding: .3em .6em 0em .6em;
+	 background-color: #DEFEBB;
+}
+
+.box-beige {
+	 margin: 0;
+	 margin-bottom:10px;
+	 border: 0.1mm solid #000000;
+	 padding: .3em .6em 0em .6em;
+	 background-color: #E0B978;
+}
+
+.mw-warning {
+	background-color: #f9f9f9;
+	border: 0.1mm solid #aaa;
+	padding: 5px;
+	margin-left: 50px;
+	margin-right: 50px;
+	text-align: center;
+	font-size: 95%;
+	clear: both;
+}
+/* Select box hack START */
+select > option {
+	display:none;
+}
+
+select > option[selected] {
+	display: inline-block;
+}
+/*  Select box hack END */
+
+/* Extension:Lingo - glossary entries are printed in pdfs without definition term */
+.mw-lingo-tooltip {
+	display: none;
+}
+
+/* MediaWiki Core default class. Used by extensions, e.g. "FlagedRevs" */
+.noprint {
+	display: none;
+}

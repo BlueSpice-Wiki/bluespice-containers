@@ -1,0 +1,18 @@
+{
+    "name": "hallowelt/html2pdf-test",
+    "type": "project",
+    "require": {
+        "guzzlehttp/guzzle": "^7.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hallowelt\\Html2pdfTest\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Robert Vogel",
+            "email": "robert.vogel@hallowelt.com"
+        }
+    ]
+}

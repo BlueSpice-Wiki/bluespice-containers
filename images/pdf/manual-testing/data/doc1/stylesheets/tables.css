@@ -1,0 +1,296 @@
+table {
+    border: none;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: 100%;
+    color: black;
+    background-color: white; /* we don't want the bottom borders of <h2>s to be visible through floated tables */
+}
+/*Mediawikik wikitable*/
+.wikitable {
+    margin: 1em 1em 1em 0;
+    background: #f9f9f9;
+    border: 0.1mm #aaa solid;
+    border-collapse: collapse;
+    color: black;
+}
+
+.wikitable th, .wikitable td {
+    border: 0.1mm #aaa solid;
+    padding: 0.2em;
+}
+
+.wikitable th {
+    background: #CDCDCD;
+    text-align: center;
+}
+.wikitable caption {
+    font-weight: bold;
+}
+/*Mediawiki contenttable*/
+.contenttable,
+.contenttable-black,
+.contenttable-blue,
+.contenttable-darkblue {
+  width: 100% !important;
+  border: 0.1mm #ccc solid;
+  border-spacing: 0;
+}
+
+.contenttable td,.contenttable tr {
+  border: 0.1mm #ccc solid;
+  padding: 0 4px 0 4px;
+  border-spacing: 0;
+}
+
+
+.contenttable, .sortable {
+    border: 0.1mm solid #CCCCCC;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.contenttable td, .contenttable tr, .sortable td, .sortable tr {
+    border: 0.1mm solid #CCCCCC;
+    border-collapse: collapse;
+    border-spacing: 0;
+    padding: 0 4px;
+}
+
+.contenttable th, .sortable th {
+    background-color: #E0E0E0;
+    border: 0.1mm solid #CCCCCC;
+    padding: 0 4px;
+}
+
+.contenttable-black td, .contenttable-black tr {
+    border: 0.1mm solid #000000;
+    border-collapse: collapse;
+    border-spacing: 0;
+    padding: 4px;
+}
+.contenttable-black th {
+    background-color: #E0E0E0;
+    border: 0.1mm solid #000000;
+    padding: 4px;
+}
+.contenttable-blue {
+    border: 0.1mm solid #B1B9CF;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+.contenttable-blue td, .contenttable-blue tr {
+    border: 0.1mm solid #B1B9CF;
+    border-collapse: collapse;
+    border-spacing: 0;
+    padding: 4px;
+}
+.contenttable-blue th {
+    background-color: #EFF3F9;
+    border: 0.1mm solid #B1B9CF;
+    color: #3E5389;
+    padding: 4px;
+}
+.contenttable-darkblue {
+    border: 0.1mm solid #B1B9CF;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+.contenttable-darkblue td, .contenttable-darkblue tr {
+    border: 0.1mm solid #B1B9CF;
+    border-collapse: collapse;
+    border-spacing: 0;
+    padding: 4px;
+}
+.contenttable-darkblue th {
+    background-color: #3E5389;
+    border: 0.1mm solid #B1B9CF;
+    color: #FFFFFF;
+    padding: 4px;
+}
+
+/*******************************************************************/
+/*Cusco Sky table*/
+table.cuscosky {
+	border: 1px solid #D4E0EE;
+	border-style:solid;
+	border-width:1px;
+	border-collapse: collapse;
+	width: 100%;
+}
+table.cuscosky tbody th{
+	color:#3C5093;
+	background-color: #E6EDF5;
+}
+table.cuscosky tbody tr{
+	color: #190054;
+	background-color:#ffffff;
+}
+table.cuscosky td, table.cuscosky th{
+	border: 1px solid #D4E0EE;
+	padding: 8px;
+}
+table.cuscosky tbody tr:nth-child(odd){
+	background-color: #F7F9FC;
+}
+/*Casablance Table*/
+table.casablanca {
+	border: 1px solid #DCDCDC;
+	border-style:solid;
+	border-width:1px;
+	border-collapse: collapse;
+	width: 100%;
+}
+table.casablanca tbody th{
+	color:#FFFFFF;
+	background-color: #3C508C;
+}
+table.casablanca tbody tr{
+	color: #180050;
+	background-color:#F1F1F1;
+}
+table.casablanca td, table.casablanca th{
+	padding: 8px;
+}
+table.casablanca tbody tr:nth-child(odd){
+	background-color: #FFFFFF;
+}
+table.casablanca tbody tr:hover{
+	background-color: #CAC9C8;
+}
+/*Greyscale Table*/
+table.greyscale {
+	border: 1px solid #000000;
+	border-style:solid;
+	border-width:1px;
+	border-collapse: collapse;
+	width: 100%;
+}
+table.greyscale tbody th{
+	color:#000000;
+	background-color: #FFFFFF;
+	border: 1px solid black;
+}
+table.greyscale tbody tr{
+	color: #180050;
+	background-color: #F5F5F5;
+}
+table.greyscale td, table.greyscale th{
+	padding: 8px;
+}
+table.greyscale td{
+	border: 1px solid #DCDCDC;
+}
+table.greyscale tbody tr:nth-child(odd){
+	background-color: #FFFFFF;
+}
+table.greyscale tbody tr:hover{
+	background-color: #DEDCDC;
+}
+/*Greyscale Narrow*/
+table.greyscale-narrow {
+	border-collapse: collapse;
+	width: 100%;
+}
+table.greyscale-narrow tbody th{
+	color:#000000;
+	background-color: #C8C8C8;
+	border-bottom : 1px solid #000000;
+}
+table.greyscale-narrow tbody tr{
+	color: #180050;
+	background-color: #F5F5F5;
+}
+table.greyscale-narrow td, table.greyscale-narrow th{
+	padding: 8px;
+}
+table.greyscale-narrow td{
+	border: 1px solid #DCDCDC;
+}
+table.greyscale-narrow tbody tr:nth-child(odd){
+	background-color: #FFFFFF;
+}
+table.greyscale-narrow tbody tr:hover{
+	background-color: #DEDCDC;
+}
+table.contenttable {
+	width:100%;
+	border:1px #ccc solid;
+	border-spacing:0;
+	border-collapse:collapse;
+}
+
+table.contenttable td,table.contenttable tr {
+	border:1px #ccc solid;
+	border-spacing:0;
+	border-collapse:collapse;
+	padding:4px;
+}
+
+table.contenttable th {
+	background-color:#E0E0E0;
+	border:1px solid #CCC;
+	padding:4px;
+}
+
+table.contenttable-black {
+	width:100%;
+	border:1px #000 solid;
+	border-spacing:0;
+	border-collapse:collapse;
+}
+
+table.contenttable-black td, table.contenttable-black tr {
+	border:1px #000 solid;
+	border-spacing:0;
+	border-collapse:collapse;
+	padding:4px;
+}
+
+table.contenttable-black th {
+	background-color:#E0E0E0;
+	border:1px solid #000;
+	padding:4px;
+}
+
+table.contenttable-blue td, table.contenttable-blue tr, table.contenttable-darkblue td, table.contenttable-darkblue tr {
+	border:1px #B1B9CF solid;
+	border-spacing:0;
+	border-collapse:collapse;
+	padding:4px;
+}
+
+table.contenttable-blue th {
+	background-color:#EFF3F9;
+	border:1px solid #B1B9CF;
+	color:#3E5389;
+	padding:4px;
+}
+
+table.contenttable-blue, table.contenttable-darkblue {
+	width:100%;
+	border:1px #B1B9CF solid;
+	border-spacing:0;
+	border-collapse:collapse;
+}
+
+table.contenttable-darkblue th {
+	background-color:#3E5389;
+	border:1px solid #B1B9CF;
+	color:#FFF;
+	padding:4px;
+}
+
+/* fix to avoid cutting of table */
+table.bs-correct-table-width,
+table.bs-correct-table-width thead tr,
+table.bs-correct-table-width tbody tr {
+	max-width: 17.68cm !important;
+}
+
+.rotated table.bs-correct-table-width,
+.bs-rotated table.bs-correct-table-width {
+	max-width: 26.3cm !important;
+}

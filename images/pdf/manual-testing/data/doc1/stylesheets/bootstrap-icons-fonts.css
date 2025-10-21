@@ -1,0 +1,14 @@
+
+@font-face {
+  font-display: block;
+	font-family: "bootstrap-icons";
+	src: url("bootstrap-icons.ttf") !important;
+	font-style: oblique;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+  font-family: bootstrap-icons !important;
+}

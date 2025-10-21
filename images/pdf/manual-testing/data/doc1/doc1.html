@@ -1,0 +1,2724 @@
+<html>
+	<head>
+		<title>SimplePage</title>
+		<link href="stylesheets/page.css" type="text/css" rel="stylesheet"/>
+		<link href="stylesheets/mediawiki.css" type="text/css" rel="stylesheet"/>
+		<link href="stylesheets/styles.css" type="text/css" rel="stylesheet"/>
+		<link href="stylesheets/geshi-php.css" type="text/css" rel="stylesheet"/>
+		<link href="stylesheets/bluespice.css" type="text/css" rel="stylesheet"/>
+		<link href="stylesheets/tables.css" type="text/css" rel="stylesheet"/>
+		<link href="stylesheets/fonts.css" type="text/css" rel="stylesheet"/>
+		<link href="stylesheets/mediawiki.action.history.diff.css" type="text/css" rel="stylesheet"/>
+		<!-- This is where additional resources and meta information is appended to -->
+	<meta name="DC.title" content="SimplePage"/><meta name="DC.subject" content="Some nice description"/><meta name="DC.date" content="2024-06-27T14:33:10Z"/><meta name="title" content="SimplePage"/><meta name="pagetitle" content="SimplePage"/><meta name="exportdate" content="27.06.2024"/><meta name="exporttime" content="14:33"/><meta name="exporttimeexact" content="14:33:10"/><meta name="keywords" content=""/><meta name="author" content="WikiSysop"/><meta name="date" content="27.06.2024"/><meta name="assigned_users" content=""/><meta name="assigned_groups" content=""/><meta name="producer" content="UniversalExport 4.3.0 (BlueSpice MediaWiki)"/><bookmarks><bookmark href="#bs-ue-jumpmark-9d6593b043b7e671eaafcab00c8f2a73" name="SimplePage"><bookmark name="Lists" href="#bs-ue-jumpmark-41da9fd35609295cbf885223f9c00601"><bookmark name="Unodered lists" href="#bs-ue-jumpmark-fdf1124b43770b845a94111187dcb915"/><bookmark name="Ordered lists" href="#bs-ue-jumpmark-d3e5d62bfee23c5ec2ba04166a5aa522"/></bookmark><bookmark name="Images" href="#bs-ue-jumpmark-e3c3ce5f5dd2fccbe279246a3bbfdcf3"/><bookmark name="Tables" href="#bs-ue-jumpmark-875b34afc7373d69517f454e5c3e9179"/><bookmark name="Code" href="#bs-ue-jumpmark-bc3b0fb551fb5c2381f7a21f93c6a2cf"/></bookmark></bookmarks><style type="text/css" rel="stylesheet"><![CDATA[
+/* MediaWiki:Common.css */
+/* unset background/border of AtMention boxes on Main Page */
+.page-Hauptseite .iconnav .at-mention {
+    background-color: unset!important;
+    border: unset!important;
+}
+
+
+.flex-container {
+  display: flex;
+  background-color: DodgerBlue;
+}
+
+.flex-container > div {
+  background-color: #f1f1f1;
+  margin: 10px;
+  padding: 20px;
+  font-size: 30px;
+}
+
+/* Zeilenumbrüche statt Scrollbar in pre-Umgebung */
+.mw-content-ltr pre {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;
+}
+
+
+h2, #mw-content-text h2 {
+	border-bottom: 1px solid rgb(51, 51, 51);
+	padding-bottom: 2px;
+}
+#toc h2 {
+	border-bottom: 0;
+}
+
+/*
+ * Allow limiting of which header levels are shown in a TOC;
+ * <div class="toclimit-3">, for instance, will limit to
+ * showing ==headings== and ===headings=== but no further.
+ * Used in [[Template:CustomTOC]]
+ */
+.toclimit-2 .toclevel-1 ul,
+.toclimit-3 .toclevel-2 ul,
+.toclimit-4 .toclevel-3 ul,
+.toclimit-5 .toclevel-4 ul,
+.toclimit-6 .toclevel-5 ul,
+.toclimit-7 .toclevel-6 ul {
+	display: none;
+}
+
+/*.page-Benutzer_PatricWirth {
+ font-size: 100px !important;
+ background-color: #000 !important;
+ color: #00FF00 !important;
+ zoom: 5 !important;
+}
+*/
+/*
+.page-Benutzer_TobiasWeichart {
+ zoom: 5 !important;
+}
+*/
+/*
+#sb-Subpages-link {
+  color:#e600e6;
+  #font-weight:bold;
+  font-size: larger;
+  animation: blinker 1s linear 10;
+  padding: 4px;
+  border: solid 1px #e600e6;
+  border-top-left-radius: 6em 3em;
+  border-bottom-right-radius: 6em 3em;
+  border-top-right-radius: 3em;
+  border-bottom-left-radius: 3em;
+}
+
+@keyframes blinker {
+  from { opacity: 1.0; }
+  to { opacity: 0.0; }
+}
+
+@-webkit-keyframes blinker {
+  from { opacity: 1.0; }
+  to { opacity: 0.0; }
+}
+*/
+/* Test CSS für Benutzerseite Rado */
+/*
+body.page-Benutzer_Rado #bs-left-column, 
+body.page-Benutzer_Rado #bs-data-before-content, 
+body.page-Benutzer_Rado #left-navigation, 
+body.page-Benutzer_Rado #right-navigation,
+body.page-Benutzer_Rado #bs-logo,
+body.page-Benutzer_Rado #bs-menu-top-left,
+body.page-Benutzer_Rado #footer {display:none;}
+
+body.page-Benutzer_Rado #content {padding: 0;}
+
+body.page-Benutzer_Rado #bs-content-column {margin:0;}
+
+body.page-Benutzer_Rado #bs-application {margin:-100px;}
+body.page-Benutzer_Rado #p-search, body.page-Benutzer_Rado #bs-user-container {position: relative; z-index: 999;}
+*/
+
+/* Test CSS für Benutzerseite ThomasSchnakenberg*/
+
+body.page-Benutzer_ThomasSchnakenberg_grzTest #bs-left-column, 
+body.page-Benutzer_ThomasSchnakenberg_grzTest #bs-data-before-content, 
+body.page-Benutzer_ThomasSchnakenberg_grzTest #left-navigation, 
+body.page-Benutzer_ThomasSchnakenberg_grzTest #right-navigation,
+body.page-Benutzer_ThomasSchnakenberg_grzTest #bs-logo,
+body.page-Benutzer_ThomasSchnakenberg_grzTest #bs-menu-top-left,
+body.page-Benutzer_ThomasSchnakenberg_grzTest #bs-menu-top,
+body.page-Benutzer_ThomasSchnakenberg_grzTest #p-search,
+body.page-Benutzer_ThomasSchnakenberg_grzTest #footer {display:none;}
+ 
+body.page-Benutzer_ThomasSchnakenberg_grzTest #content {padding: 0;}
+ 
+body.page-Benutzer_ThomasSchnakenberg_grzTest #bs-content-column {margin:0;}
+
+
+
+/* Test CSS für EWP rkubani */
+.unternehmensbereiche {
+    border-spacing: 8px;
+}
+.unternehmensbereiche td {
+    background-color: #d6d6d6;
+}
+.unternehmensbereiche a, .unternehmensbereiche a.new {
+    font-size: 36px;
+    font-weight: bold;
+    color: #68665c !important;
+    text-decoration: none;
+}
+
+.page-Protokoll_Portal .createboxButton {
+    width: 270px;
+}
+
+p.mw-empty-elt{
+	padding-top: 8px;
+}
+
+p.mw-empty-elt + p.mw-empty-elt{
+	padding-top: 0px;
+}
+
+
+table.organisationsprofil-table{
+	display: block;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    text-align: left;
+    font-size: 13px;
+    width: 100%;
+    background: white;
+    box-shadow: 2px 2px 5px #DEDEDE, -2px -2px 5px #DEDEDE;
+}
+
+tr.organisationsprofil-row{
+    width: 50px;
+    height: 10px;
+}
+tr.organisationsprofil-row > th{
+	padding-right: 10px;
+}
+tr.organisationsprofil-row > td{
+	padding-right: 10px;
+}
+tr.organisationsprofil-row > td + td b{
+	padding-left: 20px;
+}
+tr.organisationsprofil-row > td > div.hw-protokolle-inputbox,
+tr.organisationsprofil-row > td > div.hw-protokolle-results{
+	margin-left: 25px;
+}
+
+/* Style für Installtionssteckbriefe */
+table.projekt-installation-table tr > th {
+	padding-right: 10px;
+}
+table.projekt-installation-table tr > td {
+	padding-right: 30px;
+}
+
+/* Test CSS für GRZ rkubani */
+
+.box30prz {
+  float: left;
+  width: 30%;
+  height: 200px;
+  background-color: #f3f4f6;
+  margin: 0 18px 16px 0;
+}
+.box30prz p {
+  margin: 0 0 0 10px;
+}
+.box60prz {
+  float: left;
+  width: 62%;
+  height: 400px;
+  background-color: #f3f4f6;
+  margin: 0 18px 16px 0;
+}
+.box60prz p {
+  margin: 0 0 0 10px;
+}
+.header-box-blue {
+  background-color: #c0c5d7; 
+  border-bottom: 3px solid #002655; 
+  padding: 0 6px; 
+  text-transform: uppercase; 
+  font-size: 24px; 
+  color: #002655;
+}
+.header-box-blue p {margin:0;}
+
+.header-box-red {
+  background-color: #ddc5c6; 
+  border-bottom: 3px solid #6b0626; 
+  padding: 0 6px; 
+  text-transform: uppercase; 
+  font-size: 24px; 
+  color: #002655;
+}
+.header-box-red p {color: #fff; margin:0;}
+
+/* CSS placed here will be applied to all skins */
+ 
+.createboxInput {
+    border: 1px solid #CCC;
+    padding: 3px;
+}
+ 
+.createboxInput:focus {
+    border-color: #AAF;
+}
+ 
+.categoryTreeFloat {
+    float: left;
+    margin-right: 10px;
+}
+ 
+textarea.createboxInput {
+    font-family: sans-serif;
+    font-size: small;
+}
+ 
+table.smwtable {
+    width: 100%;
+}
+
+/*  Test: Breite = Fenster */
+/*
+#bs-application {
+width:100%;
+}
+
+#bs-menu-top {
+width:100%;
+}
+
+#bs-wrapper {
+width:100%;
+}
+*/
+
+.hw-protokolle-inputbox .mw-inputbox-centered {
+    text-align: left;
+}
+
+.hw-protokolle-inputbox .mw-ui-button.mw-ui-progressive,
+.hw-protokolle-inputbox .mw-ui-button.mw-ui-primary {
+    background: #3e5389;
+    color: #fff;
+    border: 1px solid #3e5389;
+    text-shadow: 0 1px rgba(0,0,0,0.1);
+}
+
+.jk-rotate * {
+    transform: rotate(-180deg);
+    /* Safari */
+    -webkit-transform: rotate(-180deg);
+    /* Firefox */
+    -moz-transform: rotate(-180deg);
+    /* IE */
+    -ms-transform: rotate(-180deg);
+    /* Opera */
+    -o-transform: rotate(-180deg);
+}
+
+
+.infobox {
+    background: #EEEEEE;
+    border: 3px solid #3E5389;
+    padding: 20px;
+    font-color: #3E5389;
+}
+
+.layoutbox {
+	padding:15px;
+	margin: 10px 10px;
+	box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.3);
+	display: inline-block;
+	width: 97%;
+	background-color: #f0f2f6;
+    /* min-height: 400px; */
+}
+.clearbox {
+	padding:15px;
+	margin: 10px 10px;
+}
+.clearbox .bs-social-entitylist-headline > h3 {
+	border-top:none;
+}
+/*
+.clearfix {
+    clear: both;
+    display: block;
+}
+*/
+
+.bs-slide {
+    width: 700px;
+    height: 450px;
+    border: 1px solid #555;
+    margin: auto;
+    margin-bottom: 0.5em;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.bs-slide h1.title {
+    background-color: #ccc;
+    padding: 0.5em;
+}
+
+.bs-slide div.content {
+    width: 650px;
+    margin: 2em auto 0 auto;
+}
+
+.bs-slide .mw-editsection {
+    display:none;
+}
+
+.table tr, table td { 
+    page-break-inside: avoid; 
+}
+
+.contenttable-blue {
+	width: 100%;
+}
+.bs-tagcloud.text {
+	border:none;
+}
+
+/**Releasechecklist**/
+#releasechecklist table {
+    font-size: 100%;
+    margin-top: 2rem;
+}
+#releasechecklist table.contenttable-blue td, table.contenttable-blue tr, table.contenttable-darkblue td
+{
+    padding:8px;
+}
+#releasechecklist table.contenttable-blue td.firstcol
+{
+    width:100px;
+}
+#releasechecklist table td
+{
+ text-align:center;	
+}
+#releasechecklist table td + td
+{
+ text-align:left;	
+}
+#content #bodyContent #releasechecklist h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 2rem;
+}
+#content #bodyContent  #releasechecklist h3 {
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+}
+
+#content #bodyContent  #releasechecklist td p
+{margin:0;}
+
+#content #bodyContent #relasechecklist input[type="radio"], #content #bodyContent #relasechecklist input[type="checkbox"] {
+    margin: 4px 4px 4px 15px;
+}
+
+/** FDPD Vorlage **/
+#content #bodyContent #technotesinternal .bs-universalexport-exportexclude
+{
+	display:block; 
+	margin-top:30px; 
+	padding:20px;
+	/* from TemplateStyles: */
+	background-color:#efefef;
+    display: block;
+    padding: 10px;
+    margin-top: 60px;
+}
+#technotesinternal .bs-universalexport-exportexclude h2 
+{margin-top:10px;}
+
+hr  {border-top: 1px solid #bbb;}
+
+
+.pet-box {
+	text-align: center;
+    font-size: large;
+    font-weight: bold;
+    border: 1px solid red;
+	padding: 0.3em;
+}
+
+/*UpdateQAChecklist form */
+.rootpage-QA_UpdateQA .oo-ui-checkboxInputWidget [type='checkbox']:disabled + span {
+    background-color: #7eb2ff;
+}
+
+.rootpage-QA_UpdateQA .oo-ui-multioptionWidget-selected .oo-ui-checkboxInputWidget [type='checkbox']:disabled + span {
+    background-color: #0d6efd;}
+
+.rootpage-QA_UpdateQA .forms-form-view-layout, .rootpage-QA_UpdateQAChecklist_form .forms-form-edit-layout{border-bottom:1px solid #e3e3e3; padding-top:10px}
+
+.rootpage-QA_UpdateQA  .mw-ext-forms-form .forms-form-view-layout .view-label {width:25em}
+
+/* Styles for section cards */
+.sectionflex {display: flex; flex-wrap: wrap; justify-content:space-between;}
+.sectionflex.col1 > div {flex-basis:100%; padding:10px 20px 20px 20px; margin:10px 0;}
+.sectionflex.col2 > div {flex-basis:49%; padding:10px 20px 20px 20px; margin:10px 0;}
+.sectionflex.col3 > div {flex-basis:32%; padding:10px 20px 20px 20px; margin:10px 0;}
+.sectionflex.col5 > div {flex-basis:19%; padding:10px 20px 20px 20px; margin:10px 0;}
+.sectionflex > div h2 {margin:0 0 1em 0; font-size:1.3em}
+.sectionflex.frame > div {border: 1px solid #e7e7e7}
+.sectionflex.background> div {background: #f1f3f9}
+.sectionflex .ve-ce-branchNode-slug, .sectionflex  span.mw-editsection {display:none}
+@media (max-width: 767px) {.sectionflex.col2 > div, .sectionflex.col3 > div {flex-basis:100%; margin-top:2em}}
+
+
+#mw-content-text .mw-ui-progressive a:not([class*="oo-ui-"]), [class^="mw-content-"] .mw-ui-progressive  a:not([class*="oo-ui-"])
+{color:white;}
+
+/* Styles for section cards */
+.sectionflex {display: flex; flex-wrap: wrap; justify-content:space-between;}
+.sectionflex.col1 > div {flex-basis:100%; padding:10px 20px 20px 20px; margin:10px 0;}
+.sectionflex.col2 > div {flex-basis:49%; padding:10px 20px 20px 20px; margin:10px 0;}
+.sectionflex.col3 > div {flex-basis:32%; padding:10px 20px 20px 20px; margin:10px 0;}
+.sectionflex > div h2,#mw-content-text .sectionflex > div h2  {margin:0 0 1em 0; font-size:1.3em}
+.sectionflex > div h3, .sectionflex > #mw-content-text div h3 {margin:1.2em 0 0 0; font-size:1em}
+.sectionflex.frame > div {border: 1px solid #e7e7e7}
+.sectionflex.background> div {background: #f1f3f9}
+.sectionflex .ve-ce-branchNode-slug, .sectionflex span.mw-editsection {display:none}
+@media (max-width: 767px) {.sectionflex.col2 > div, .sectionflex.col3 > div {flex-basis:100%; margin-top:2em}}
+
+
+/*SMW filtered format*/
+#bodyContent .filtered .filtered-filters {
+    display: flex;
+    border:none;
+    margin:0;
+    gap:20px;
+}
+
+#bodyContent .filtered .filtered-filters > div {
+    width:48%
+}
+
+#bodyContent  .filtered .filtered-views {
+    border: none!important;
+    margin: 0;
+}
+.filtered .filtered-views .filtered-views-container {
+    padding: 0;
+}
+
+/*class to count table rows in an empty first col*/
+
+table.countrows {
+  counter-reset: row-num  -1;
+}
+table.countrows tr {
+  counter-increment: row-num;
+}
+table.countrows tr td:first-child::before {
+    content: counter(row-num);
+}
+/*overwrite dated contentable background to match grey of product style guide  - looks much better and table is useful because it left-aligns header col content */
+table.contenttable thead tr, table.contenttable th {
+    background-color: #f1f3f9;
+}
+
+/*template "Persona"*/
+@media print {
+h1#firstHeading {margin:0;padding:0}
+#profile, #goals {page-break-after:always}
+.talkpagelink {display:none}
+}
+
+/* For holyday countdown on :Hauptseite */
+#countdown {
+  text-align: center;
+  font-size: 24px;
+  background-color: rgb(43, 128, 235);
+  color: #fff;
+  padding: 20px;
+}
+
+.minutes-banner {
+  padding: 0.5em;
+}
+
+/*Background colors in templates - based on product style guide*/
+.wordbg {padding: 1px 4px; margin-right: 2px;}
+.wordbg.strong {font-weight:bold}
+.wordbg.blue, .wordbg.blau {background:#dfecfc;}
+.wordbg.darkblue, .wordbg.dunkelblau {background:#e2e5ed;}
+.wordbg.green, .wordbg.gruen {background:#eff6dd;}
+.wordbg.grey, .wordbg.gray, .wordbg.grau {background:#f1f3f9;}
+.wordbg.orange {background:#fdeed9;}
+.wordbg.purple, .wordbg.lila {background:#F4DBEE;}
+.wordbg.red, .wordbg.rot{background:#f5dcdc;}
+.wordbg.teal, .wordbg.tuerkis {background:#d4f1ee;}
+.wordbg.yellow, .wordbg.gelb {background:#fef6d8;}
+
+/* CONFLUENCE PRE-CHECK - START */
+/* See https://wiki.hallowelt.com/wiki/Migration/Confluence/Pre-Check */
+textarea.confluence-pre-check-input {
+  height: 300px;
+  font-family: monospace;
+  margin-bottom: 1em;
+}
+
+div.confluence-pre-check-progressbar-outer {
+  width: 300px;
+  height: 32px;
+  border: 1px solid #ccc;
+  margin: 1em 0;
+}
+
+div.confluence-pre-check-progressbar-inner {
+  background-color: lightblue;
+  height: 32px;
+  text-align: right;
+  padding: 0.25em;
+}
+
+
+li.confluence-pre-check-type-unsupported {
+  color: crimson;
+}
+
+li.confluence-pre-check-type-supported {
+  color: olive;
+}
+
+li.confluence-pre-check-type-partially-supported {
+  color: orange;
+}
+/* CONFLUENCE PRE-CHECK - END */
+
+.col3 {columns:3;}
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* Drawio */
+.bs-page-content .mw-editdrawio { display: none; }  img[id^="drawio-img-"] { width: 99%; height: auto; }
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* CPD */
+.cpd-entity-header,
+.cpd-entity-footer {
+  text-align: center;
+  background: #ececec;
+  border: 1px solid #999;
+}
+.cpd-entity-header.happy-path,
+.cpd-entity-footer.happy-path {
+  border-left: 5px solid #e7556f;
+}
+.cpd-entity-header a.cpd-entity-link,
+.cpd-entity-footer a.cpd-entity-link {
+  display: inline-block;
+  padding: 0.5em;
+  border: 1px solid #999;
+  background-color: #fff;
+}
+.cpd-entity-header a.cpd-entity-link.happy-path,
+.cpd-entity-footer a.cpd-entity-link.happy-path {
+  border-left: 5px solid #e7556f;
+}
+.cpd-entity-header .cpd-arrow:before,
+.cpd-entity-footer .cpd-arrow:before {
+  content: '\21E9';
+  font-size: 1.5rem;
+  color: #999;
+}
+.cpd-entity-header .cpd-happy-path,
+.cpd-entity-footer .cpd-happy-path {
+  color: #e7556f;
+  font-size: 1rem;
+}
+.cpd-entity-header .cpd-happy-path:after,
+.cpd-entity-footer .cpd-happy-path:after {
+  content: '\2605';
+  font-size: 1rem;
+  color: #e7556f;
+  margin-right: 0.5em;
+}
+.cpd-entity-header .cpd-separator,
+.cpd-entity-footer .cpd-separator {
+  margin: 0 1em;
+}
+.cpd-entity-header {
+  padding: 0.5em;
+}
+.cpd-entity-footer {
+  padding: 0.5em;
+}
+.cpd-entity-header .cpd-arrow {
+  margin-top: 0.5em;
+}
+.cpd-entity-footer .cpd-arrow {
+  margin-bottom: 0.5em;
+}
+.cdp-data {
+  display: none;
+}
+.bs-page-content .cpd-entity-header a.cpd-entity-link,
+.bs-page-content .cpd-entity-footer a.cpd-entity-link {
+  padding: 0.5em !important;
+}
+#processXml pre {
+  white-space: pre-wrap;
+  /* css-3 */
+  white-space: -moz-pre-wrap;
+  /* Mozilla, since 1999 */
+  white-space: -o-pre-wrap;
+  /* Opera 7 */
+  word-wrap: break-word;
+}
+
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* PageTemplates */
+/*
+These stylings are specifically made for standard page templates provided in
+`data/Content/PageTemplates/`. They should stay skin agnostic as much as
+possible
+*/
+.databox, .ve-ce-branchNode.databox {
+	display: flex;
+	justify-content: space-between;
+	border: 1px solid #dbdbdb;
+	flex-wrap: wrap;
+	margin: 0 0 28px 0;
+	padding-bottom: 6px;
+}
+
+.databox div.tbl, .databox.ve-ce-branchNode div.tbl {
+	flex-basis: 50%;
+	margin: 0;
+}
+
+.databox div.tbl.single {
+	flex-basis: 100%;
+}
+
+.databox table, .databox.ve-ce-branchNode table {
+	margin: 10px 10px 0 10px;
+	width: 95%;
+	background: white;
+	text-align: left;
+	font-size: 13px;
+}
+
+.databox table tr > th, #content .databox.ve-ce-branchNode table tr > th p {
+	text-align: left;
+	border-style: hidden;
+	white-space: nowrap;
+	vertical-align: middle;
+	width: 14em;
+	font-weight: bold;
+}
+
+.databox table tr > td, .databox.ve-ce-branchNode table tr > td p {
+	border-style: hidden;
+	vertical-align: middle;
+}
+
+.databox table tr > th, .databox table tr > td, .databox.ve-ce-branchNode table tr > th, .databox.ve-ce-branchNode table tr > td {
+	border: 0;
+	border-bottom: 1px solid #dbdbdb;
+	padding: 6px 4px;
+}
+
+.databox table tr:last-child > th, .databox table tr:last-child > td, .databox.ve-ce-branchNode table tr:last-child > th, .databox.ve-ce-branchNode table tr:last-child > td {
+	border-bottom: 0;
+}
+
+/*avoid box alignment issues in ve-mode */
+div.databox .ve-ce-branchNode-slug {
+	display: none;
+}
+
+div.portal-row .ve-ce-branchNode-slug {
+	display: none;
+}
+
+/*avoid editing issues because of previous declaration when editing cells in ve-mode */
+.databox div table .ve-ce-branchNode-slug {
+	display: block;
+}
+
+/*better alignment of drop-downs for checklists in ve-mode */
+.databox tr > td.select .ve-ce-branchNode-inlineSlug {
+	display: none;
+}
+
+table.pagetemplate th .bi::before {
+	vertical-align: -0.125em
+}
+
+.databox select {
+	padding: 3px;
+}
+
+/*mobile view*/
+@media only screen and (max-width: 1000px) {
+	.databox {
+		flex-wrap: wrap;
+		margin: 0 5px 28px 3px;
+	}
+
+	.databox div.tbl {
+		flex-basis: 100%;
+	}
+
+	.databox div:nth-child(1) table, .databox.ve-ce-branchNode div:nth-child(1) table {
+		margin-bottom: 0;
+	}
+
+	.databox div:nth-child(2) table, .databox.ve-ce-branchNode div:nth-child(2) table {
+		margin-top: 0;
+	}
+}
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* VisualEditorConnector */
+#mw-content-text span.col-white,
+.oojsplus-color-picker-main-grid span.col-white,
+.ve-init-mw-target-surface span.col-white,
+.bs-page-content span.col-white,
+#mw-content-text div.col-white,
+.oojsplus-color-picker-main-grid div.col-white,
+.ve-init-mw-target-surface div.col-white,
+.bs-page-content div.col-white {
+  color: #ffffff;
+}
+#mw-content-text span.col-blue-light,
+.oojsplus-color-picker-main-grid span.col-blue-light,
+.ve-init-mw-target-surface span.col-blue-light,
+.bs-page-content span.col-blue-light,
+#mw-content-text div.col-blue-light,
+.oojsplus-color-picker-main-grid div.col-blue-light,
+.ve-init-mw-target-surface div.col-blue-light,
+.bs-page-content div.col-blue-light {
+  color: #97bfe7;
+}
+#mw-content-text span.col-blue,
+.oojsplus-color-picker-main-grid span.col-blue,
+.ve-init-mw-target-surface span.col-blue,
+.bs-page-content span.col-blue,
+#mw-content-text div.col-blue,
+.oojsplus-color-picker-main-grid div.col-blue,
+.ve-init-mw-target-surface div.col-blue,
+.bs-page-content div.col-blue {
+  color: #5185b9;
+}
+#mw-content-text span.col-blue-dark,
+.oojsplus-color-picker-main-grid span.col-blue-dark,
+.ve-init-mw-target-surface span.col-blue-dark,
+.bs-page-content span.col-blue-dark,
+#mw-content-text div.col-blue-dark,
+.oojsplus-color-picker-main-grid div.col-blue-dark,
+.ve-init-mw-target-surface div.col-blue-dark,
+.bs-page-content div.col-blue-dark {
+  color: #0060df;
+}
+#mw-content-text span.col-blue-navy,
+.oojsplus-color-picker-main-grid span.col-blue-navy,
+.ve-init-mw-target-surface span.col-blue-navy,
+.bs-page-content span.col-blue-navy,
+#mw-content-text div.col-blue-navy,
+.oojsplus-color-picker-main-grid div.col-blue-navy,
+.ve-init-mw-target-surface div.col-blue-navy,
+.bs-page-content div.col-blue-navy {
+  color: #3e5389;
+}
+#mw-content-text span.col-orange,
+.oojsplus-color-picker-main-grid span.col-orange,
+.ve-init-mw-target-surface span.col-orange,
+.bs-page-content span.col-orange,
+#mw-content-text div.col-orange,
+.oojsplus-color-picker-main-grid div.col-orange,
+.ve-init-mw-target-surface div.col-orange,
+.bs-page-content div.col-orange {
+  color: #e49c00;
+}
+#mw-content-text span.col-turquoise,
+.oojsplus-color-picker-main-grid span.col-turquoise,
+.ve-init-mw-target-surface span.col-turquoise,
+.bs-page-content span.col-turquoise,
+#mw-content-text div.col-turquoise,
+.oojsplus-color-picker-main-grid div.col-turquoise,
+.ve-init-mw-target-surface div.col-turquoise,
+.bs-page-content div.col-turquoise {
+  color: #259596;
+}
+#mw-content-text span.col-green,
+.oojsplus-color-picker-main-grid span.col-green,
+.ve-init-mw-target-surface span.col-green,
+.bs-page-content span.col-green,
+#mw-content-text div.col-green,
+.oojsplus-color-picker-main-grid div.col-green,
+.ve-init-mw-target-surface div.col-green,
+.bs-page-content div.col-green {
+  color: #3fb34c;
+}
+#mw-content-text span.col-purple,
+.oojsplus-color-picker-main-grid span.col-purple,
+.ve-init-mw-target-surface span.col-purple,
+.bs-page-content span.col-purple,
+#mw-content-text div.col-purple,
+.oojsplus-color-picker-main-grid div.col-purple,
+.ve-init-mw-target-surface div.col-purple,
+.bs-page-content div.col-purple {
+  color: #cd41cb;
+}
+#mw-content-text span.col-red,
+.oojsplus-color-picker-main-grid span.col-red,
+.ve-init-mw-target-surface span.col-red,
+.bs-page-content span.col-red,
+#mw-content-text div.col-red,
+.oojsplus-color-picker-main-grid div.col-red,
+.ve-init-mw-target-surface div.col-red,
+.bs-page-content div.col-red {
+  color: #b73a3a;
+}
+#mw-content-text span.col-grey-light,
+.oojsplus-color-picker-main-grid span.col-grey-light,
+.ve-init-mw-target-surface span.col-grey-light,
+.bs-page-content span.col-grey-light,
+#mw-content-text div.col-grey-light,
+.oojsplus-color-picker-main-grid div.col-grey-light,
+.ve-init-mw-target-surface div.col-grey-light,
+.bs-page-content div.col-grey-light {
+  color: #d2d2d2;
+}
+#mw-content-text span.col-grey-medium,
+.oojsplus-color-picker-main-grid span.col-grey-medium,
+.ve-init-mw-target-surface span.col-grey-medium,
+.bs-page-content span.col-grey-medium,
+#mw-content-text div.col-grey-medium,
+.oojsplus-color-picker-main-grid div.col-grey-medium,
+.ve-init-mw-target-surface div.col-grey-medium,
+.bs-page-content div.col-grey-medium {
+  color: #acacac;
+}
+#mw-content-text span.col-grey,
+.oojsplus-color-picker-main-grid span.col-grey,
+.ve-init-mw-target-surface span.col-grey,
+.bs-page-content span.col-grey,
+#mw-content-text div.col-grey,
+.oojsplus-color-picker-main-grid div.col-grey,
+.ve-init-mw-target-surface div.col-grey,
+.bs-page-content div.col-grey {
+  color: #787878;
+}
+#mw-content-text span.col-grey-dark,
+.oojsplus-color-picker-main-grid span.col-grey-dark,
+.ve-init-mw-target-surface span.col-grey-dark,
+.bs-page-content span.col-grey-dark,
+#mw-content-text div.col-grey-dark,
+.oojsplus-color-picker-main-grid div.col-grey-dark,
+.ve-init-mw-target-surface div.col-grey-dark,
+.bs-page-content div.col-grey-dark {
+  color: #434343;
+}
+#mw-content-text span.col-black,
+.oojsplus-color-picker-main-grid span.col-black,
+.ve-init-mw-target-surface span.col-black,
+.bs-page-content span.col-black,
+#mw-content-text div.col-black,
+.oojsplus-color-picker-main-grid div.col-black,
+.ve-init-mw-target-surface div.col-black,
+.bs-page-content div.col-black {
+  color: #000000;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color,
+.bs-page-content span.oojsplus-color-picker-palette-color,
+#mw-content-text div.oojsplus-color-picker-palette-color,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color,
+.bs-page-content div.oojsplus-color-picker-palette-color {
+  /* Keep this aligned with the background colors. These classes define actual colors for the color picker blocks*/
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-white-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-white-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-white-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-white-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-white-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-white-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-white-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-white-bg {
+  color: #ffffff;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-blue-light-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-blue-light-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-blue-light-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-blue-light-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-blue-light-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-blue-light-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-blue-light-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-blue-light-bg {
+  color: #e0ecf8;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-blue-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-blue-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-blue-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-blue-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-blue-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-blue-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-blue-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-blue-bg {
+  color: #cadaea;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-blue-dark-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-blue-dark-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-blue-dark-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-blue-dark-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-blue-dark-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-blue-dark-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-blue-dark-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-blue-dark-bg {
+  color: #b2cff5;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-blue-navy-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-blue-navy-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-blue-navy-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-blue-navy-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-blue-navy-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-blue-navy-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-blue-navy-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-blue-navy-bg {
+  color: #c5cbdb;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-orange-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-orange-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-orange-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-orange-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-orange-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-orange-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-orange-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-orange-bg {
+  color: #f7e1b2;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-turquoise-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-turquoise-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-turquoise-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-turquoise-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-turquoise-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-turquoise-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-turquoise-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-turquoise-bg {
+  color: #bddfdf;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-green-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-green-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-green-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-green-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-green-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-green-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-green-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-green-bg {
+  color: #c5e8c9;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-purple-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-purple-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-purple-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-purple-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-purple-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-purple-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-purple-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-purple-bg {
+  color: #f0c6ef;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-red-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-red-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-red-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-red-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-red-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-red-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-red-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-red-bg {
+  color: #e9c4c4;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-grey-light-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-grey-light-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-grey-light-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-grey-light-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-grey-light-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-grey-light-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-grey-light-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-grey-light-bg {
+  color: #d2d2d2;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-grey-medium-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-grey-medium-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-grey-medium-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-grey-medium-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-grey-medium-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-grey-medium-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-grey-medium-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-grey-medium-bg {
+  color: #acacac;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-grey-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-grey-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-grey-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-grey-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-grey-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-grey-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-grey-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-grey-bg {
+  color: #787878;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-grey-dark-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-grey-dark-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-grey-dark-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-grey-dark-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-grey-dark-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-grey-dark-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-grey-dark-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-grey-dark-bg {
+  color: #434343;
+}
+#mw-content-text span.oojsplus-color-picker-palette-color.col-black-bg,
+.oojsplus-color-picker-main-grid span.oojsplus-color-picker-palette-color.col-black-bg,
+.ve-init-mw-target-surface span.oojsplus-color-picker-palette-color.col-black-bg,
+.bs-page-content span.oojsplus-color-picker-palette-color.col-black-bg,
+#mw-content-text div.oojsplus-color-picker-palette-color.col-black-bg,
+.oojsplus-color-picker-main-grid div.oojsplus-color-picker-palette-color.col-black-bg,
+.ve-init-mw-target-surface div.oojsplus-color-picker-palette-color.col-black-bg,
+.bs-page-content div.oojsplus-color-picker-palette-color.col-black-bg {
+  color: #000000;
+}
+#mw-content-text th.col-white-bg,
+.oojsplus-color-picker-main-grid th.col-white-bg,
+.ve-init-mw-target-surface th.col-white-bg,
+.bs-page-content th.col-white-bg,
+#mw-content-text td.col-white-bg,
+.oojsplus-color-picker-main-grid td.col-white-bg,
+.ve-init-mw-target-surface td.col-white-bg,
+.bs-page-content td.col-white-bg,
+#mw-content-text span.col-white-bg,
+.oojsplus-color-picker-main-grid span.col-white-bg,
+.ve-init-mw-target-surface span.col-white-bg,
+.bs-page-content span.col-white-bg {
+  background-color: #ffffff;
+}
+#mw-content-text th.col-blue-light-bg,
+.oojsplus-color-picker-main-grid th.col-blue-light-bg,
+.ve-init-mw-target-surface th.col-blue-light-bg,
+.bs-page-content th.col-blue-light-bg,
+#mw-content-text td.col-blue-light-bg,
+.oojsplus-color-picker-main-grid td.col-blue-light-bg,
+.ve-init-mw-target-surface td.col-blue-light-bg,
+.bs-page-content td.col-blue-light-bg,
+#mw-content-text span.col-blue-light-bg,
+.oojsplus-color-picker-main-grid span.col-blue-light-bg,
+.ve-init-mw-target-surface span.col-blue-light-bg,
+.bs-page-content span.col-blue-light-bg {
+  background-color: #e0ecf8;
+}
+#mw-content-text th.col-blue-bg,
+.oojsplus-color-picker-main-grid th.col-blue-bg,
+.ve-init-mw-target-surface th.col-blue-bg,
+.bs-page-content th.col-blue-bg,
+#mw-content-text td.col-blue-bg,
+.oojsplus-color-picker-main-grid td.col-blue-bg,
+.ve-init-mw-target-surface td.col-blue-bg,
+.bs-page-content td.col-blue-bg,
+#mw-content-text span.col-blue-bg,
+.oojsplus-color-picker-main-grid span.col-blue-bg,
+.ve-init-mw-target-surface span.col-blue-bg,
+.bs-page-content span.col-blue-bg {
+  background-color: #cadaea;
+}
+#mw-content-text th.col-blue-dark-bg,
+.oojsplus-color-picker-main-grid th.col-blue-dark-bg,
+.ve-init-mw-target-surface th.col-blue-dark-bg,
+.bs-page-content th.col-blue-dark-bg,
+#mw-content-text td.col-blue-dark-bg,
+.oojsplus-color-picker-main-grid td.col-blue-dark-bg,
+.ve-init-mw-target-surface td.col-blue-dark-bg,
+.bs-page-content td.col-blue-dark-bg,
+#mw-content-text span.col-blue-dark-bg,
+.oojsplus-color-picker-main-grid span.col-blue-dark-bg,
+.ve-init-mw-target-surface span.col-blue-dark-bg,
+.bs-page-content span.col-blue-dark-bg {
+  background-color: #b2cff5;
+}
+#mw-content-text th.col-blue-navy-bg,
+.oojsplus-color-picker-main-grid th.col-blue-navy-bg,
+.ve-init-mw-target-surface th.col-blue-navy-bg,
+.bs-page-content th.col-blue-navy-bg,
+#mw-content-text td.col-blue-navy-bg,
+.oojsplus-color-picker-main-grid td.col-blue-navy-bg,
+.ve-init-mw-target-surface td.col-blue-navy-bg,
+.bs-page-content td.col-blue-navy-bg,
+#mw-content-text span.col-blue-navy-bg,
+.oojsplus-color-picker-main-grid span.col-blue-navy-bg,
+.ve-init-mw-target-surface span.col-blue-navy-bg,
+.bs-page-content span.col-blue-navy-bg {
+  background-color: #c5cbdb;
+}
+#mw-content-text th.col-orange-bg,
+.oojsplus-color-picker-main-grid th.col-orange-bg,
+.ve-init-mw-target-surface th.col-orange-bg,
+.bs-page-content th.col-orange-bg,
+#mw-content-text td.col-orange-bg,
+.oojsplus-color-picker-main-grid td.col-orange-bg,
+.ve-init-mw-target-surface td.col-orange-bg,
+.bs-page-content td.col-orange-bg,
+#mw-content-text span.col-orange-bg,
+.oojsplus-color-picker-main-grid span.col-orange-bg,
+.ve-init-mw-target-surface span.col-orange-bg,
+.bs-page-content span.col-orange-bg {
+  background-color: #f7e1b2;
+}
+#mw-content-text th.col-turquoise-bg,
+.oojsplus-color-picker-main-grid th.col-turquoise-bg,
+.ve-init-mw-target-surface th.col-turquoise-bg,
+.bs-page-content th.col-turquoise-bg,
+#mw-content-text td.col-turquoise-bg,
+.oojsplus-color-picker-main-grid td.col-turquoise-bg,
+.ve-init-mw-target-surface td.col-turquoise-bg,
+.bs-page-content td.col-turquoise-bg,
+#mw-content-text span.col-turquoise-bg,
+.oojsplus-color-picker-main-grid span.col-turquoise-bg,
+.ve-init-mw-target-surface span.col-turquoise-bg,
+.bs-page-content span.col-turquoise-bg {
+  background-color: #bddfdf;
+}
+#mw-content-text th.col-green-bg,
+.oojsplus-color-picker-main-grid th.col-green-bg,
+.ve-init-mw-target-surface th.col-green-bg,
+.bs-page-content th.col-green-bg,
+#mw-content-text td.col-green-bg,
+.oojsplus-color-picker-main-grid td.col-green-bg,
+.ve-init-mw-target-surface td.col-green-bg,
+.bs-page-content td.col-green-bg,
+#mw-content-text span.col-green-bg,
+.oojsplus-color-picker-main-grid span.col-green-bg,
+.ve-init-mw-target-surface span.col-green-bg,
+.bs-page-content span.col-green-bg {
+  background-color: #c5e8c9;
+}
+#mw-content-text th.col-purple-bg,
+.oojsplus-color-picker-main-grid th.col-purple-bg,
+.ve-init-mw-target-surface th.col-purple-bg,
+.bs-page-content th.col-purple-bg,
+#mw-content-text td.col-purple-bg,
+.oojsplus-color-picker-main-grid td.col-purple-bg,
+.ve-init-mw-target-surface td.col-purple-bg,
+.bs-page-content td.col-purple-bg,
+#mw-content-text span.col-purple-bg,
+.oojsplus-color-picker-main-grid span.col-purple-bg,
+.ve-init-mw-target-surface span.col-purple-bg,
+.bs-page-content span.col-purple-bg {
+  background-color: #f0c6ef;
+}
+#mw-content-text th.col-red-bg,
+.oojsplus-color-picker-main-grid th.col-red-bg,
+.ve-init-mw-target-surface th.col-red-bg,
+.bs-page-content th.col-red-bg,
+#mw-content-text td.col-red-bg,
+.oojsplus-color-picker-main-grid td.col-red-bg,
+.ve-init-mw-target-surface td.col-red-bg,
+.bs-page-content td.col-red-bg,
+#mw-content-text span.col-red-bg,
+.oojsplus-color-picker-main-grid span.col-red-bg,
+.ve-init-mw-target-surface span.col-red-bg,
+.bs-page-content span.col-red-bg {
+  background-color: #e9c4c4;
+}
+#mw-content-text th.col-grey-light-bg,
+.oojsplus-color-picker-main-grid th.col-grey-light-bg,
+.ve-init-mw-target-surface th.col-grey-light-bg,
+.bs-page-content th.col-grey-light-bg,
+#mw-content-text td.col-grey-light-bg,
+.oojsplus-color-picker-main-grid td.col-grey-light-bg,
+.ve-init-mw-target-surface td.col-grey-light-bg,
+.bs-page-content td.col-grey-light-bg,
+#mw-content-text span.col-grey-light-bg,
+.oojsplus-color-picker-main-grid span.col-grey-light-bg,
+.ve-init-mw-target-surface span.col-grey-light-bg,
+.bs-page-content span.col-grey-light-bg {
+  background-color: #d2d2d2;
+}
+#mw-content-text th.col-grey-medium-bg,
+.oojsplus-color-picker-main-grid th.col-grey-medium-bg,
+.ve-init-mw-target-surface th.col-grey-medium-bg,
+.bs-page-content th.col-grey-medium-bg,
+#mw-content-text td.col-grey-medium-bg,
+.oojsplus-color-picker-main-grid td.col-grey-medium-bg,
+.ve-init-mw-target-surface td.col-grey-medium-bg,
+.bs-page-content td.col-grey-medium-bg,
+#mw-content-text span.col-grey-medium-bg,
+.oojsplus-color-picker-main-grid span.col-grey-medium-bg,
+.ve-init-mw-target-surface span.col-grey-medium-bg,
+.bs-page-content span.col-grey-medium-bg {
+  background-color: #acacac;
+}
+#mw-content-text th.col-grey-bg,
+.oojsplus-color-picker-main-grid th.col-grey-bg,
+.ve-init-mw-target-surface th.col-grey-bg,
+.bs-page-content th.col-grey-bg,
+#mw-content-text td.col-grey-bg,
+.oojsplus-color-picker-main-grid td.col-grey-bg,
+.ve-init-mw-target-surface td.col-grey-bg,
+.bs-page-content td.col-grey-bg,
+#mw-content-text span.col-grey-bg,
+.oojsplus-color-picker-main-grid span.col-grey-bg,
+.ve-init-mw-target-surface span.col-grey-bg,
+.bs-page-content span.col-grey-bg {
+  background-color: #787878;
+}
+#mw-content-text th.col-grey-dark-bg,
+.oojsplus-color-picker-main-grid th.col-grey-dark-bg,
+.ve-init-mw-target-surface th.col-grey-dark-bg,
+.bs-page-content th.col-grey-dark-bg,
+#mw-content-text td.col-grey-dark-bg,
+.oojsplus-color-picker-main-grid td.col-grey-dark-bg,
+.ve-init-mw-target-surface td.col-grey-dark-bg,
+.bs-page-content td.col-grey-dark-bg,
+#mw-content-text span.col-grey-dark-bg,
+.oojsplus-color-picker-main-grid span.col-grey-dark-bg,
+.ve-init-mw-target-surface span.col-grey-dark-bg,
+.bs-page-content span.col-grey-dark-bg {
+  background-color: #434343;
+}
+#mw-content-text th.col-black-bg,
+.oojsplus-color-picker-main-grid th.col-black-bg,
+.ve-init-mw-target-surface th.col-black-bg,
+.bs-page-content th.col-black-bg,
+#mw-content-text td.col-black-bg,
+.oojsplus-color-picker-main-grid td.col-black-bg,
+.ve-init-mw-target-surface td.col-black-bg,
+.bs-page-content td.col-black-bg,
+#mw-content-text span.col-black-bg,
+.oojsplus-color-picker-main-grid span.col-black-bg,
+.ve-init-mw-target-surface span.col-black-bg,
+.bs-page-content span.col-black-bg {
+  background-color: #000000;
+}
+
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* Expiry */
+.bs-page-content.expired {
+	background-image: url('images/bg-expired-de.png');
+	background-repeat: repeat;
+	background-position: top left;
+	background-size: auto 6cm;
+	min-height: 250px;
+}
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* SocialEntity */
+.bs-social-loadmask {
+  position: absolute;
+  display: none;
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 10;
+}
+.bs-social-loadmask .loader-indicator.loading {
+  position: static;
+}
+.bs-social-entitylist.nodiscussion li div,
+.bs-data-after-content-socialwikipagestash li div {
+  padding: 5px;
+  text-align: center;
+}
+.bs-social-entitylist.nodiscussion li div label,
+.bs-data-after-content-socialwikipagestash li div label {
+  display: block;
+  margin-bottom: 5px;
+}
+#content .bs-social-entity-right a {
+  color: #0060df;
+}
+#content .bs-social-entity-right .bs-social-entity-aftercontent {
+  color: #333333 !important;
+}
+#content .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-tags a,
+#content .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-topic a {
+  color: #bababa;
+}
+ul.bs-social-entitylist,
+#content [class^="mw-content-"] ul.bs-social-entitylist {
+  margin: 0;
+  padding: 10px;
+  clear: both;
+  font-family: inherit;
+  background-color: #f4f4f4;
+}
+ul.bs-social-entitylist li,
+#content [class^="mw-content-"] ul.bs-social-entitylist li {
+  list-style-type: none !important;
+}
+ul.bs-social-entitylist .bs-social-entity-content ol li,
+#content [class^="mw-content-"] ul.bs-social-entitylist .bs-social-entity-content ol li,
+ul.bs-social-entitylist .ve-init-sa-target ol li,
+#content [class^="mw-content-"] ul.bs-social-entitylist .ve-init-sa-target ol li,
+ul.bs-social-entitylist .bs-social-entity-content div > ol li,
+#content [class^="mw-content-"] ul.bs-social-entitylist .bs-social-entity-content div > ol li,
+ul.bs-social-entitylist .ve-init-sa-target div > ol li,
+#content [class^="mw-content-"] ul.bs-social-entitylist .ve-init-sa-target div > ol li {
+  list-style-type: decimal !important;
+}
+ul.bs-social-entitylist .bs-social-entity-content ul li,
+#content [class^="mw-content-"] ul.bs-social-entitylist .bs-social-entity-content ul li,
+ul.bs-social-entitylist .ve-init-sa-target ul li,
+#content [class^="mw-content-"] ul.bs-social-entitylist .ve-init-sa-target ul li,
+ul.bs-social-entitylist .bs-social-entity-content div > ul li,
+#content [class^="mw-content-"] ul.bs-social-entitylist .bs-social-entity-content div > ul li,
+ul.bs-social-entitylist .ve-init-sa-target div > ul li,
+#content [class^="mw-content-"] ul.bs-social-entitylist .ve-init-sa-target div > ul li {
+  list-style-type: disc !important;
+}
+ul.bs-social-entitylist .bs-social-entity-edit-mode form textarea,
+#content [class^="mw-content-"] ul.bs-social-entitylist .bs-social-entity-edit-mode form textarea,
+ul.bs-social-entitylist .bs-social-entity-edit-mode form input,
+#content [class^="mw-content-"] ul.bs-social-entitylist .bs-social-entity-edit-mode form input {
+  border-radius: 3px;
+}
+.bs-social-entitylist-more {
+  background: #6e7b96;
+  margin: 10px auto 50px auto;
+  display: block;
+  width: 30px;
+  height: 30px;
+  position: relative;
+  border-radius: 100px;
+}
+.bs-social-entitylist-more:hover {
+  background: #3e5389;
+}
+.bs-social-entitylist-more .bs-social-entitylist-more-section-button {
+  text-align: center;
+}
+.bs-social-entitylist-more .bs-social-entitylist-more-section-button a {
+  display: inline-block;
+  width: 100%;
+  font-size: 30px !important;
+  font-weight: 700;
+  color: white !important;
+  line-height: 15px;
+}
+.bs-social-entitylist-more .bs-social-entitylist-more-section-button a:hover {
+  text-decoration: none;
+}
+.bs-social-entitylist-more .bs-social-entitylist-more-section-button a:hover:before {
+  color: #3e5389 !important;
+}
+.bs-social-entitylist-more .bs-social-entitylist-more-section-button a:before {
+  margin-right: 5px;
+  color: white !important;
+}
+.bs-social-entitylist-more .bs-social-entitylist-more-section-button a:after {
+  content: unset !important;
+}
+.bs-social-entity-content-attachments {
+  position: relative;
+  padding: 5px;
+  overflow: hidden !important;
+}
+.bs-social-entity-content-attachments div {
+  float: left;
+  height: 155px;
+  color: #6E7B96 !important;
+  background-color: #EEEEEE;
+  cursor: pointer;
+  margin: 1px 3px 6px 3px;
+  padding: 0px !important;
+  width: 128px;
+}
+.bs-social-entity-content-attachments div a,
+.bs-social-entity-content-attachments div span {
+  color: #6E7B96 !important;
+  height: 155px;
+  width: 128px;
+  display: inline-block;
+}
+.bs-social-entity-content-attachments div a img,
+.bs-social-entity-content-attachments div span img {
+  height: 155px;
+  width: 128px;
+  overflow: hidden;
+  object-fit: cover;
+  background-color: #eeeeee;
+}
+.bs-social-entity-content-attachments div a p,
+.bs-social-entity-content-attachments div span p {
+  margin: 0;
+  padding: 0;
+  font-size: 75% !important;
+  word-break: break-all;
+  height: 2.2em;
+  line-height: 1em;
+  overflow: hidden;
+  display: inherit;
+  vertical-align: middle;
+}
+.bs-social-entity-content-attachments div.bs-social-entity-attachment-file a span {
+  text-align: center;
+}
+.bs-social-entity-content-attachments div.bs-social-entity-attachment-file a span:before {
+  font-family: icomoon;
+  font-size: 120px;
+  line-height: 155px;
+  color: #787878;
+}
+.bs-social-entity-content-attachments div.bs-social-entityattachment-pdf a span::before {
+  content: "\eadf";
+}
+.bs-social-entity-content-attachments div.bs-social-entityattachment-excel a span::before {
+  content: "\eae2";
+}
+.bs-social-entity-content-attachments div.bs-social-entityattachment-word a span::before {
+  content: "\eae1";
+}
+.bs-social-entity-content-attachments div.bs-social-entityattachment-unknown a span::before {
+  content: "\eae3";
+}
+.bs-social-entity-content-attachments div .bs-social-entity-attachment-file a {
+  color: #6E7B96 !important;
+  line-height: 50px;
+  vertical-align: baseline;
+  display: inline-block !important;
+}
+.bs-social-entity-content-attachments div .bs-social-entity-attachment-file a:hover {
+  text-decoration: none !important;
+}
+.bs-social-entity-content-attachments div .bs-social-entity-attachment-file a span:before {
+  width: 20px;
+  font-size: 40px;
+  line-height: 0;
+  font-family: icomoon;
+  content: "\eae3";
+  vertical-align: middle;
+  color: #7B7B7B;
+}
+.bs-social-entity-attachment-wrapper {
+  background: lightgrey;
+  position: relative;
+}
+.bs-social-entity-attachment-wrapper a.delete {
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  float: right;
+  clear: both;
+  right: 0;
+  cursor: pointer;
+}
+.bs-social-entity-attachment-wrapper a.delete::before {
+  font-size: 30px;
+  font-family: icomoon !important;
+  content: "\e9ad";
+  color: #d11d13;
+}
+.bs-social-entity-attachment-wrapper a.add {
+  border: 1px solid #347bff;
+  cursor: pointer;
+  position: absolute;
+}
+.bs-social-entity-attachment-wrapper a.add::before {
+  position: relative;
+  top: 40%;
+  left: 32%;
+  font-size: 50px;
+  content: '\ea0a';
+  font-family: icomoon !important;
+  color: #347bff;
+}
+.bs-social-entity-attachment-wrapper img {
+  border: 1px solid #347bff;
+  cursor: pointer;
+}
+.bs-social-entity-attachment-wrapper.editable img {
+  cursor: initial;
+}
+.bs-social-entity-attachment-wrapper p.attachment-name {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 75% !important;
+  word-break: break-all;
+}
+.bs-social-entity-content-attachments div.breakheight {
+  height: auto;
+}
+.bs-social-entity-content-attachments div.breakheight a {
+  height: none;
+}
+.bs-social-entitylist.initiallyhidden,
+.bs-social-entitylist-menu.initiallyhidden,
+.bs-social-entitylist-headline.initiallyhidden,
+.bs-social-entitylist-more.initiallyhidden {
+  display: none;
+}
+.bs-social-entityspawner-new form.oo-ui-layout.oo-ui-formLayout {
+  padding: 10px;
+  z-index: 30;
+  background: #f4f4f4;
+  border: 1px solid #6e7b96;
+}
+.bs-social-entityspawner-new form.oo-ui-layout.oo-ui-formLayout fieldset {
+  width: 100%;
+}
+.bs-social-entity {
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+.bs-social-entity .bs-social-entity-author {
+  font-size: 0.8em;
+}
+.bs-social-entity .bs-social-entity-author a {
+  color: #bababa !important;
+}
+.bs-social-entity .bs-social-entity-author a:active,
+.bs-social-entity .bs-social-entity-author a:hover {
+  color: #0060df !important;
+}
+.bs-social-entity .bs-social-entity-author:before {
+  content: "\2022";
+  color: #000;
+  color: #bababa !important;
+}
+.bs-social-entity .ve-ui-surface {
+  background: white;
+}
+.bs-social-entity form.oo-ui-layout.oo-ui-formLayout {
+  padding: 0px;
+  max-width: 100%;
+  margin: 0px auto 0;
+}
+.bs-social-entity div.bs-social-entity-actions {
+  display: none;
+}
+.bs-social-entity .bs-social-entity-actions {
+  color: #bababa;
+  position: absolute;
+  display: block;
+  top: 0px;
+  right: 0px;
+}
+.bs-social-entity .bs-social-entity-actions .bs-social-entity-actions-btn {
+  cursor: pointer;
+  padding: 0 5px;
+}
+.bs-social-entity .bs-social-entity-actions .bs-social-entity-actions-btn:hover {
+  color: #3e5389;
+  cursor: pointer;
+}
+.bs-social-entity .bs-social-entity-actions .bs-social-entity-actions-btn:before {
+  color: #bababa;
+  content: '\f142';
+  font-family: fontawesome !important;
+  text-decoration: none;
+}
+.bs-social-entity .bs-social-entity-actions-menu-prio {
+  list-style-type: none;
+  float: left;
+  cursor: pointer;
+  padding: 6px 10px 6px 8px;
+  margin-right: 5px;
+  border: 1px solid #d8dfec;
+  background-color: #fff;
+  border-radius: 4px;
+  height: 38px;
+}
+.bs-social-entity .bs-social-entity-actions-menu-prio a {
+  color: #7B7B7B;
+}
+.bs-social-entity .bs-social-entity-actions-menu-prio:hover {
+  color: #23527c !important;
+}
+.bs-social-entity .bs-social-entity-actions-menu-prio img {
+  height: 16px;
+  width: 15px;
+}
+.bs-social-entity .bs-social-entity-actions-menu {
+  list-style-type: none;
+  float: right;
+}
+.bs-social-entity .bs-social-entity-actions-menu button {
+  border: 1px solid #d8dfec;
+  background-color: #fff;
+  color: #747474;
+  height: 38px;
+}
+.bs-social-entity .bs-social-entity-actions-menu .dropdown-menu {
+  min-width: 60px;
+  right: 0;
+  left: unset;
+}
+.bs-social-entity .bs-social-entity-actions-menu .dropdown-menu li a {
+  padding: 3px 10px;
+  color: #7B7B7B;
+}
+.bs-social-entity .bs-social-entity-actions-menu .dropdown-menu li a:hover {
+  color: #23527c !important;
+}
+.bs-social-entity .bs-social-entity-actions-menu img {
+  height: 16px;
+  width: 15px;
+}
+.bs-social-entity .bs-social-entity-title {
+  margin-bottom: 5px;
+}
+.bs-social-entity .bs-social-entity-title h3 {
+  font-size: 17px !important;
+  color: #3e5389 !important;
+  margin-top: 3px !important;
+  margin-bottom: 0px !important;
+}
+.bs-social-entity .bs-social-entity-title h3 a {
+  color: #0060df !important;
+}
+.bs-social-entity .bs-social-entity-title h3 a:active,
+.bs-social-entity .bs-social-entity-title h3 a:hover {
+  color: #0060df !important;
+}
+.bs-social-entity .bs-social-entity-userimage {
+  margin-top: 8px !important;
+  float: left;
+}
+.bs-social-entity .bs-social-entity-userimage .bs-userminiprofile img {
+  border-radius: 0.25rem;
+}
+.bs-social-entity .bs-social-entity-right {
+  margin: 0 0px 0 80px;
+  padding-top: 5px;
+  border-radius: 3px;
+  position: relative;
+}
+.bs-social-entity .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-topic,
+.bs-social-entity .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-tags {
+  font-size: 10px;
+}
+.bs-social-entity .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-topic a,
+.bs-social-entity .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-tags a {
+  color: #bababa;
+}
+.bs-social-entity .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-topic a:hover,
+.bs-social-entity .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-tags a:hover,
+.bs-social-entity .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-topic a:active,
+.bs-social-entity .bs-social-entity-right .bs-social-entity-beforecontent .bs-social-beforecontent-tags a:active {
+  color: #bababa;
+}
+.bs-social-entity .bs-social-entity-right .bs-social-entity-timecreated {
+  color: #bababa;
+}
+.bs-social-entity.bs-social-entity-output-List .bs-social-entity-right {
+  background-color: transparent;
+  border: none;
+  border-radius: 0px;
+}
+.bs-social-entity.bs-social-entity-output-List .bs-social-entity-right:before {
+  width: 0px;
+  height: 0px;
+  display: none;
+  background-color: transparent;
+  border-top: none;
+  border-left: none;
+  box-shadow: none;
+}
+.bs-social-entity.bs-social-entity-output-List .bs-social-entity-right .bs-social-entity-title h3 {
+  display: inline;
+  margin-right: 5px;
+}
+.bs-social-entity.bs-social-entity-output-List .bs-social-entity-right .bs-social-entity-timecreated {
+  color: #bababa;
+}
+.bs-social-entity.bs-social-entity-output-List.archived .bs-social-entity-right {
+  color: #bababa !important;
+  background-color: #ffffff;
+}
+.bs-social-entity.bs-social-entity-output-Short > .bs-social-entity-wrapper > .bs-social-entity-right:before,
+.bs-social-entity.bs-social-entity-output-Default > .bs-social-entity-wrapper > .bs-social-entity-right:before,
+.bs-social-entity.bs-social-entity-output-Page > .bs-social-entity-wrapper > .bs-social-entity-right:before {
+  background-color: white;
+}
+.bs-social-entity.bs-social-entity-output-Short.archived > .bs-social-entity-wrapper > .bs-social-entity-right,
+.bs-social-entity.bs-social-entity-output-Default.archived > .bs-social-entity-wrapper > .bs-social-entity-right,
+.bs-social-entity.bs-social-entity-output-Page.archived > .bs-social-entity-wrapper > .bs-social-entity-right {
+  background-color: #f1d8d8 !important;
+}
+.bs-social-entity.bs-social-entity-output-Short.archived > .bs-social-entity-wrapper > .bs-social-entity-right:before,
+.bs-social-entity.bs-social-entity-output-Default.archived > .bs-social-entity-wrapper > .bs-social-entity-right:before,
+.bs-social-entity.bs-social-entity-output-Page.archived > .bs-social-entity-wrapper > .bs-social-entity-right:before {
+  background-color: #f1d8d8 !important;
+}
+.bs-social-entity .bs-social-entitylist-children {
+  margin-left: 70px;
+}
+.bs-social-entity .bs-social-entitylist-children .bs-social-entity-title h3 {
+  font-size: 17px !important;
+  color: #3e5389 !important;
+}
+.bs-social-entity .bs-social-entitylist-children .bs-social-entity-title h3 a {
+  color: #0060df !important;
+}
+.bs-social-entity .bs-social-entitylist-children .bs-social-entity-userimage {
+  margin-top: 5px !important;
+  float: left;
+}
+.bs-social-entity .bs-social-entitylist-children .bs-social-entity-right {
+  padding-top: 5px;
+  position: relative;
+}
+.bs-social-entity .bs-social-entitylist-children .bs-social-entity-right .bs-social-entity-timecreated {
+  color: #bababa;
+  font-size: 0.8em;
+}
+.bs-social-entity .bs-social-entity-wrapper .bs-social-entity-userimage {
+  margin-top: 10px;
+}
+.bs-social-entity .bs-social-entity-wrapper .bs-social-entity-userimage .bs-social-entity-icon {
+  width: 50px;
+  float: left;
+  margin-top: 25px;
+}
+.bs-social-entity .bs-social-entity-wrapper .bs-social-entity-userimage .bs-social-entity-icon:after {
+  font-size: 50px;
+}
+.bs-social-entity .bs-social-entity-aftercontent {
+  clear: both;
+  color: #3e5389;
+}
+.bs-social-entity .bs-social-entity-aftercontent a {
+  color: #3e5389;
+}
+.bs-social-entity .bs-social-entity-aftercontent a:before {
+  color: #3e5389;
+}
+.bs-social-entity .bs-social-entity-aftercontent a .bs-social-count-short {
+  display: none;
+}
+.bs-social-entity .bs-social-entity-aftercontent a span {
+  color: #3e5389;
+}
+.bs-social-entity .bs-social-entity-aftercontent a:before,
+.bs-social-entity .bs-social-entity-aftercontent .bs-rating-bssocial .bs-rating-bssocial-button {
+  margin-right: 7px;
+}
+.bs-social-entity .bs-social-entity-aftercontent a,
+.bs-social-entity .bs-social-entity-aftercontent .bs-rating-bssocial {
+  margin-right: 18px;
+}
+.bs-social-entity .bs-social-entity-aftercontent a {
+  text-decoration: none !important;
+}
+.bs-social-entity.bs-social-entity-edit-mode {
+  background-color: transparent;
+}
+.bs-social-entity.bs-social-entity-edit-mode .bs-social-entity-wrapper {
+  display: none !important;
+}
+.bs-social-entity.bs-social-entity-edit-mode .bs-social-entity-wrapper .bs-social-entity-aftercontent {
+  background-color: white;
+  padding: 10px;
+  border: 1px solid black;
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  clear: none;
+}
+.bs-social-entity.bs-social-entity-edit-mode form.oo-ui-formLayout.oo-ui-layout {
+  margin: 0 0 10px 0;
+}
+.bs-social-entity.bs-social-entity-edit-mode form.oo-ui-formLayout.oo-ui-layout .oo-ui-fieldsetLayout:last-child .oo-ui-fieldsetLayout-group {
+  float: right;
+}
+.bs-social-entity.bs-social-entity-edit-mode form.oo-ui-formLayout.oo-ui-layout .oo-ui-fieldLayout-body .oo-ui-widget.oo-ui-widget-enabled.oo-ui-inputWidget.oo-ui-textInputWidget.oo-ui-textInputWidget-type-text {
+  max-width: none;
+}
+.bs-social-entity.bs-social-entity-edit-mode form.oo-ui-formLayout.oo-ui-layout textarea {
+  border-color: lightgray;
+}
+.bs-social-entity.bs-social-entity-edit-mode form.oo-ui-formLayout.oo-ui-layout .oo-ui-inputWidget-input {
+  border-color: lightgray;
+}
+.bs-social-entity.bs-social-entity-edit-mode form.oo-ui-formLayout.oo-ui-layout.short textarea {
+  height: 33px;
+}
+.bs-social-entity.bs-social-entity-edit-mode .oo-ui-fieldsetLayout .oo-ui-fieldLayout-field input,
+.bs-social-entity.bs-social-entity-edit-mode .oo-ui-fieldsetLayout .oo-ui-fieldLayout-field textarea {
+  border: 1px solid #d8dfec;
+}
+.bs-social-entity.bs-social-entity-edit-mode form.short .oo-ui-fieldLayout {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.bs-social-entity .bs-social-entitylist.bs-social-entitylist-discussion-children {
+  position: relative;
+  top: 40px;
+}
+a.bs-social-entity-action-edit:before {
+  font-family: icomoon !important;
+  margin-right: 5px;
+  content: "\e905";
+}
+a.bs-social-entity-action-delete:before {
+  font-family: icomoon !important;
+  margin-right: 5px;
+  content: "\e9ad";
+}
+a.bs-social-entity-action-source:before {
+  font-family: icomoon !important;
+  margin-right: 5px;
+  content: "\ea0c";
+}
+#hidesocialentities {
+  margin: 0 5px 0 2px;
+}
+#hidesocialentities + label {
+  margin-right: 5px;
+}
+a.bs-social-entityspawner-blog:before {
+	font-family: icomoon !important;
+	margin-right:8px;
+}
+.bs-social-entity-blog > .bs-social-entity-right div.bs-social-entity-title h3:before,
+a.bs-social-entityspawner-blog:before,
+.bs-social-entity-icon-blog:before, .icon-bs-social-entity-blog:before {
+	font-family: icomoon !important;
+	content: "\e904";
+}
+.bs-social-entity-content-more {
+	width: 65%;
+	text-align: right;
+	border-top: 1px solid #3e5389;
+	margin-bottom: 10px;
+}
+.bs-social-entity-content-more p {
+	margin: 0;
+	padding: 0;
+	height: auto;
+	line-height: 10px;
+	height: 10px;
+}
+.bs-social-entity-content-more a.bs-social-entity-content-more-button {
+	cursor: pointer;
+	font-size: 10px;
+}
+.bs-social-entity-content-more a.bs-social-entity-content-more-button::after {
+	margin-left: 3px;
+	display: inline-block;
+	content: '\f078';
+	font-family: fontawesome !important;
+}
+.bs-social-entity-content-more a.bs-social-entity-content-more-button.extended::after {
+	content: '\f077';
+}.bs-social-entityaftercontent-comment {
+	display: inline-block;
+	margin-right: 10px;
+	cursor: pointer;
+}
+.bs-social-entityaftercontent-comment::before {
+	font-family: 'icomoon';
+	font-size: 13px;
+	color: #3e5389 !important;
+}
+.bs-social-entityaftercontent-comment:hover {
+	text-decoration: none !important;
+}
+.bs-social-entity-comment > .bs-social-entity-right div.bs-social-entity-title h3:before,
+.bs-social-entityaftercontent-comment::before,
+a.bs-social-entityspawner-comment:before {
+	content: '\e96f';
+}a.bs-social-entityspawner-microblog:before {
+	font-family: icomoon !important;
+	margin-right:8px;
+}
+.bs-social-entity-microblog > .bs-social-entity-right div.bs-social-entity-title h3:before,
+a.bs-social-entityspawner-microblog:before {
+	content: "\e91a";
+}.bs-social-entity-wrapper .bs-social-entity-beforecontent {
+  display: none;
+}
+.bs-social-entity-wrapper .bs-social-entity-profileleftcolumn {
+  width: 100%;
+}
+.bs-social-entity-wrapper .bs-social-entity-profileleftcolumn .bs-social-entity-profilefields {
+  position: relative;
+}
+.bs-social-entity-wrapper .bs-social-entity-profileleftcolumn .bs-social-entity-profilefields .bs-social-profile-info {
+  padding: 5px;
+}
+.bs-social-entity-wrapper .bs-social-entity-profileleftcolumn .bs-social-entity-profilefields .bs-social-entity-profileimage {
+  padding: 5px;
+  margin: auto;
+  text-align: center;
+}
+.bs-social-entity-wrapper .bs-social-entity-profileleftcolumn .bs-social-entity-profilefields .bs-social-entity-profileimage .bs-userminiprofile > a img {
+  border: 6px solid #bababa;
+  width: 112px;
+}
+.bs-social-entity-wrapper .bs-social-entity-profileleftcolumn .bs-social-entity-profilebasetitlecontent {
+  margin-bottom: 20px;
+}
+div.bs-social-profileview {
+  overflow: auto;
+}
+div.bs-social-entity-profileleftcolumn {
+  float: left;
+}
+div.bs-social-entity-profilerightcolumn .bs-social-entity-actions {
+  margin-right: 5px;
+}
+.bs-social-entity-profilerightcolumn {
+  width: 240px;
+  margin-left: 10px;
+}
+.bs-social-entity-profilerightcolumn:after {
+  content: "";
+  display: table;
+}
+ul.bs-socialprofile-useroptions {
+  list-style-type: none;
+  margin: 0;
+  text-align: right;
+}
+.bs-social-entitylist-profile-children {
+  display: block;
+  margin: 0 !important;
+  list-style: none !important;
+}
+.bs-social-entity-action-classicprofile::before {
+  margin-right: 5px;
+  font-family: 'entypo';
+  content: '\ea26';
+}
+.bs-social-entity-action-changeimage::before {
+  margin-right: 5px;
+  font-family: 'icomoon';
+  content: '\e90d';
+}
+.bs-social-entity-action-editprofilefields::before {
+  margin-right: 5px;
+  font-family: 'icomoon';
+  content: "\e905";
+}
+.bs-social-entity-action-edituserpage::before {
+  margin-right: 5px;
+  font-family: 'entypo';
+  content: "\ea26";
+}
+.bs-social-entity-profile > .bs-social-entity-right div.bs-social-entity-title h3:before,
+a.bs-social-entityspawner-profile:before,
+.bs-social-entity.bs-social-entity-profile.bs-social-entity-output-Default .bs-social-entity-title h3:before {
+  font-family: icomoon;
+  content: "\e971";
+}
+.bs-social-entity-profileleftcolumn .bs-social-entity-profilefields {
+  background: none rgba(62, 83, 137, 0.1);
+  padding: 11px;
+  margin-bottom: 4px;
+}
+.bs-social-entity-profilefields table {
+  width: 100%;
+}
+.bs-social-entity-profilefields table tr td:first-child {
+  width: 20%;
+}
+.bs-social-entity.bs-social-entity-profile.bs-social-entity-output-Page .bs-social-entity-actions {
+  right: 5px;
+  top: 5px;
+}
+.bs-social-entity-discussion.bs-social-entity-output-Page ul.bs-social-entitylist-children.bs-social-entitylist-discussion-children {
+  display: block;
+  margin-left: 0;
+  list-style: none;
+}
+.bs-social-entity-discussion.bs-social-entity-output-Page .bs-social-entity-wrapper {
+  position: relative;
+}
+.bs-social-entity-discussion a.bs-social-entityspawner-topic:before {
+  font-family: icomoon !important;
+  margin-right: 8px;
+  content: "\e907";
+}
+.bs-social-entity-discussion .bs-data-after-content-socialtopics {
+  clear: both;
+}
+.bs-social-entity-discussion .bs-data-after-content-socialtopics ul.empty-topics > li,
+.bs-social-entity-discussion .bs-data-after-content-socialtopics ul.social-topics-entitylist-newdiscussion > li {
+  padding: 0;
+  margin: 0;
+  margin-top: -42px;
+  font-size: 1em;
+  float: right;
+}
+.bs-data-after-content-socialtopics {
+  clear: both;
+  position: relative;
+}
+.bs-data-after-content-socialtopics ul.bs-social-entitylist.nodiscussion li {
+  padding: 0;
+}
+.bs-data-after-content-socialtopics ul.bs-social-entitylist.nodiscussion li > div {
+  padding: 0;
+}
+.bs-data-after-content-socialtopics .bs-socialtopics-topic-create-first,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussion-create,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussionpage-create {
+  position: absolute;
+  right: 1rem;
+  top: 0.3rem;
+}
+.bs-data-after-content-socialtopics .bs-socialtopics-topic-create-first .oo-ui-buttonElement-button,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussion-create .oo-ui-buttonElement-button,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussionpage-create .oo-ui-buttonElement-button {
+  margin-top: 5px;
+}
+.bs-data-after-content-socialtopics .bs-socialtopics-topic-create-first .oo-ui-buttonElement-button .oo-ui-labelElement-label,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussion-create .oo-ui-buttonElement-button .oo-ui-labelElement-label,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussionpage-create .oo-ui-buttonElement-button .oo-ui-labelElement-label {
+  display: none;
+}
+.bs-data-after-content-socialtopics .bs-socialtopics-topic-create-first .oo-ui-buttonElement-button:selected,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussion-create .oo-ui-buttonElement-button:selected,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussionpage-create .oo-ui-buttonElement-button:selected,
+.bs-data-after-content-socialtopics .bs-socialtopics-topic-create-first .oo-ui-buttonElement-button:active,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussion-create .oo-ui-buttonElement-button:active,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussionpage-create .oo-ui-buttonElement-button:active,
+.bs-data-after-content-socialtopics .bs-socialtopics-topic-create-first .oo-ui-buttonElement-button:focus,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussion-create .oo-ui-buttonElement-button:focus,
+.bs-data-after-content-socialtopics .bs-socialtopics-discussionpage-create .oo-ui-buttonElement-button:focus {
+  border-color: transparent;
+}
+.bs-social-entitylist-menu-item.bs-entitylist-menu-item-update .bs-social-entitylist-menu-item-actions-btn:before {
+  font-family: 'fontawesome';
+  content: '\f021';
+}
+.bs-social-entitylist-menu-item.bs-entitylist-menu-item-update .bs-social-entitylist-menu-item-actions-btn .updateCounter {
+  margin-left: 0px;
+  font-size: 0.75em;
+  vertical-align: top;
+  line-height: 8px;
+  color: #3e5389 !important;
+  font-weight: 700 !important;
+}
+.bs-social-entityaftercontent-tags {
+  display: inline-block;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.bs-social-beforecontent-tags,
+.bs-social-beforecontent-tags a {
+  display: inline-block;
+  margin-right: 5px;
+  word-break: keep-all !important;
+  white-space: nowrap;
+  clear: both;
+}
+.bs-social-entity-action-tags::before {
+  content: '\e935';
+  font-family: 'icomoon';
+  font-size: 13px;
+  color: #3e5389 !important;
+  margin-right: 5px;
+}
+.bs-social-entityaftercontent-tags:hover {
+  text-decoration: none !important;
+}
+.bs-social-entity-aftercontent-tageditor {
+  padding: 10px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  background: #f4f4f4;
+  max-width: 100%;
+  width: 700px;
+  border-top: 1px solid #6e7b96;
+  margin: auto;
+  margin-bottom: 10px;
+}
+.bs-social-entity-aftercontent-tageditor .select2-container {
+  margin-bottom: 20px;
+}
+.bs-social-entity-aftercontent-tageditor li.select2-selection__choice:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.bs-social-entity-aftercontent-tageditor li.select2-selection__choice > span:hover {
+  text-decoration: none;
+}
+.bs-social-entity.bs-social-entity-output-Short.foreign > .bs-social-entity-wrapper > .bs-social-entity-right,
+.bs-social-entity.bs-social-entity-output-Default.foreign > .bs-social-entity-wrapper > .bs-social-entity-right,
+.bs-social-entity.bs-social-entity-output-Page.foreign > .bs-social-entity-wrapper > .bs-social-entity-right {
+  background-color: #d6dce7;
+}
+.bs-social-entity.bs-social-entity-output-Short.foreign > .bs-social-entity-wrapper > .bs-social-entity-right:before,
+.bs-social-entity.bs-social-entity-output-Default.foreign > .bs-social-entity-wrapper > .bs-social-entity-right:before,
+.bs-social-entity.bs-social-entity-output-Page.foreign > .bs-social-entity-wrapper > .bs-social-entity-right:before {
+  background-color: #d6dce7;
+}
+.mw-special-Timeline #content .bs-social-entity-wrapper .bs-social-entity-beforecontent {
+  display: block;
+}
+.mw-special-Timeline #content .bs-social-entity-wrapper .bs-social-entity-beforecontent .bs-social-beforecontent-tags {
+  font-size: 12px;
+}
+.mw-special-Timeline #content .bs-social-entity-wrapper .bs-social-entity-beforecontent .bs-social-beforecontent-tags a {
+  color: #6e6e6e;
+}
+.mw-special-Timeline #content .bs-social-entity-wrapper .bs-social-entity-beforecontent .bs-social-beforecontent-topic {
+  display: none;
+}
+.bs-social-entity-aftercontent, .bs-social-entity-actions,
+.bs-social-entity-content-more, .bs-social-entitylist-menu {
+	display: none !important;
+}
+.bs-social-entity-userimage {
+	float: left;
+	position: absolute;
+}
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* ContentStabilization */
+.contentstabilization-stabilizationhistory-stables-list thead tr {
+	background-color: #d7e4f3;
+}
+.contentstabilization-stabilizationhistory-stables-list td {
+	padding: 0.2cm;
+	vertical-align: top;
+}
+.contentstabilization-stabilizationhistory-stables-list tr.odd {
+	background-color: #f5f8fa;
+}
+.contentstabilization-stabilizationhistory-stables-list tr.even {
+	background-color: #fcfcfc;
+}
+.contentstabilization-export-laststable-tag > .nostable,
+.contentstabilization-stabilizationhistory-no-stables-list {
+	font-style: oblique;
+	font-weight: bold;
+	color: #f00;
+}
+table.fr-diff-ratings {
+	width: 100%;
+}
+table.fr-diff-ratings td {
+	width: 50%;
+}
+span.flaggedrevs-color-0 {
+	background-color: #f9f9f9;
+}
+span.flaggedrevs-color-2 {
+	background-color: #e1ffe1;
+}
+span.flaggedrevs-color-3 {
+	background-color: #afa;
+}
+
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* ContentStabilizationBookshelf */
+.contentstabilization-stabilizationhistory-stables-list thead tr {
+	background-color: #d7e4f3;
+}
+.contentstabilization-stabilizationhistory-stables-list td {
+	padding: 0.2cm;
+	vertical-align: top;
+}
+.contentstabilization-stabilizationhistory-stables-list tr.odd {
+	background-color: #f5f8fa;
+}
+.contentstabilization-stabilizationhistory-stables-list tr.even {
+	background-color: #fcfcfc;
+}
+.contentstabilization-export-laststable-tag > .nostable,
+.contentstabilization-stabilizationhistory-no-stables-list {
+	font-style: oblique;
+	font-weight: bold;
+	color: #f00;
+}
+table.fr-diff-ratings {
+	width: 100%;
+}
+table.fr-diff-ratings td {
+	width: 50%;
+}
+span.flaggedrevs-color-0 {
+	background-color: #f9f9f9;
+}
+span.flaggedrevs-color-2 {
+	background-color: #e1ffe1;
+}
+span.flaggedrevs-color-3 {
+	background-color: #afa;
+}
+
+]]></style><style type="text/css" rel="stylesheet"><![CDATA[
+/* ChecklistsListStyles */
+.checklist-li {
+	list-style: none;
+	position: relative;
+	margin-left: 0;
+}
+
+/* stylelint-disable function-parentheses-space-inside, function-url-quotes */
+.checklist-li::before {
+	content: '';
+	vertical-align: middle;
+	display: inline-block;
+	width: 0.5cm;
+	height: 0.5cm;
+	/* @embed */
+	background-image: url('./images/unchecked.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 0.5cm 0.5cm;
+}
+
+.checklist-li.checklist-checked::before {
+	/* @embed */
+	background-image: url('./images/checked.png');
+}
+/* stylelint-enable function-parentheses-space-inside, function-url-quotes */
+
+.checklist-li.checklist-checked {
+	text-decoration: line-through;
+	color: #747474;
+}
+
+]]></style><link href="stylesheets/entypo.css" type="text/css" rel="stylesheet"/><link href="stylesheets/entypo-fonts.css" type="text/css" rel="stylesheet"/><link href="stylesheets/fontawesome.css" type="text/css" rel="stylesheet"/><link href="stylesheets/fontawesome-fonts.css" type="text/css" rel="stylesheet"/><link href="stylesheets/icomoon.css" type="text/css" rel="stylesheet"/><link href="stylesheets/icomoon-fonts.css" type="text/css" rel="stylesheet"/><link href="stylesheets/bootstrap-icons-fonts.css" type="text/css" rel="stylesheet"/><link href="stylesheets/bootstrap-icons.css" type="text/css" rel="stylesheet"/></head>
+	<body>
+		<div id="bs-runningheaderfix">
+			<table>
+				<tr>
+					<td>
+						<div class="bs-runningheader-logo"/>
+					</td>
+					<td>
+						<h1 class="title">
+							SimplePage
+						</h1>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="bs-runningfooterfix">
+			<table>
+				<tr>
+					<td>
+						Ausgabe: 27.06.2024
+					</td>
+					<td>
+						Dieses Dokument wurde erzeugt mit BlueSpice
+						
+					</td>
+					<td>
+						Seite <span class="bs-currentpagenumber"/>
+						 von  <span class="bs-totalpagescount"/>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<html><body><div class="bs-page-content page-SimplePage"><a name="bs-ue-jumpmark-9d6593b043b7e671eaafcab00c8f2a73" href="https://mydev.localhost"/><h1 class="firstHeading">SimplePage</h1><div class="bodyContent"><p style="visibility:hidden;height:0px;margin:0px;padding:0px">I am here to prevent the first-page-empty bug!</p><div class="mw-parser-output"><p>This is just a simple page.
+</p><p>Input elements are going to be replaced by spans but the value is kept: <input class="example-class" style="height:50px; width:150px" type="button" value="Input value"/>
+</p><p><a title="dummy title" href="#SomeInternalLink">Some page internal link</a>
+</p><p><a title="dummy title" href="https://mydev.localhost/w/index.php?title=Some_redlink_without_label&amp;action=view" class="new" title="Some redlink without label (Seite nicht vorhanden)" data-bs-title="Some_redlink_without_label">Some redlink without label</a>
+</p><p><a title="dummy title" href="https://mydev.localhost/wiki/SomePage" title="SomePage" data-bs-title="SomePage">Internal link with label</a>
+</p><p><a data-fs-embed-file="true" style="display:inline-block" href="attachments/Some_attachment.docx" class="internal media" title="Some attachment.docx" data-bs-title="Medium:Some attachment.docx" data-bs-filename="Some_attachment.docx" data-bs-filetimestamp="20240627142837">Some attachment link</a>
+</p>
+<div id="toc-bs-ue-jumpmark-9d6593b043b7e671eaafcab00c8f2a73" class="toc" role="navigation" aria-labelledby="mw-toc-heading"><div class="toctitle" lang="de" dir="ltr" id="toctitle-bs-ue-jumpmark-9d6593b043b7e671eaafcab00c8f2a73"><h2 id="mw-toc-heading">Inhaltsverzeichnis</h2><span class="toctogglespan"><label class="toctogglelabel" for="toctogglecheckbox"/></span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a title="dummy title" href="#9d6593b043b7e671eaafcab00c8f2a73-691d1860ec58dd973e803e209697d065"><span class="tocnumber">1</span> <span class="toctext">Lists</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a title="dummy title" href="#9d6593b043b7e671eaafcab00c8f2a73-5361c46bb49ec9dc2b8b772ccf7f5f40"><span class="tocnumber">1.1</span> <span class="toctext">Unodered lists</span></a></li>
+<li class="toclevel-2 tocsection-3"><a title="dummy title" href="#9d6593b043b7e671eaafcab00c8f2a73-c3a158b1b6c647269d083833b2ff33c9"><span class="tocnumber">1.2</span> <span class="toctext">Ordered lists</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-4"><a title="dummy title" href="#9d6593b043b7e671eaafcab00c8f2a73-fff0d600f8a0b5e19e88bfb821dd1157"><span class="tocnumber">2</span> <span class="toctext">Images</span></a></li>
+<li class="toclevel-1 tocsection-5"><a title="dummy title" href="#9d6593b043b7e671eaafcab00c8f2a73-651ae5789ab776f2fcaf80b5e62801dc"><span class="tocnumber">3</span> <span class="toctext">Tables</span></a></li>
+<li class="toclevel-1 tocsection-6"><a title="dummy title" href="#9d6593b043b7e671eaafcab00c8f2a73-ca0dbad92a874b2f69b549293387925e"><span class="tocnumber">4</span> <span class="toctext">Code</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="9d6593b043b7e671eaafcab00c8f2a73-691d1860ec58dd973e803e209697d065">Lists<a name="bs-ue-jumpmark-41da9fd35609295cbf885223f9c00601"/></span></h2>
+<p>Here are some lists
+</p>
+<h3><span class="mw-headline" id="9d6593b043b7e671eaafcab00c8f2a73-5361c46bb49ec9dc2b8b772ccf7f5f40">Unodered lists<a name="bs-ue-jumpmark-fdf1124b43770b845a94111187dcb915"/></span></h3>
+<ul><li>Item 1</li>
+<li>Item 2</li>
+<li>Item 3</li></ul>
+<p>Another one
+</p>
+<ul><li>Item 1
+<ul><li>Item 1.1
+<ul><li>Item 1.1.1
+<ul><li>Item 1.1.1.1</li>
+<li>Item 1.1.1.2</li></ul></li></ul></li>
+<li>Item 1.2</li>
+<li>Item 1.3 with really much text. And some <a target="_blank" rel="nofollow noreferrer noopener" class="external text" href="https://www.bluespice.com">link</a>. And even more text. So much text. it does not even fit in a single line anymore! Oh my god, there is a line break just within this list item. How could that even happen?</li></ul></li>
+<li>Item 2
+<ul><li>Item 2.1</li></ul></li></ul>
+<h3><span class="mw-headline" id="9d6593b043b7e671eaafcab00c8f2a73-c3a158b1b6c647269d083833b2ff33c9">Ordered lists<a name="bs-ue-jumpmark-d3e5d62bfee23c5ec2ba04166a5aa522"/></span></h3>
+<ol><li>Item A</li>
+<li>Item B</li>
+<li>Item C</li></ol>
+<p>Another one
+</p>
+<ol><li>aäb cde fgh ijk lmn oöp qrsß tuü vwx yz AÄBC DEF GHI JKL MNO ÖPQ RST UÜV WXYZ !"</li>
+<li>§ $%&amp; /() =?* '&lt;&gt; #|; ²³~ @`´ ©«» ¼× {} aäb cde fgh ijk lmn oöp qrsß tuü vwx yz AÄBC DEF GHI</li>
+<li>JKL MNO ÖPQ RST UÜV WXYZ !"§ $%&amp; /() =?* '&lt;&gt; #|; ²³~ @´ ©«» ¼× {} aäb cde fgh ijk lmn oöp qrsß tuü vwx yz AÄBC DEF GHI JKL MNO ÖPQ RST UÜV WXYZ !"§ $%&amp; /() =?* '&lt;&gt; #|; ²³~ @`´ ©«» ¼× {} aäb cde fgh ijk lmn oöp qrsß tuü vwx yz AÄBC DEF GHI
+<ol><li>JKL MNO</li></ol></li>
+<li>ÖPQ RST UÜV WXYZ !"§ $%&amp; /() =?* '&lt;&gt; #|; ²³~ @`´ ©«»</li>
+<li>¼× {} aäb cde fgh ijk lmn oöp qrsß tuü vwx yz AÄBC DEF GHI JKL MNO ÖPQ RST UÜ</li>
+<li>V WXYZ !"§ $%&amp; /() =?* '&lt;&gt; #|; ²³ @´ ©«» ¼× {} aäb cde fgh ijk lmn oöp qrsß tuü vwx yz AÄBC DEF GHI JKL MNO ÖPQ RST UÜV WXYZ !"§ $%&amp; /() =?* '&lt;&gt; #|; ²³~ @`´ ©«» ¼× {}aäb cde fgh ijk lmn oöp qrsß tuü vwx yz AÄBC DEF GHI JKL MNO ÖPQ RST UÜV WXYZ !"§</li></ol>
+<h2><span class="mw-headline" id="9d6593b043b7e671eaafcab00c8f2a73-fff0d600f8a0b5e19e88bfb821dd1157">Images<a name="bs-ue-jumpmark-e3c3ce5f5dd2fccbe279246a3bbfdcf3"/></span></h2>
+<p>Single image
+</p>
+<div class="thumb tleft"><div class="thumbinner" style="width:302px;"><a title="dummy title" href="https://mydev.localhost/wiki/Datei:Ghostscript_Tiger.svg" class="image" data-bs-title="Datei:Ghostscript_Tiger.svg" data-bs-filetimestamp="20240627135815"><img alt="Ghostscript Tiger.svg" src="images/Ghostscript_Tiger.svg" decoding="async" width="300" height="300" class="thumbimage" srcset="/w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/450px-Ghostscript_Tiger.svg.png 1.5x, /w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/600px-Ghostscript_Tiger.svg.png 2x" data-file-width="512" data-file-height="512" data-orig-src="/w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/300px-Ghostscript_Tiger.svg.png"/></a>  <div class="thumbcaption"><div class="magnify"><a title="dummy title" href="https://mydev.localhost/wiki/Datei:Ghostscript_Tiger.svg" class="internal" title="vergr&#xF6;&#xDF;ern"/></div></div></div></div>
+<div class="center"><div class="thumb tnone"><div class="thumbinner" style="width:128px;"><a title="dummy title" href="https://mydev.localhost/wiki/Datei:Ghostscript_Tiger.svg" class="image" data-bs-title="Datei:Ghostscript_Tiger.svg" data-bs-filetimestamp="20240627135815"><img alt="Ghostscript Tiger.svg" src="images/Ghostscript_Tiger.svg" decoding="async" width="126" height="126" class="thumbimage" srcset="/w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/189px-Ghostscript_Tiger.svg.png 1.5x, /w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/252px-Ghostscript_Tiger.svg.png 2x" data-file-width="512" data-file-height="512" data-orig-src="/w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/126px-Ghostscript_Tiger.svg.png"/></a>  <div class="thumbcaption"><div class="magnify"><a title="dummy title" href="https://mydev.localhost/wiki/Datei:Ghostscript_Tiger.svg" class="internal" title="vergr&#xF6;&#xDF;ern"/></div></div></div></div></div>
+<div class="thumb tright"><div class="thumbinner" style="width:302px;"><a title="dummy title" href="https://mydev.localhost/wiki/Datei:Ghostscript_Tiger.svg" class="image" data-bs-title="Datei:Ghostscript_Tiger.svg" data-bs-filetimestamp="20240627135815"><img alt="Ghostscript Tiger.svg" src="images/Ghostscript_Tiger.svg" decoding="async" width="300" height="300" class="thumbimage" srcset="/w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/450px-Ghostscript_Tiger.svg.png 1.5x, /w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/600px-Ghostscript_Tiger.svg.png 2x" data-file-width="512" data-file-height="512" data-orig-src="/w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/300px-Ghostscript_Tiger.svg.png"/></a>  <div class="thumbcaption"><div class="magnify"><a title="dummy title" href="https://mydev.localhost/wiki/Datei:Ghostscript_Tiger.svg" class="internal" title="vergr&#xF6;&#xDF;ern"/></div></div></div></div>
+<div style="clear:both"/>
+<h2><span class="mw-headline" id="9d6593b043b7e671eaafcab00c8f2a73-651ae5789ab776f2fcaf80b5e62801dc">Tables<a name="bs-ue-jumpmark-875b34afc7373d69517f454e5c3e9179"/></span></h2>
+<p>Nice long table
+</p>
+<table class="wikitable bs-correct-table-width ">
+<caption>
+</caption>
+<thead><tr>
+<th>Some nice header
+</th>
+<th>Another nice header
+</th></tr></thead><tbody>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Look, an image<div class="thumb tright"><div class="thumbinner" style="width:128px;"><a title="dummy title" href="https://mydev.localhost/wiki/Datei:Ghostscript_Tiger.svg" class="image" data-bs-title="Datei:Ghostscript_Tiger.svg" data-bs-filetimestamp="20240627135815"><img alt="Ghostscript Tiger.svg" src="images/Ghostscript_Tiger.svg" decoding="async" width="126" height="126" class="thumbimage" srcset="/w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/189px-Ghostscript_Tiger.svg.png 1.5x, /w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/252px-Ghostscript_Tiger.svg.png 2x" data-file-width="512" data-file-height="512" data-orig-src="/w/nsfr_img_auth.php/thumb/f/fd/Ghostscript_Tiger.svg/126px-Ghostscript_Tiger.svg.png"/></a>  <div class="thumbcaption"><div class="magnify"><a title="dummy title" href="https://mydev.localhost/wiki/Datei:Ghostscript_Tiger.svg" class="internal" title="vergr&#xF6;&#xDF;ern"/></div></div></div></div>
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть)
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чужешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>ce qui lui permet de penser à la cænogenèse de l'être dont il est question dans la cause ambiguë entendue à Moÿ, dans un capharnaüm qui, pense-t-il, diminue çà et là la qualité de son œuvre. Prouvez, beau juge, que le fameux sandwich au yak tue. L'île exiguë, Où l'obèse jury mûr
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешвздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прядохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>ce qui lui permet de penser à la cænogenèse de l'être dont il est question dans la cause ambiguë entendue à Moÿ, dans un capharnaüm qui, pense-t-il, diminue çà et là la qualité de son œuvre. Prouvez, beau juge, que le fameux sandwich au yak tue. L'île exiguë, Où l'obèse jury mûr
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хк! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудба, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, —эр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш ъешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>ce qui lui permet de penser à la cænogenèse de l'être dont il est question dans la cause ambiguë entendue à Moÿ, dans un capharnaüm qui, pense-t-il, diminue çà et là la qualité de son œuvre. Prouvez, beau juge, que le fameux sandwich au yak tue. L'île exiguë, Où l'obèse jury mûr
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхооб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждыйчужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — ъёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Б— кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуже туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>ce qui lui permet de penser à la cænogenèse de l'être dont il est question dans la cause ambiguë entendue à Moÿ, dans un capharnaüm qui, pense-t-il, diminue çà et là la qualité de son œuvre. Prouvez, beau juge, que le fameux sandwich au yak tue. L'île exiguë, Où l'obèse jury mûr
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, —ипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Л Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг! Любя, съешь щипцы, —
+</td></tr>
+<tr>
+<td>вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных
+</td>
+<td>Voyez ce jeu exquis wallon, de graphie en kit mais bref. Portez ce vieux whisky au juge blond qui fuue j'examine près du wharf. Portez ce vieux whisky au juge blond qui fume. Bâchez la queue du wagon-taxi avec les pyjamas du fakir. Voix ambiguë d'un cœur qui, au zéphyr, préfère les jattes de kiwis. Mon pauvre zébu ankylosé choque deux
+</td></tr>
+<tr>
+<td>Voyez ce jeu exquis wallon, de graphie en kit mais bref. Portez ce vieux whisky au juge blond qui fume sur son île intérieure, à côté de l'alcôve ovoïde, où les bûches se consument dans l'âtre, ce qui lui permet de penser à la cænogenèse de l'être dont il est question dans la cause ambiguë entendue à Moÿ, dans un capharnaüm qui, pense-t-il, diminue çà et là la qualité de son œuvre. Prouvez, beau juge, que le fameux sandwich au yak tue. L'île exiguë, Où l'obèse jury mûr Fête l'haï volapük, Âne ex æquo au whist, Ôtez ce vœu déçu. Vieux pelage que je modifie : breitschwanz ou yak ? Dès Noël où un zéphyr haï me vêt de glaçons würmiens, je dîne d’exquis rôtis de bœuf au kir à l’aÿ d’âge mûr &amp; cætera ! Fougueux, j'enivre la squaw au pack de beau zythum. Ketch, yawl, jonque flambant neuve… jugez des prix ! Voyez le brick géant que j'examine près du wharf. Portez ce vieux whisky au juge blond qui fume. Bâchez la queue du wagon-taxi avec les pyjamas du fakir. Voix ambiguë d'un cœur qui, au zéphyr, préfère les jattes de kiwis. Mon pauvre zébu ankylosé choque deux
+</td>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных
+</td></tr>
+<tr>
+<td>ce qui lui permet de penser à la cænogenèse de l'être dont il est question dans la cause ambiguë entendue à Moÿ, dans un capharnaüm qui, pense-t-il, diminue çà et là la qualité de son œuvre. Prouvez, beau juge, que le fameux sandwich au yak tue. L'île exiguë, Où l'obèse jury mûr
+</td>
+<td>вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr>
+<tr>
+<td>Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных
+</td>
+<td>Voyez ce jeu exquis wallon, de graphie en kit mais bref. Portez ce vieux whisky au juge blond qui fume sur ss rôtis de bœuf au kir à l’aÿ d’âge mûr &amp; cætera ! Fougueux, j'enivre la squaw au pack de beau zythum. Ketch, yawl, jonque flambant neuve… jugez des prix ! Voyez le brick géant que j'examine près du wharf. Portez ce vieux whisky au juge blond qui fume. Bâchez la queue du wagon-taxi avec les pyjamas du fakir. Voix ambiguë d'un cœur qui, au zéphyr, préfère les jattes de kiwis. Mon pauvre zébu ankylosé choque deux
+</td></tr>
+<tr>
+<td>вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td>
+<td>Voyez ce jeu exquis wallon, de graphie en kit mais bref. Portez ce vieux whisky au juge blond qui fume sur son île intérieure, à côté de l'alcôve ovoïde, où les bûches se consument dans l'âtre, ce qui lui permet de penser à la cænogenèse de l'être dont il est question dans la cause ambiguë entendue à Moÿ, dans un capharnaüm qui, pense-t-il, diminue çà et là la qualité de son œuvre. Prouvez, beau juge, que le fameux sandwich au yak tue. L'île exiguë, Où l'obèse jury mûr Fête l'haï volapük, Âne ex æquo au whist, Ôtez ce vœu déçu. Vieux pelage que je modifie : breitschwanz ou yak ? Dès Noël où un zéphyr haï me vêt de glaçons würmiens, je dîne d’exquis rôtis de bœuf au kir à l’aÿ d’âge mûr &amp; cætera ! Fougueux, j'enivre la squaw au pack de beau zythum. Ketch, yawl, jonque flambant neuve… jugez des prix ! Voyez le brick géant que j'examine près du wharf. Portez ce vieux whisky au juge blond qui fume. Bâchez la queue du wagon-taxi avec les pyjamas du fakir. Voix ambiguë d'un cœur qui, au zéphyr, préfère les jattes de kiwis. Mon pauvre zébu ankylosé choque deux
+</td></tr>
+<tr>
+<td>Voyez ce jeu exquis wallon, de graphie en kit mais bref. Portez ce vieux whisky au juge blond qui fume sur son île intérieure, à côté de l'alcôve ovoïde, où les bûches se consument dans l'âtre, ce qui lui permet de penser à la cænogenèse de l'être dont il est question dans la cause ambiguë entendue à Moÿ, dans un capharnaüm qui, pense-t-il, diminue çà et là la qualité de son œuvre. Prouvez, beau juge, que le fameux sandwich au yak tue. L'île exiguë, Où l'obèse jury mûr Fête l'haï volapük, Âne ex æquo au whist, Ôtez ce vœu déçu. Vieux pelage que je modifie : breitschwanz ou yak ? Dès Noël où un zéphyr haï me vêt de glaçons würmiens, je dîne d’exquis rôtis de bœuf au kir à l’aÿ d’âge mûr &amp; cætera ! Fougueux, j'enivre la squaw au pack de beau zythum. Ketch, yawl, jonque flambant neuve… jugez des prix ! Voyez le brick géant que j'examine près du wharf. Portez ce vieux whisky au juge blond qui fume. Bâchez la queue du wagon-taxi avec les pyjamas du fakir. Voix ambiguë d'un cœur qui, au zéphyr, préfère les jattes de kiwis. Mon pauvre zébu ankylosé choque deux
+</td>
+<td>вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) — вдрызг!Любя, съешь щипцы, — вздохнёт мэр, — кайф жгуч. Шеф взъярён тчк щипцы с эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен
+</td></tr></tbody></table>
+<p><span id="SomeInternalLink">Internal anchor</span>
+</p><p><br/>
+A more complex table
+</p>
+<table class="wikitable bs-correct-table-width ">
+<caption>
+</caption>
+<thead><tr>
+<th>Heading 1
+</th>
+<th>Heading 2
+</th>
+<th>Heading 3
+</th>
+<th>Heading 4
+</th></tr></thead><tbody>
+<tr>
+<td>Value A
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td></tr>
+<tr>
+<td>
+</td>
+<td>Value B
+</td>
+<td>
+</td>
+<td>
+</td></tr>
+<tr>
+<td colspan="3">Value C
+</td>
+<td rowspan="3">Value C
+</td></tr>
+<tr>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td></tr>
+<tr>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td></tr></tbody></table>
+<h2><span class="mw-headline" id="9d6593b043b7e671eaafcab00c8f2a73-ca0dbad92a874b2f69b549293387925e">Code<a name="bs-ue-jumpmark-bc3b0fb551fb5c2381f7a21f93c6a2cf"/></span></h2>
+<div class="mw-highlight mw-highlight-lang-php mw-content-ltr mw-highlight-lines" dir="ltr"><pre><span/><span class="linenos" data-line="1"/><span class="cp">&lt;?php</span>
+<span class="linenos" data-line="2"/>
+<span class="linenos" data-line="3"/><span class="k">namespace</span> <span class="nx">BlueSpice</span><span class="p">;</span>
+<span class="linenos" data-line="4"/>
+<span class="linenos" data-line="5"/><span class="k">use</span> <span class="nx">Awesomeness</span><span class="p">;</span>
+<span class="linenos" data-line="6"/><span class="k">use</span> <span class="nx">Product</span><span class="p">;</span>
+<span class="linenos" data-line="7"/><span class="k">use</span> <span class="nx">Thing</span><span class="p">;</span>
+<span class="linenos" data-line="8"/>
+<span class="linenos" data-line="9"/><span class="k">class</span> <span class="nc">Developer</span> <span class="k">implements</span> <span class="nx">Awesomeness</span> <span class="p">{</span>
+<span class="linenos" data-line="10"/>    
+<span class="linenos" data-line="11"/>    <span class="sd">/**</span>
+<span class="linenos" data-line="12"/><span class="sd">     * @param Thing $thing The thing to develop</span>
+<span class="linenos" data-line="13"/><span class="sd">     * @return Product The final product</span>
+<span class="linenos" data-line="14"/><span class="sd">     */</span>
+<span class="linenos" data-line="15"/>    <span class="k">public</span> <span class="k">function</span> <span class="nf">develop</span><span class="p">(</span> <span class="nx">Thing</span> <span class="nv">$thing</span> <span class="p">)</span><span class="o">:</span> <span class="nx">Product</span> <span class="p">{</span>
+<span class="linenos" data-line="16"/>        <span class="c1">// TODO: Implement ...</span>
+<span class="linenos" data-line="17"/>    <span class="p">}</span>
+<span class="linenos" data-line="18"/>    <span class="sd">/**</span>
+<span class="linenos" data-line="19"/><span class="sd">     * @inheritdoc</span>
+<span class="linenos" data-line="20"/><span class="sd">     */</span>
+<span class="linenos" data-line="21"/>    <span class="k">public</span> <span class="k">function</span> <span class="nf">beAwesome</span><span class="p">()</span> <span class="o">:</span> <span class="nx">IAwesomenessArtifact</span> <span class="p">{</span>
+<span class="linenos" data-line="22"/>        <span class="k">return</span> <span class="k">new</span> <span class="nx">UniversalAwesomeness</span><span class="p">(</span> <span class="nv">$this</span> <span class="p">);</span>
+<span class="linenos" data-line="23"/>    <span class="p">}</span>
+<span class="linenos" data-line="24"/><span class="p">}</span>
+</pre></div>
+<div class="mw-highlight mw-highlight-lang-shell mw-content-ltr" dir="ltr"><pre><span/>./doIt --when<span class="o">=</span>now &gt; /dev/null
+</pre></div>
+			<h2><span class="mw-headline" id="4c224d96caecfb72894fdfd68980c5a3-Test_for_Base_14_Fonts"
+			          orig-id="Test_for_Base_14_Fonts"><span class="mw-headline-number">5 </span>Test for Base 14 Fonts</span>
+			</h2>
+			<p>In this table we test all 14 standard PDF fonts ("Base 14") for PDF export:
+			</p>
+			<table class="wikitable pdf-correct-table-width">
+				<thead>
+				<tr>
+					<th>Font
+					</th>
+					<th>Example Text
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>Times-Roman
+					</td>
+					<td><span style="font-family: Times;">The quick brown fox jumps over the lazy dog. 1234567890</span>
+					</td>
+				</tr>
+				<tr>
+					<td>Times-Bold
+					</td>
+					<td><span style="font-family: Times;"><b>The quick brown fox jumps over the lazy dog. 1234567890</b></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Times-Italic
+					</td>
+					<td><span style="font-family: Times;"><i>The quick brown fox jumps over the lazy dog. 1234567890</i></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Times-BoldItalic
+					</td>
+					<td><span
+							style="font-family: Times;"><i><b>The quick brown fox jumps over the lazy dog. 1234567890</b></i></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Helvetica
+					</td>
+					<td><span
+							style="font-family: Helvetica;">The quick brown fox jumps over the lazy dog. 1234567890</span>
+					</td>
+				</tr>
+				<tr>
+					<td>Helvetica-Bold
+					</td>
+					<td><span
+							style="font-family: Helvetica;"><b>The quick brown fox jumps over the lazy dog. 1234567890</b></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Helvetica-Oblique
+					</td>
+					<td><span
+							style="font-family: Helvetica;"><i>The quick brown fox jumps over the lazy dog. 1234567890</i></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Helvetica-BoldOblique
+					</td>
+					<td><span style="font-family: Helvetica;"><i><b>The quick brown fox jumps over the lazy dog. 1234567890</b></i></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Courier
+					</td>
+					<td><span
+							style="font-family: Courier;">The quick brown fox jumps over the lazy dog. 1234567890</span>
+					</td>
+				</tr>
+				<tr>
+					<td>Courier-Bold
+					</td>
+					<td><span
+							style="font-family: Courier;"><b>The quick brown fox jumps over the lazy dog. 1234567890</b></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Courier-Oblique
+					</td>
+					<td><span
+							style="font-family: Courier;"><i>The quick brown fox jumps over the lazy dog. 1234567890</i></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Courier-BoldOblique
+					</td>
+					<td><span style="font-family: Courier;"><i><b>The quick brown fox jumps over the lazy dog. 1234567890</b></i></span>
+					</td>
+				</tr>
+				<tr>
+					<td>Symbol
+					</td>
+					<td><span style="font-family: Symbol;">!@#$%^&amp;*() SYMBOL TEST αβγδεζηθ</span>
+					</td>
+				</tr>
+				<tr>
+					<td>ZapfDingbats
+					</td>
+					<td><span style="font-family: ZapfDingbats;">ZapfDingbats test: ✈ ✂ ✉ ☎</span>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+			<h2><span class="mw-headline" id="4c224d96caecfb72894fdfd68980c5a3-Test_for_More_Fonts"
+			          orig-id="Test_for_More_Fonts"><span class="mw-headline-number">6 </span>Test for More Fonts</span>
+			</h2>
+			<p>In this table we test more fonts that might (not) work with PDF Export:
+			</p>
+			<table class="wikitable pdf-correct-table-width">
+				<thead>
+				<tr>
+					<th>Font
+					</th>
+					<th>Example Text
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>DejaVu Sans
+					</td>
+					<td><span
+							style="font-family: DejaVuSans;">The quick brown fox jumps over the lazy dog. 1234567890</span>
+					</td>
+				</tr>
+				<tr>
+					<td>DejaVu Sans Bold
+					</td>
+					<td><span style="font-family: DejaVuSans;"><b>The quick brown fox jumps over the lazy dog. 1234567890</b></span>
+					</td>
+				</tr>
+				<tr>
+					<td>DejaVu Sans Italic
+					</td>
+					<td><span style="font-family: DejaVuSans;"><i>The quick brown fox jumps over the lazy dog. 1234567890</i></span>
+					</td>
+				</tr>
+				<tr>
+					<td>DejaVu Sans BoldItalic
+					</td>
+					<td><span style="font-family: DejaVuSans;"><i><b>The quick brown fox jumps over the lazy dog. 1234567890</b></i></span>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+			<!--
+			NewPP limit report
+			Cached time: 20240627143309
+			Cache expiry: 86400
+			Reduced expiry: false
+			Complications: [show‐toc]
+			[SMW] In‐text annotation parser time: 0.005 seconds
+			CPU time usage: 0.231 seconds
+			Real time usage: 0.250 seconds
+			Preprocessor visited node count: 34/1000000
+			Post‐expand include size: 0/2097152 bytes
+			Template argument size: 0/2097152 bytes
+			Highest expansion depth: 2/100
+			Expensive parser function count: 0/100
+			Unstrip recursion depth: 0/20
+			Unstrip post‐expand size: 3112/5000000 bytes
+			ExtLoops count: 0/100
+			-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+</div></div></div></body></html> <!-- This is where the content is inserted before -->
+	</body>
+</html>

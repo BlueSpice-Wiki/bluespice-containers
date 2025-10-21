@@ -1,0 +1,26 @@
+.source-php {line-height: normal;}
+.source-php li, .source-php pre {
+	line-height: normal; border: 0px none white;
+}
+.source-php .de1, .source-php .de2 {font-family: monospace; font-weight: normal; font-style: normal; margin:0; padding:0; background:inherit;}
+.source-php  {font-family: monospace;}
+.source-php .imp {font-weight: bold; color: red;}
+.source-php li, .source-php li.li1 {font-weight: normal;}
+.source-php li.li2 {font-weight: bold;}
+.source-php .kw1 {color: #b1b100;}
+.source-php .kw2 {color: #000000; font-weight: bold;}
+.source-php .kw3 {color: #990000;}
+.source-php .co1 {color: #666666; font-style: italic;}
+.source-php .co2 {color: #666666; font-style: italic;}
+.source-php .co3 {color: #0000cc; font-style: italic;}
+.source-php .coMULTI {color: #666666; font-style: italic;}
+.source-php .es0 {color: #000099; font-weight: bold;}
+.source-php .br0 {color: #009900;}
+.source-php .sy0 {color: #339933;}
+.source-php .st0 {color: #0000ff;}
+.source-php .nu0 {color: #cc66cc;}
+.source-php .me1 {color: #004000;}
+.source-php .me2 {color: #004000;}
+.source-php .re0 {color: #000088;}
+.source-php .ln-xtra, .source-php li.ln-xtra, .source-php div.ln-xtra {background-color: #ffc;}
+.source-php span.xtra { display:block; }

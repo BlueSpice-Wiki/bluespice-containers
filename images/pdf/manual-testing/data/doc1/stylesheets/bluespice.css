@@ -1,0 +1,82 @@
+/*
+This file contains parts of BlueSpiceFoundation/resources/bluespice/bluespice.css
+The correct way would be to have it included using the
+'BSUEModulePDFBeforeAddingStyleBlocks' hook within the BSF but this seems to be
+a little too much overhead at the moment. We've got things like 'geshi-php.css'
+in this place anyways.
+*/
+
+.bluebox,
+.box-blue {
+	border:0.2mm solid #6093D2;
+	background-color:#AEC8E8;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.beigebox,
+.box-beige {
+	border:0.2mm solid #000;
+	background-color:#E0B978;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.greenbox,
+.box-green {
+	border:0.2mm solid #237E14;
+	background-color:#DEFEBB;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.yellowbox,
+.box-yellow {
+	border:0.2mm solid #DDDD00;
+	background-color:#FFFFAA;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.redbox,
+.box-red {
+	border:0.2mm solid #DD0000;
+	background-color:#FFAAAA;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.blueborder,
+.border-blue {
+	border:0.2mm solid #AEC8E8;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.beigeborder,
+.border-beige {
+	border:0.2mm solid #E0B978;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.greenborder,
+.border-green {
+	border:0.2mm solid #237E14;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.yellowborder,
+.border-yellow {
+	border:0.2mm solid #DDDD00;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
+
+.redborder,
+.border-red {
+	border:0.2mm solid #DD0000;
+	margin:0 0 10px;
+	padding:.3em .6em;
+}
