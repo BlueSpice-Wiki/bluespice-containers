@@ -1,0 +1,7 @@
+/composer.lock
+/package-lock.json
+vendor/
+node_modules/
+mongo/
+config.php
+.env
