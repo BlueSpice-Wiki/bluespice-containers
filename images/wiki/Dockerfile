@@ -102,3 +102,12 @@ USER bluespice
 EXPOSE 9090
 HEALTHCHECK --interval=30s --timeout=5s CMD probe-liveness
 ENTRYPOINT ["/app/bin/entrypoint"]
+
+FROM bluespice-final AS bluespice-dev
+USER root
+RUN apk add nano \
+		vim \
+		curl \
+		iputils-ping\
+		php-xdebug
+USER bluespice
