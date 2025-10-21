@@ -1,0 +1,1 @@
+0 ###BACKUP_HOUR### * * * /app/bin/backup-pipeline

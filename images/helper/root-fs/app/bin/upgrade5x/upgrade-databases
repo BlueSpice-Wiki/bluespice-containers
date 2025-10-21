@@ -1,0 +1,24 @@
+#!/bin/bash
+MYSQL_SERVER=${DB_HOST:-'database'}
+MYSQL_USER=${DB_USER:-'bluespice'}
+MYSQL_PASS=${DB_PASS}
+
+function mysql_connect() {
+    mysql -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} $*
+}
+function mysql_dump() {
+    mysqldump -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} --single-transaction --ignore-table=$*.dpl_clview --ignore-table=$*.objectcache $*
+}
+
+#LIST DATABASES
+DATABASES=$(mysql_connect <<< "SHOW DATABASES;" | awk -F " " '{if (NR!=1) print $1}' | grep -v information_schema | grep -v mysql | grep -v sys | grep -v performance_schema)
+
+# Create an array with the database names
+readarray -t aDB <<< "$DATABASES"
+
+# run sql-command
+for sDB in "${aDB[@]}"; do
+    TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+    mysql_dump ${sDB} > $Upgrade_Directory/${sDB}_${TIMESTAMP}.sql 
+    mysql_connect ${sDB} < /app/bin/upgrade5x/upgrade_db.sql && echo $TIMESTAMP "5.1 DB upgrade on Database ${sDB}" | tee -a ${LOGFILE}
+done

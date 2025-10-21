@@ -1,0 +1,6 @@
+#!/bin/bash
+if [[  $(restic -r /data/backup/ stats <<< ${BACKUP_PASS} > /dev/null 2>&1 )  ]]; then
+	restic -r /data/backup/ forget --keep-within-daily 7d --keep-within-weekly 1m --keep-within-monthly 1y --keep-within-yearly 75y  <<< ${BACKUP_PASS} > /proc/1/fd/1 2>&1 ;
+else
+	find /data/backup -iname "${WIKI_HOST}_*.tar" -ctime +${BLUESPICE_BACKUP_RETENTION_TIME:-5} -exec rm -fr {} \;
+fi

@@ -1,0 +1,20 @@
+#!/bin/bash
+	echo "Creating persistent Data-Directories"
+	mkdir -p /data/search/data/nodes/0
+	mkdir -p /data/wiki
+	mkdir -p /data/proxy
+	mkdir -p /data/database
+
+	if [[ "${EDITION}" == "pro" || "${EDITION}" == "farm" ]]; then
+		mkdir -p /data/database-collabpads
+	fi
+		
+	if [[ "${EDITION}" == "farm" ]]; then
+		mkdir -p /data/wiki/bluespice/{farm-instances,farm-archives}
+	fi
+echo "Changing User-Permission on persistent Data-Directories"
+
+chown -R 911:911 /data/database
+chown -R 1000:1000 /data/search
+chown -R 1002:1002 /data/wiki
+

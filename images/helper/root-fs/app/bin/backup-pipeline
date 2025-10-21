@@ -1,0 +1,10 @@
+#!/bin/bash
+export BLUESPICE_DATABASE_BACKUP_DIRECTORY=${BLUESPICE_DATABASE_BACKUP_DIRECTORY:-'/data/wiki/backup-databases'}
+mkdir -p ${BLUESPICE_DATABASE_BACKUP_DIRECTORY}
+for f in /app/bin/backup.d/*; do
+	if [ -f "$f" ]; then
+		echo ""
+		echo "🔧 Running $f"
+		$f $*
+	fi
+done

@@ -1,0 +1,42 @@
+#!/bin/bash
+export LOGFILE=/data/wiki/bluespice/logs/backend_upgrade_5.log
+export VERSIONFILE=/data/wiki/bluespice/logs/BASEVERSION
+export Upgrade_Directory=/data/upgrade_backup
+delete_logs() {
+	cat ${LOGFILE} >> ${LOGFILE}.bak
+	rm -fr ${LOGFILE}
+	rm -fr ${VERSIONFILE}
+}
+while getopts ":f" option; do
+   case $option in
+      f) # rerun upgrade
+         delete_logs;;
+   esac
+done
+
+
+if [[ -f ${LOGFILE} ]] && [[ $(stat -c%s ${LOGFILE}) > 0 ]]; then
+    exit 0
+
+else
+    touch ${LOGFILE}
+    echo "move instances-Folders if needed"
+    /app/bin/upgrade5x/upgrade-filesystem
+    echo "running backend-upgrade"
+    echo "fix Databases"
+    /app/bin/upgrade5x/upgrade-databases
+    echo "Databases fixed"
+    echo "running further tasks" 
+    /app/bin/upgrade5x/upgrade-tasks
+    echo "Wait for Mongo"
+    echo "30"
+    sleep 10
+    echo "20"
+    sleep 10
+    echo "10"
+    echo "checking MongoDB"
+    /app/bin/upgrade5x/upgrade-mongo-db
+    echo "see DATADIR/wiki/bluespice/logs/backend_upgrade_5.log for more Information"
+    echo "restart container with -f Option to force rerun"
+
+fi

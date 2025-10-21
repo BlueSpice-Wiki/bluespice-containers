@@ -1,0 +1,12 @@
+#!/bin/bash
+Mongo=bluespice-collabpads-database
+Mongo_DB=collabpads
+
+function check_collabpads {
+    docker exec ${Mongo} mongosh --eval 'db.getMongo().getDBNames().indexOf("collabpads");'
+}
+
+    if [[ $(check_collabpads) > 0 ]]; then  #does DB exist then dump
+        rm -fr ${BLUESPICE_BACKUP_DIRECTORY}/databases/collabpads_dump.gz
+        docker exec ${Mongo} mongodump --db ${Mongo_DB} --gzip --archive > ${BLUESPICE_BACKUP_DIRECTORY}/databases/collabpads_dump.gz
+    fi

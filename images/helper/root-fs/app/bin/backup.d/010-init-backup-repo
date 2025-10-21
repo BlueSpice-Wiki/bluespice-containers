@@ -1,0 +1,10 @@
+#!/bin/bash
+if [[ ${1} != "--no-compress" ]]; then
+
+	if [[ ! $(restic -r /data/backup cat config  <<< ${BACKUP_PASS} )  ]]; then
+		echo "Your Backup Password is: " ${BACKUP_PASS} > /proc/1/fd/1 2>&1 ; 
+		restic -r /data/backup init <<< ${BACKUP_PASS} > /proc/1/fd/1 2>&1 ;
+	fi
+else
+	mkdir -p /data/backup 
+fi

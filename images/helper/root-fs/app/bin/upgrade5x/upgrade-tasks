@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd /data/wiki/bluespice
+	
+		echo "no tasks to do" | tee -a ${LOGFILE}

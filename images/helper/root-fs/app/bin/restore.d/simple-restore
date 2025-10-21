@@ -1,0 +1,44 @@
+#!/bin/bash
+BACKUP_FILE=/data/wiki/backup/${1}
+MYSQL_SERVER=${DB_HOST:-'database'}
+MYSQL_USER=${DB_USER:-'bluespice'}
+MYSQL_PASS=${DB_PASS}
+MYSQL_DBNAME=${DB_NAME}
+
+function mysql_connect() {
+    mysql -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} $*
+}
+function mysql_dump() {
+    mysqldump -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} --single-transaction --ignore-table=$*.dpl_clview --ignore-table=$*.objectcache $*
+}
+unzip -qo ${BACKUP_FILE} -d /tmp
+## Stop proxy and Task contaimer
+docker stop bluespice-proxy
+docker stop bluespice-wiki-task
+
+##CLEAR AND RESTORE DATABASE
+mysql_connect <<EOF
+DROP DATABASE $MYSQL_DBNAME;
+CREATE DATABASE $MYSQL_DBNAME;
+EOF
+mysql_connect ${MYSQL_DBNAME} < /tmp/database.sql
+
+##CLEAR and RESTORE FILES
+rm -fr /data/wiki//bluespice/images
+mv /tmp/filesystem/images /data/wiki/bluespice
+chown -R 1002:1002 /data/wiki/bluespice
+##RUN UPDATES
+
+docker exec bluespice-wiki-web php /app/bluespice/w/maintenance/update.php --quick
+
+##REBUILD SEARCHINDEX
+docker exec bluespice-wiki-web rebuild-searchindex --main
+
+ if [[ -f /data/wiki/bluespice/extensions/BlueSpiceFoundation/data/ext-chatbot-index-pages.json ]]; then
+        rm -fr /data/wiki/bluespice/extensions/BlueSpiceFoundation/data/ext-chatbot-index-pages.json
+	fi
+while [[ $(docker exec bluespice-wiki-web php /app/bluespice/w/maintenance/showJobs.php) != "0" ]]; do  
+      docker exec bluespice-wiki-web php /app/bluespice/w/maintenance/runJobs.php --maxjobs=100 --memory-limit=max
+done
+docker start bluespice-proxy
+docker start bluespice-wiki-task

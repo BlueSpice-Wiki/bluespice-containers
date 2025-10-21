@@ -1,0 +1,18 @@
+#!/bin/bash
+BACKUP_HOUR=${BACKUP_HOUR:-1}
+BACKUP_HOUR=$(echo ${BACKUP_HOUR} | sed 's/0\([0-9]\)/\1/g')
+sed -i "s/###BACKUP_HOUR###/${BACKUP_HOUR}/g" /app/cron/backup-jobs
+/usr/bin/supercronic /app/cron/backup-jobs > /proc/1/fd/1 2>&1  &
+
+no-compress() {
+sed -i "s/run-backups/backup-pipeline --no-compress/g" /app/cron/backup-jobs
+}
+
+sleep infinity
+
+while getopts ":-no-compress" option; do
+   case $option in
+      -no-compress) # rerun upgrade
+         deacttivate_restic;;
+   esac
+done

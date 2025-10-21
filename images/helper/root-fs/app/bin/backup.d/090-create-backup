@@ -1,0 +1,22 @@
+#!/bin/bash
+if [[  $(restic -r /data/backup/ cat config <<< ${BACKUP_PASS} > /dev/null 2>&1 ) ]]; then
+	restic -r /data/backup/ backup /data/wiki/ --exclude-file=/app/bin/backup.d/conf/restic_excludes.txt <<< ${BACKUP_PASS} > /proc/1/fd/1 2>&1 ;
+else
+	TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+	mkdir -p /data/backup/${WIKI_HOST}_${TIMESTAMP}	
+	for f in /data/wiki/*; do
+	if [ -d "$f" ]; then
+		echo ""
+		echo "🔧 Backing up $f"
+		s=${f##/*/}
+		tar czf  /data/backup/${WIKI_HOST}_${TIMESTAMP}/$s.tar.gz  -C /data/wiki/ $s
+	fi
+	done
+if [[ -n ${KUBERNETES_SERVICE_HOST} ]]; then
+	cat /data/wiki/.wikienv > /tmp/.env
+	env >> /tmp/.env
+	tar cf  /data/backup/${WIKI_HOST}${TIMESTAMP}.tar  -C /data/backup/${WIKI_HOST}${TIMESTAMP} 
+ 	tar -r /data/backup/${WIKI_HOST}${TIMESTAMP}.tar -C /tmp/.env
+fi
+	rm -fr /data/backup/${WIKI_HOST}${TIMESTAMP}
+fi

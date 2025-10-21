@@ -1,0 +1,5 @@
+**/images/thumb
+**/images/lockdir
+**/images/temp
+**/images/cache
+**/extensions/BlueSpiceFondation/data

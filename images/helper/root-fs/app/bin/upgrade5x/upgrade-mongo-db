@@ -1,0 +1,49 @@
+#!/bin/bash
+Mongo_new=bluespice-collabpads-database
+Collabpads=bluespice-collabpads
+Mongo_old_image=mongo:5.0-focal
+Mongo_old=bluespice-mongodumper
+Mongo_DB=collabpads
+
+function check_collabpads {
+    docker exec ${Mongo_old} mongosh --eval 'db.getMongo().getDBNames().indexOf("collabpads");'
+}
+
+output=$(docker ps -a -f name=${Mongo_new} | grep ${Mongo_new} 2> /dev/null)
+status=$(echo ${output}| awk '{print $7}')
+
+if [[ $status != "Up" ]]; then #is Mongo 8 not running then run 
+    docker run -d -v ${DATADIR}/database-collabpads:/data/db --name ${Mongo_old} ${Mongo_old_image}
+    sleep 5
+    if [[ $(check_collabpads) > 0 ]]; then  #does DB exist then dump
+        docker exec ${Mongo_old} mongodump --db ${Mongo_DB} --gzip --archive > ${Upgrade_Directory}/collabpads_dump.gz
+        TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+        echo $TIMESTAMP "Get Collabpads-Dump" >> ${LOGFILE}
+    fi
+    docker stop ${Mongo_old} 
+    docker rm ${Mongo_old} 
+fi
+
+if [[ $status != "Up" ]] ; then #if MONGO8 breaking 
+    docker stop ${Mongo_new}
+    cd /data
+    tar czf ${Upgrade_Directory}/mongo_backup.tar.gz database-collabpads
+    rm -fr database-collabpads
+    mkdir -p /data/database-collabpads
+    docker restart ${Mongo_new}
+    docker restart ${Collabpads}
+else
+	echo "MongoDB is fine" | tee -a ${LOGFILE}
+fi
+
+if [[ $status == "Up" ]] ; then
+    TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+    echo $TIMESTAMP "Mongo Version is 8" >> ${LOGFILE}
+fi
+
+if [[ -f ${Upgrade_Directory}/collabpads_dump.gz ]]; then #ifdumpexists
+    docker cp ${Upgrade_Directory}/collabpads_dump.gz ${Mongo_new}:/tmp
+    docker exec ${Mongo_new} mongorestore --gzip --archive=/tmp/collabpads_dump.gz
+    TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+    echo $TIMESTAMP "Collabpads-Dump restored" >> ${LOGFILE}
+fi
