@@ -1,0 +1,47 @@
+#!/bin/php
+<?php
+
+$matoidBaseUrl = $argv[1];
+$stdin = fopen( 'php://stdin', 'r' );
+$inputJSON = fgets( $stdin );
+fclose( $stdin );
+
+// Process Mathoid-CLI input
+$input = json_decode( $inputJSON, true );
+$hash = $input[0]['query']['hash'];
+$query = $input[0]['query']['q'];
+$type = $input[0]['query']['type'];
+
+// Transform to Marhoid-Service input
+$postData = [
+	'q' => $query,
+	'type' => $type
+];
+$streamContext = stream_context_create( [
+	'http' => [
+		'method' => 'POST',
+		'header' => 'Content-Type: application/json',
+		'content' => json_encode( $postData )
+	]
+] );
+
+$output = [
+	'nohash' => [ $hash ],
+	'success' => false
+];
+
+// Call Mathoid-Service
+$mathoidResponseJSON = file_get_contents( $matoidBaseUrl, false, $streamContext );
+$mathoidResponse = null;
+if ( $mathoidResponseJSON !== false ) {
+	$mathoidResponse = json_decode( $mathoidResponseJSON, true );
+}
+
+// Mimic Mathoid-CLI output
+if ( $mathoidResponse !== null && $mathoidResponse['success'] ) {
+	$output['nohash'] = [];
+	$output['success'] = true;
+	$output[$hash] = $mathoidResponse;
+}
+
+echo json_encode( $output );
