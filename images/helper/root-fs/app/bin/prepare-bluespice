@@ -18,3 +18,14 @@ chown -R 911:911 /data/database
 chown -R 1000:1000 /data/search
 chown -R 1002:1002 /data/wiki
 
+if ls /data/database/logs/mariadb-bin.* 1>/dev/null 2>&1; then
+  echo "Cleaning up MariaDB binlog files"
+  rm -f /data/database/logs/mariadb-bin.*
+else
+fi
+
+if ls /data/database/logs/mysql/mariadb-bin.* 1>/dev/null 2>&1; then
+  echo "Cleaning up MariaDB binlog files"
+  rm -f /data/database/logs/mysql/mariadb-bin.*
+else
+fi
