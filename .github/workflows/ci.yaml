@@ -2,13 +2,13 @@ name: Build and Push Container Images
 
 on:
   push:
-    branches: [ 'dev-5.1.x' ]
+    branches: [ 'freeze-5.1.x' ]
   pull_request:
-    branches: [ 'dev-5.1.x' ]
+    branches: [ 'freeze-5.1.x' ]
   workflow_dispatch:
 
 env:
-  VERSION: ${{ github.event.inputs.version || 'dev-5.1.x' }}
+  VERSION: ${{ github.event.inputs.version || 'freeze-5.1.x' }}
 
 jobs:
   discover:
