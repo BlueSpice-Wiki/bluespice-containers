@@ -80,6 +80,8 @@ if ( getenv( 'AV_HOST' ) ) {
 	$GLOBALS['wgAntivirus'] = 'clamav';
 	$GLOBALS['wgAntivirusRequired'] = true;
 }
+
+$GLOBALS['wgCdnServersNoPurge'] = Wikimedia\IPUtils::sanitizeRange( gethostbyname( gethostname() ?? '' ) . '/24' );
 if ( getenv('WIKI_PROXY') ) {
 	$GLOBALS['wgCdnServersNoPurge'] = explode( ',', trim( getenv( 'WIKI_PROXY' ) ) );
 	array_walk( $GLOBALS['wgCdnServersNoPurge'], function ( &$value ) {
@@ -90,8 +92,8 @@ if ( getenv( 'WIKI_SUBSCRIPTION_KEY' ) ) {
 	$GLOBALS['bsgOverrideLicenseKey'] = trim( getenv( 'WIKI_SUBSCRIPTION_KEY' ) ) ;
 }
 
-$GLOBALS['wgOAuth2PrivateKey'] = '/data/bluespice/oauth_private.key';
-$GLOBALS['wgOAuth2PublicKey'] = '/data/bluespice/oauth_public.key';
+$GLOBALS['wgOAuth2PrivateKey'] = getenv( 'INTERNAL_OAUTH2_PRIVATE_KEY' ) ?: '/data/bluespice/oauth_private.key';
+$GLOBALS['wgOAuth2PublicKey'] = getenv( 'INTERNAL_OAUTH2_PUBLIC_KEY' ) ?: '/data/bluespice/oauth_public.key';
 
 $GLOBALS['bsgESBackendHost'] = trim( getenv( 'SEARCH_HOST' ) ?: 'search' );
 $GLOBALS['bsgESBackendPort'] = trim( getenv( 'SEARCH_PORT' ) ?: '9200' );
@@ -140,7 +142,10 @@ $GLOBALS['wgMathoidCli'] = [
 	$GLOBALS['wgMathMathMLUrl']
 ];
 
-$GLOBALS['bsgInstanceStatusCheckAllowedIP'] = trim( getenv( 'WIKI_STATUSCHECK_ALLOWED' ) ?? '' );
+$GLOBALS['bsgInstanceStatusCheckAllowedIP'] =
+	trim( getenv( 'WIKI_STATUSCHECK_ALLOWED' ) )
+	?? Wikimedia\IPUtils::sanitizeRange( $_SERVER['SERVER_ADDR'] . '/24' );
+
 
 $GLOBALS['wgSimpleSAMLphp_InstallDir'] = '/app/simplesamlphp';
 
@@ -181,6 +186,58 @@ if ( getenv( 'EDITION' ) === 'farm' ) {
 	$GLOBALS['wgSharedPrefix'] = $GLOBALS['wgDBprefix'];
 	$GLOBALS['wgSharedTables'] = [ 'bs_translationtransfer_translations' ];
 }
+
+
+$GLOBALS['mwsgTokenAuthenticatorSalt'] = getenv( 'INTERNAL_WIKI_TOKEN_AUTH_SALT' );
+
+// While this is not necessarily `bluespice/chat` service specific configuration, we currently assume it is.
+// This may change in future versions. See https://github.com/hallowelt/mwstake-mediawiki-component-token-authenticator/issues/2
+$GLOBALS['mwsgTokenAuthenticatorServiceUser'] = 'ChatBot service user';
+$GLOBALS['mwsgTokenAuthenticatorServiceToken'] = getenv( 'INTERNAL_CHAT_WIKI_ACCESS_TOKEN' );
+$GLOBALS['mwsgTokenAuthenticatorServiceAllowedAPIModules'] = [
+	ApiOpenSearch::class
+];
+$GLOBALS['mwsgTokenAuthenticatorServiceAllowedRestPaths'] = [
+	'/mws/v1/user-token/verify',
+	'/chatintegration/v1/ping'
+];
+# By default limit to same subnet as the host (container)
+$GLOBALS['mwsgTokenAuthenticatorServiceCIDR'] =
+	trim( getenv( 'WIKI_SERVICE_TOKEN_AUTH_ALLOWED' ) )
+	?? Wikimedia\IPUtils::sanitizeRange( gethostbyname( gethostname() ?? '' ) . '/24' );
+
+// `bluespice/wire` service configuration
+$GLOBALS['mwsgWireServiceApiKey'] = getenv( 'INTERNAL_WIRE_API_KEY' );
+$GLOBALS['mwsgWireServiceUrl'] = bsAssembleURL(
+	[ 'WIRE_PROTOCOL', 'http' ],
+	[ 'WIRE_HOST', 'wire' ],
+	[ 'WIRE_PORT', '3333' ]
+);
+$GLOBALS['mwsgWireServiceWebsocketUrl'] = $GLOBALS[ 'wgServer' ] . '/_wire';
+
+// Extension:WikiRAG configuration
+$GLOBALS['wgWikiRAGTarget'] = [
+	'type' => 'local-directory',
+	'configuration' => [
+		'path' => '/data/bluespice/rag'
+	]
+];
+$GLOBALS['wgWikiRAGPipeline'] = [ 'content.wikitext', 'repofile', 'meta.json', 'acl.json' ];
+
+// Extension:ChatIntegration configuration
+$GLOBALS['wgChatIntegrationBridge'] = [
+	'url' => bsAssembleURL(
+		[ 'CHAT_PROTOCOL', 'http' ],
+		[ 'CHAT_HOST', 'chat' ],
+		[ 'CHAT_PORT', '3000' ]
+	),
+	'token' => getenv( 'INTERNAL_CHAT_TOKEN' )
+];
+
+// Extension:ChatBot configuration
+$GLOBALS['wgChatBotService'] = [
+	'url' => $GLOBALS[ 'wgServer' ] . '/_chat'
+];
 
 require_once '/data/bluespice/pre-init-settings.php';
 if ( getenv( 'EDITION' ) === 'farm' ) {

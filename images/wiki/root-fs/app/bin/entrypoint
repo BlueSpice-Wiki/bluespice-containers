@@ -22,14 +22,30 @@ fi
 export PATH=$PATH:/app/bin
 substitutePlaceholders /app/bin/config/clamd.conf
 
-init-datadirectory
-
 if [ -f /data/.wikienv ]; then
+  # For b/c, in case 5.2 bluespice/helper was not used and file was not migrated therefore
   set -a
   source /data/.wikienv
   set +a
 fi
+
+# Since 5.2
+# Load secrets; Omit subdirectories and non-uppercase filenames
+for secret in $(find /run/secrets/ -maxdepth 1 -type f | grep -E '/[A-Z_]+$' | xargs -n1 basename); do
+  # For grep:
+  # - INTERNAL_CHAT_TOKEN
+  # - INTERNAL_SIMPLESAMLPHP_ADMIN_PASS
+  # - INTERNAL_SIMPLESAMLPHP_SECRET_SALT
+  # - INTERNAL_WIKI_SECRETKEY
+  # - INTERNAL_WIKI_UPGRADEKEY
+  # - INTERNAL_WIKI_TOKEN_AUTH_SALT
+  # - INTERNAL_WIRE_API_KEY
+  echo "$secret=$(cat /run/secrets/$secret)" >> /app/.env
+done
+
 if [ -f /app/.env ]; then
+  # For grep:
+    # - EDITION
   set -a
   source /app/.env
   set +a

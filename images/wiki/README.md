@@ -17,6 +17,9 @@ docker build -t bluespice/wiki:latest .
 | `BACKUP_HOUR`                | `1`            | Hour for daily backup. Set to `-1` to disable        | Yes      |
 | `CACHE_HOST`                 | `cache`        | Hostname of a `bluespice/cache` compatible service *)| Yes      |
 | `CACHE_PORT`                 | `11211`        | Port of a `bluespice/cache` compatible service       | Yes      |
+| `CHAT_HOST`                  | `chat`         | Hostname of a `bluespice/chat` compatible service    | Yes      |
+| `CHAT_PORT`                  | `3000`         | Port of a `bluespice/chat` compatible service        | Yes      |
+| `CHAT_PROTOCOL`              | `http`         | Protocol of a `bluespice/chat` compatible service    | Yes      |
 | `DB_HOST`                    | `database`     | Database host                                        | Yes      |
 | `DB_NAME`                    | `bluespice`    | Database name                                        | Yes      |
 | `DB_PASS`                    | `null`         | Database password                                    | No       |
@@ -35,6 +38,7 @@ docker build -t bluespice/wiki:latest .
 | `FORMULA_HOST`               | `formula`      | Hostname of a `bluespice/formula` compatible service | Yes      |
 | `FORMULA_PORT`               | `10044`        | Port of a `bluespice/formula` compatible service     | Yes      |
 | `FORMULA_PROTOCOL`           | `http`         | Protocol of a `bluespice/formula` compatible service | Yes      |
+| `INTERNAL_CHAT_WIKI_ACCESS_TOKEN` | `null` | Access token `bluespice/chat` | No       |
 | `INTERNAL_WIKI_SECRETKEY`    | `null`         | Secret key for the wiki                              | No       |
 | `INTERNAL_WIKI_UPGRADEKEY`   | `null`         | Upgrade key for the wiki                             | No       |
 | `PDF_HOST`                   | `pdf`          | Hostname of a `bluespice/pdf` compatible service     | Yes      |
@@ -67,6 +71,10 @@ docker build -t bluespice/wiki:latest .
 | `WIKI_PROXY`                 | `null`         | IP address(es) of proxy server. Will fall back to `proxy` service of `bluespice-deploy` | Yes      |
 | `WIKI_SUBSCRIPTION_KEY`      | `null`         | Only used by PRO edition. Overrides in-app config    | Yes      |
 | `WIKI_STATUSCHECK_ALLOWED`   | `null`         | IP or CIDR range for status check REST endpoint      | Yes      |
+| `WIRE_HOST`                  | `wire`         | Hostname of a `bluespice/wire` compatible service    | Yes      |
+| `WIRE_PORT`                  | `3333`         | Port of a `bluespice/wire` compatible service        | Yes      |
+| `WIRE_PROTOCOL`              | `http`         | Protocol of a `bluespice/wire` compatible service    | Yes      |
+
 
 *) External cache can be disabled by setting `-` as `CACHE_HOST`.
 **) See section "Database requirements for FARM edition"
