@@ -48,6 +48,12 @@ fi
 if [ "${ANTIVIRUS}" == "true" ]; then
 	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.clamav-antivirus.yml"
 fi
+if [ "${AI}" == "true" ]; then
+	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.ai.yml"
+fi
+if [ "${CHAT}" == "true" ]; then
+	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.chat.yml"
+fi
 if [ "${LETSENCRYPT}" == "true" ]; then
 	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.proxy-letsencrypt.yml"
 fi
@@ -62,8 +68,9 @@ fi
 if [ "${DEVELOPMENT}" == "true" ] && [ -f docker-compose.dev.yml ]; then
 	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.dev.yml"
 fi
+
 if [ -f docker-compose.override.yml ]; then
-	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.override.yml"
+       EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.override.yml"
 fi
 ##allow custom services repo for testing
 if [ -n "${SERVICES_REPOSITORY_PATH}" ]; then
