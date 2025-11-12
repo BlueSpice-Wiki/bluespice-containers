@@ -76,22 +76,30 @@ prepare_build() {
     local repo="$3"
     local branch="$4"
     if [[ "$key" == "bluespice-image-wiki" ]]; then
-        echo "Preparing build environment in $prefix/_codebase..."
-        # Load (empty) BlueSpice codebase
-        mkdir -p "$prefix/_codebase/bluespice"
+        if [[ ! -d "$prefix/_codebase/bluespice" ]]; then
+            echo "Codebase for BlueSpice missing. Adding an empty placeholder..."
+            mkdir -p "$prefix/_codebase/bluespice"
+        fi
         # Load (latest) Simplesamlphp
         local sp_latest=$(curl -s https://api.github.com/repos/simplesamlphp/simplesamlphp/releases/latest | \
             grep -o '"tag_name": "v[^"]*"' | cut -d'"' -f4 | sed 's/^v//' || echo "2.4.2")
-        echo "Downloading simplesamlphp v$sp_latest..."
+        echo "Downloading simplesamlphp v$sp_latest (latest)..."
         curl -sL "https://github.com/simplesamlphp/simplesamlphp/releases/download/v${sp_latest}/simplesamlphp-${sp_latest}-slim.tar.gz" | \
-            tar -xzf - -C "$prefix/_codebase" && \
-                mv "$prefix/_codebase/simplesamlphp-${sp_latest}" "$prefix/_codebase/simplesamlphp" 2>/dev/null || true
+            tar -xzf - -C "$prefix/_codebase"
+        if [[ -d "$prefix/_codebase/simplesamlphp" ]]; then
+            rm -rf "$prefix/_codebase/simplesamlphp"
+        fi
+        mv "$prefix/_codebase/simplesamlphp-${sp_latest}" "$prefix/_codebase/simplesamlphp" 2>/dev/null || true
         echo "Build environment ready: bluespice/ and simplesamlphp/ created"
     fi
 }
 
 dry_run_build() {
     echo "Testing Docker builds in images/ directory (no images created)..."
+    if [[ ! -d "images/wiki/_codebase/bluespice" || ! -d "images/wiki/_codebase/simplesamlphp" ]]; then
+        echo "Preparing missing codebase in images/wiki/_codebase...."
+        iterate_components prepare_build
+    fi
     for dir in images/*/; do
         if [[ -d "$dir" && -f "$dir/Dockerfile" ]]; then
             local image_name=$(basename "$dir")
@@ -107,6 +115,10 @@ dry_run_build() {
 
 build_images() {
     echo "Building Docker images in images/ directory..."
+    if [[ ! -d "images/wiki/_codebase/bluespice" || ! -d "images/wiki/_codebase/simplesamlphp" ]]; then
+        echo "Preparing missing codebase in images/wiki/_codebase...."
+        iterate_components prepare_build
+    fi
     for dir in images/*/; do
         if [[ -d "$dir" && -f "$dir/Dockerfile" ]]; then
             local image_name=$(basename "$dir")
