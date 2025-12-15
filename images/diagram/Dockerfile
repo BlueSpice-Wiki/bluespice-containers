@@ -1,24 +1,26 @@
-ARG BASE_IMAGE=alpine:3.20.3
+ARG BASE_IMAGE=alpine:3
 
 FROM $BASE_IMAGE AS builder
 
-ARG SHA512SUM_1=aecbc4ae16f6783e3f80696fe936c8201fd74a708be18a2512864c0141eeec91180b8c8274f60a0e28390d932344a15c5ef3b3e6fbb819b3d2db244d4f562998
-ARG SHA512SUM_2=016b4ec30120198b75083bf842fc8de9866d78a6cfa6d006161ebc7a6c7a4218dbf5566e382c9a104ec6bc96cfdb7e310e3400b3c0dd58cc703fa6dfd427a47e
+
+ARG TOMCAT_VERSION=10.1.49
+ARG TOMCAT_SHA512SUM=a46c8e37d4767b56a16dbdd8e81b80f25ad2edd5fba68b5099b9165cfffbe32bc923a601db8bb5cba50e8b1047a7906eb8c30ca176e1c0b8dfd85fbb9c54c6c2
+ARG DRAWIO_VERSION=29.2.2
+ARG DRAWIO_SHA256SUM=28a043b381818b765e1c414551fbc089930166e3f217abffa60cad28ee5e9b88
 
 RUN apk add --no-cache wget tar \
-    && wget https://archive.apache.org/dist/tomcat/tomcat-10/v10.1.48/bin/apache-tomcat-10.1.48.tar.gz \
-    && echo "$SHA512SUM_1  apache-tomcat-10.1.48.tar.gz" | sha512sum -c - \
+    && wget https://archive.apache.org/dist/tomcat/tomcat-10/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+    && echo "$TOMCAT_SHA512SUM  apache-tomcat-$TOMCAT_VERSION.tar.gz" | sha512sum -c - \
     && mkdir -p /opt/tomcat \
-    && tar xzf apache-tomcat-10.1.48.tar.gz -C /opt/tomcat --strip-components 1 \
-    && rm apache-tomcat-10.1.48.tar.gz
+    && tar xzf apache-tomcat-$TOMCAT_VERSION.tar.gz -C /opt/tomcat --strip-components 1 \
+    && rm apache-tomcat-$TOMCAT_VERSION.tar.gz
 
-RUN wget https://github.com/jgraph/drawio/releases/download/v28.2.5/draw.war \
-    && echo "$SHA512SUM_2  draw.war" | sha512sum -c - \
+RUN wget https://github.com/jgraph/drawio/releases/download/v$DRAWIO_VERSION/draw.war \
+    && echo "$DRAWIO_SHA256SUM  draw.war" | sha256sum -c - \
         && rm -fr /opt/tomcat/webapps/* \
     && unzip draw.war -d /opt/tomcat/webapps/_diagram \
     && ln -sf /opt/tomcat/webapps/_diagram /opt/tomcat/webapps/ROOT \
     && rm -rf draw.war
-
 
 FROM $BASE_IMAGE AS main
 
