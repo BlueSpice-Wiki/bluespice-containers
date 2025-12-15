@@ -62,8 +62,9 @@ fi
 if [ "${DEVELOPMENT}" == "true" ] && [ -f docker-compose.dev.yml ]; then
 	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.dev.yml"
 fi
+
 if [ -f docker-compose.override.yml ]; then
-	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.override.yml"
+       EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.override.yml"
 fi
 ##allow custom services repo for testing
 if [ -n "${SERVICES_REPOSITORY_PATH}" ]; then
