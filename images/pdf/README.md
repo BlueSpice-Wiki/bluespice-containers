@@ -58,7 +58,7 @@ curl http://localhost:8080/Html2PDF/v1/
 ```
 will return somthing like:
 ```
-{"msg":"Service is running","success":true,"version":"1.1.0"}
+{"msg":"Service is running","success":true,"version":"1.1.1"}
 ```
 
 ## "bshtml2pdf" compatibility

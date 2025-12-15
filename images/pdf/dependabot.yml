@@ -1,0 +1,10 @@
+package-ecosystem: "java-maven"
+directory: "/"
+versioning-strategy: "auto"
+updates:
+  - package-ecosystem: "java-maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    ignore: []
