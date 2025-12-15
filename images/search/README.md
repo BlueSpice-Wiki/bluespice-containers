@@ -10,6 +10,20 @@ Given you have this service running at `http://localhost:9200`, you can configur
 $GLOBALS['bsgESBackendTransport'] = 'http';
 ```
 
+## Additional Scripts
+Search stops writing in indices, if diskspace usage increases over 90%.
+In Order to remove the Lock decrease diskspace usage under 90% and run:
+```sh
+removeROtag
+```
+in Container
+or 
+```sh
+./bluespice-deploy exec search removeROtag
+```
+from compose-directory
+
+
 ## How to release a new version
 
 ### Build a new version of the image
