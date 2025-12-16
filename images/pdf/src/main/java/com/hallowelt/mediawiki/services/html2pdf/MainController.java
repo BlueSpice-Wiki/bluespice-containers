@@ -60,7 +60,7 @@ public class MainController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("success", true);
 		response.put("msg", "Service is running");
-		response.put( "version", "1.1.0");
+		response.put( "version", "1.1.1");
 		return response;
 	}
 
@@ -243,17 +243,6 @@ public class MainController {
 			input.replaceWith(span);
 		}
 
-		String[] supportedNormalizedFonts = new String[] {
-			"courier",
-			"helvetica",
-			"monospace",
-			"sans-serif",
-			"serif",
-			"symbol",
-			"times",
-			"zapfdingbats"
-		};
-
 		// We need to strip all unsupported font-families from inline CSS styles
 		Elements styledElements = doc.select("[style]");
 		for (org.jsoup.nodes.Element el : styledElements) {
@@ -281,61 +270,14 @@ public class MainController {
 				String value = rule[1].trim();
 				String normalizedValue = value.toLowerCase();
 
-				// Strip `mso-*` entirely
-				if (normalizedProperty.startsWith("mso-")) {
+				if (normalizedProperty.equals("font-family")
+					||normalizedProperty.equals("font")
+					||normalizedProperty.startsWith("mso-")) {
 					logger.debug("Sanitize: remove property: " + normalizedProperty + ":" + normalizedValue);
 					continue;
 				}
 
-				// Leave unchanged if not `font-family` or `font`
-				if (!normalizedProperty.equals("font-family")
-					&& !normalizedProperty.equals("font")) {
-					sanitizedParts.add(part);
-					continue;
-				}
-
-				if ( normalizedProperty.equals("font-family") ) {
-					// font-family:Arial, Helvetica, sans-serif
-					String[] families = value.split(",");
-					List<String> sanitizedFamilies = new ArrayList<>();
-					for (String family : families) {
-						String normalizedFamily = family.trim().toLowerCase();
-						for (String supportedNormalizedFont : supportedNormalizedFonts) {
-							if (normalizedFamily.equals(supportedNormalizedFont)) {
-								sanitizedFamilies.add(family.trim());
-								break;
-							}
-						}
-					}
-					if (sanitizedFamilies.size() == 0) {
-						logger.debug("Sanitize: remove property: " + normalizedProperty + ":" + normalizedValue);
-						continue;
-					}
-					value = String.join(", ", sanitizedFamilies); // We keep processing below
-				}
-
-				// Try to extract quoted strings from the value, e.g. `7.0pt "Times New Roman"`
-				Pattern pattern = Pattern.compile("\"([^\"]+)\"");
-				Matcher matcher = pattern.matcher(value);
-				StringBuffer sanitizedValue = new StringBuffer();
-				while (matcher.find()) {
-					String match = matcher.group(1);
-					String normalizedMatch = match.toLowerCase();
-					String replacement = "";
-					for (String supportedNormalizedFont : supportedNormalizedFonts) {
-						if (normalizedMatch.equals(supportedNormalizedFont)) {
-							replacement = match;
-							break;
-						}
-					}
-					matcher.appendReplacement(sanitizedValue, Matcher.quoteReplacement(replacement));
-				}
-				matcher.appendTail(sanitizedValue);
-				if (sanitizedValue.length() == 0) {
-					logger.debug("Sanitize: remove property: " + normalizedProperty + ":" + normalizedValue);
-					continue;
-				}
-				sanitizedParts.add(property + ":" + sanitizedValue.toString().trim());
+				sanitizedParts.add(part);
 			}
 
 			String sanitizedStyle = String.join(";", sanitizedParts);
