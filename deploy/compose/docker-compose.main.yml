@@ -1,4 +1,4 @@
-name: bluespice
+name: dev-5.2.x
 
 x-common-environment: &common-environment
   VERSION: ${VERSION}
