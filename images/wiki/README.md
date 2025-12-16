@@ -17,14 +17,14 @@ docker build -t bluespice/wiki:latest .
 | `BACKUP_HOUR`                | `1`            | Hour for daily backup. Set to `-1` to disable        | Yes      |
 | `CACHE_HOST`                 | `cache`        | Hostname of a `bluespice/cache` compatible service *)| Yes      |
 | `CACHE_PORT`                 | `11211`        | Port of a `bluespice/cache` compatible service       | Yes      |
-| `CHAT_HOST`                  | `chat`         | Hostname of a `bluespice/chat` compatible service    | Yes      |
+| `CHAT_HOST`                  | `chat`         | Hostname of a `bluespice/chat` compatible service **)| Yes      |
 | `CHAT_PORT`                  | `3000`         | Port of a `bluespice/chat` compatible service        | Yes      |
 | `CHAT_PROTOCOL`              | `http`         | Protocol of a `bluespice/chat` compatible service    | Yes      |
 | `DB_HOST`                    | `database`     | Database host                                        | Yes      |
 | `DB_NAME`                    | `bluespice`    | Database name                                        | Yes      |
 | `DB_PASS`                    | `null`         | Database password                                    | No       |
-| `DB_PREFIX`                  | `''`           | Database prefix **)                                  | Yes      |
-| `DB_ROOT_PASS`               | ``             | Database root password **)                           | Yes      |
+| `DB_PREFIX`                  | `''`           | Database prefix ***)                                  | Yes      |
+| `DB_ROOT_PASS`               | ``             | Database root password ***)                           | Yes      |
 | `DB_ROOT_USER`               | ``             | Database root user                                   | Yes      |
 | `DB_TYPE`                    | `mysql`        | Database type                                        | Yes      |
 | `DB_USER`                    | `bluespice`    | Database user                                        | Yes      |
@@ -57,8 +57,8 @@ docker build -t bluespice/wiki:latest .
 | `TZ`                         | `UTC`          | Timezone for BlueSpice and container system time     | Yes      |
 | `WIKI_BASE_PATH`             | `''`           | Base path for the wiki. Must be aligned with proxy   | Yes      |
 | `WIKI_EMERGENCYCONTACT`      | `''`           | Emergency contact email                              | No       |
-| `WIKI_FARM_DB_PREFIX`        | `sfr_`         | Database name prefix for wiki farm instances **)     | Yes      |
-| `WIKI_FARM_USE_SHARED_DB`    | `null`         | Store wiki farm instances in `DB_NAME` **)           | Yes      |
+| `WIKI_FARM_DB_PREFIX`        | `sfr_`         | Database name prefix for wiki farm instances ***)     | Yes      |
+| `WIKI_FARM_USE_SHARED_DB`    | `null`         | Store wiki farm instances in `DB_NAME` ***)           | Yes      |
 | `WIKI_HOST`                  | `localhost`    | Host for the wiki                                    | Yes      |
 | `WIKI_INITIAL_ADMIN_PASS`    | `null`         | Initial admin password. Uses random, if not set      | Yes      |
 | `WIKI_INITIAL_ADMIN_USER`    | `Admin`        | Admin user name use during initial installation      | Yes      |
@@ -77,7 +77,8 @@ docker build -t bluespice/wiki:latest .
 
 
 *) External cache can be disabled by setting `-` as `CACHE_HOST`.
-**) See section "Database requirements for FARM edition"
+**) Functions requiring `bluespice/chat` can be disabled by setting `-` as `CHAT_HOST`.
+***) See section "Database requirements for FARM edition"
 
 ## Directories and Volumes
 

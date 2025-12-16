@@ -81,7 +81,7 @@ if ( getenv( 'AV_HOST' ) ) {
 	$GLOBALS['wgAntivirusRequired'] = true;
 }
 
-$GLOBALS['wgCdnServersNoPurge'] = Wikimedia\IPUtils::sanitizeRange( gethostbyname( gethostname() ?? '' ) . '/24' );
+$GLOBALS['wgCdnServersNoPurge'] = [ Wikimedia\IPUtils::sanitizeRange( gethostbyname( gethostname() ?? '' ) . '/24' ) ];
 if ( getenv('WIKI_PROXY') ) {
 	$GLOBALS['wgCdnServersNoPurge'] = explode( ',', trim( getenv( 'WIKI_PROXY' ) ) );
 	array_walk( $GLOBALS['wgCdnServersNoPurge'], function ( &$value ) {
@@ -198,8 +198,8 @@ $GLOBALS['mwsgTokenAuthenticatorServiceAllowedAPIModules'] = [
 	ApiOpenSearch::class
 ];
 $GLOBALS['mwsgTokenAuthenticatorServiceAllowedRestPaths'] = [
-	'/mws/v1/user-token/verify',
-	'/chatintegration/v1/ping'
+	'/mws/v1/user-token',
+	'/chatintegration'
 ];
 # By default limit to same subnet as the host (container)
 $GLOBALS['mwsgTokenAuthenticatorServiceCIDR'] =
@@ -224,20 +224,23 @@ $GLOBALS['wgWikiRAGTarget'] = [
 ];
 $GLOBALS['wgWikiRAGPipeline'] = [ 'content.wikitext', 'repofile', 'meta.json', 'acl.json' ];
 
-// Extension:ChatIntegration configuration
-$GLOBALS['wgChatIntegrationBridge'] = [
-	'url' => bsAssembleURL(
-		[ 'CHAT_PROTOCOL', 'http' ],
-		[ 'CHAT_HOST', 'chat' ],
-		[ 'CHAT_PORT', '3000' ]
-	),
-	'token' => getenv( 'INTERNAL_CHAT_TOKEN' )
-];
+// We allow explictly disabling Chat extensions
+if ( getenv( 'CHAT_HOST' ) !== '-' ) {
+	// Extension:ChatIntegration configuration
+	$GLOBALS['wgChatIntegrationBridge'] = [
+		'url' => bsAssembleURL(
+			[ 'CHAT_PROTOCOL', 'http' ],
+			[ 'CHAT_HOST', 'chat' ],
+			[ 'CHAT_PORT', '3000' ]
+		),
+		'token' => getenv( 'INTERNAL_CHAT_TOKEN' )
+	];
 
-// Extension:ChatBot configuration
-$GLOBALS['wgChatBotService'] = [
-	'url' => $GLOBALS[ 'wgServer' ] . '/_chat'
-];
+	// Extension:ChatBot configuration
+	$GLOBALS['wgChatBotService'] = [
+		'url' => $GLOBALS[ 'wgServer' ] . '/_chat'
+	];
+}
 
 require_once '/data/bluespice/pre-init-settings.php';
 if ( getenv( 'EDITION' ) === 'farm' ) {

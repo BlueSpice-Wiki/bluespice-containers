@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Due to ERM39476, we need to rebuild the search index after updates
+# Due to ERM42811, we need to rebuild the search index after updates
 if [ "${EDITION}" == "farm" ]; then
 	/app/bin/rebuild-searchindex --all
 else
