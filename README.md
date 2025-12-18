@@ -1,5 +1,5 @@
-![BlueSpice Logo](https://bluespice.com/wp-content/uploads/2022/09/bluespice_logo.png)
-
+<img alt="BlueSpice Logo" align="right" src="https://bluespice.com/wp-content/uploads/2022/09/bluespice_logo.png" />
+# `bluespice/ai` service for BlueSpice
 This service is the AI and RAG component. All AI functionality in BlueSpice is provided by this service.
 
 It is part of the [BlueSpice MediaWiki deployment stack](https://github.com/hallowelt/bluespice-deploy). Instructions on how to use it can be found on the [official helpdesk 📚](https://en.wiki.bluespice.com/wiki/Setup:Installation_Guide/Docker). For questions and support, please use the [contact form 🌐](https://bluespice.com/contact/) or visit the [community forums 💡](https://community.bluespice.com/).
