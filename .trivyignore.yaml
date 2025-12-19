@@ -14,3 +14,7 @@ vulnerabilities:
     reason: "SSI disabled"
   - id: CVE-2023-2953
     reason: "Patched by Debian backport"
+
+secrets:
+  - file: /etc/ssl/private/ssl-cert-snakeoil.key
+    reason: "Default Debian snakeoil key, not used in container"
