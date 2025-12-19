@@ -1,0 +1,7 @@
+{
+	"name": "wire",
+	"dependencies": {
+		"winston": "^3.17.0",
+		"ws": "^8.18.3"
+	}
+}
