@@ -1,13 +1,15 @@
 ## Build
 
+Assuming you have a valid access token for https://gitlab.hallowelt.com/ai/webservice-ai.git stored in `~/gitlab-token.txt`, you can run
+
 ```bash
+GIT_AUTH_TOKEN=$(cat ~/gitlab-token.txt) \
 docker build \
-     --build-arg GITLAB_TOKEN=glpat-...token... \
-     --build-arg GITLAB_USERNAME=bluespice-bot \
-     -t docker.bluespice.com/bluespice-qa/ai:latest .
+	--secret id=GIT_AUTH_TOKEN \
+	-t bluespice/ai:latest .
 ```
 
-## Environmant Variables
+## Environment Variables
 
 > [!WARNING]
 > The choice of LLM provider is chosen by the given env variables: `AI__LLM_PROVIDER` `AI__EMBEDDER_PROVIDER`.
