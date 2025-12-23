@@ -1,10 +1,12 @@
 ## Build
 
+Assuming you have a valid access token for https://gitlab.hallowelt.com/BlueSpice/webservice-chat.git stored in `~/gitlab-token.txt`, you can run
+
 ```bash
+GIT_AUTH_TOKEN=$(cat ~/gitlab-token.txt) \
 docker build \
-     --build-arg GITLAB_TOKEN=glpat-...token... \
-     --build-arg GITLAB_USERNAME=bluespice-bot \
-     -t docker.bluespice.com/bluespice-qa/chat:latest .
+	--secret id=GIT_AUTH_TOKEN \
+	-t bluespice/chat:latest .
 ```
 
 ## Environment variables

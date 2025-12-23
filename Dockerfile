@@ -3,21 +3,18 @@ FROM node:24-alpine AS builder
 WORKDIR /tmp/chat
 
 # To be eventually replaced by clone of a build release
-RUN apk update && apk add --no-cache git
-ARG REPO_BRANCH="master"
-ARG GITLAB_TOKEN
-ARG GITLAB_USERNAME="bluespice-bot"
-ENV REPO_URL="https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@gitlab.hallowelt.com/BlueSpice/webservice-chat.git"
-RUN git clone --depth=1 -b ${REPO_BRANCH} "$REPO_URL" .
+ARG REPO_BRANCH="1.0.x"
+ENV REPO_URL="https://gitlab.hallowelt.com/BlueSpice/webservice-chat.git"
+ADD "$REPO_URL#$REPO_BRANCH" /tmp/chat/
 RUN find . -type d -name '.git' | xargs rm -rf {} \;
 RUN npm install
-RUN apk del git
 
 FROM node:24-alpine
 
 WORKDIR /app
 
-COPY --from=builder /tmp/chat ./
-RUN chmod +x ./start.sh
+COPY root-fs/* ./
+COPY --from=builder /tmp/chat ./chat
+RUN chmod +x ./chat/start.sh
 
-CMD ["./start.sh"]
+CMD ["/app/bin/entrypoint"]
