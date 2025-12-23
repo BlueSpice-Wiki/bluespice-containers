@@ -1,22 +1,21 @@
 FROM node:24-alpine AS builder
 
-WORKDIR /tmp/chat
+WORKDIR /tmp/wire
 
-ARG REPO_BRANCH="master"
+ARG REPO_BRANCH="1.0.x"
 # To be eventually replaced by clone of a build release
-RUN --mount=type=secret,id=gitlab-token,env=GITLAB_TOKEN \
-	apk update \
-	&& apk add --no-cache git \
-	&& git clone --depth=1 -b ${REPO_BRANCH} "https://oauth:${GITLAB_TOKEN}@gitlab.hallowelt.com/BlueSpice/webservice-wire.git" . \
-	&& find . -type d -name '.git' | xargs rm -rf {} \; \
-	&& npm install \
-	&& apk del git
+ARG REPO_BRANCH="1.0.x"
+ENV REPO_URL="https://gitlab.hallowelt.com/BlueSpice/webservice-wire.git"
+ADD "$REPO_URL#$REPO_BRANCH" /tmp/wire/
+RUN find . -type d -name '.git' | xargs rm -rf {} \;
+RUN npm install
 
 FROM node:24-alpine
 
 WORKDIR /app
 
-COPY --from=builder /tmp/chat ./
-RUN chmod +x ./start.sh
+COPY root-fs/* ./
+COPY --from=builder /tmp/wire ./wire
+RUN chmod +x ./wire/start.sh
 
-CMD ["./start.sh"]
+CMD ["/app/bin/entrypoint"]

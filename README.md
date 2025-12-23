@@ -1,15 +1,12 @@
 ## Build
 
-Make sure you have your GitLab personal access token stored in a file at `$HOME/.GITLAB_TOKEN`.
-
-> **Warning**: Make sure the file does not contain a trailing newline! Create the file with `echo -n 'your_token_here' > $HOME/.GITLAB_TOKEN` to avoid that.
-
-Then run the following command to build the Docker image:
+Assuming you have a valid access token for https://gitlab.hallowelt.com/BlueSpice/webservice-wire.git stored in `~/gitlab-token.txt`, you can run
 
 ```bash
+GIT_AUTH_TOKEN=$(cat ~/gitlab-token.txt) \
 docker build \
-     --secret id=gitlab-token,src=$HOME/.GITLAB_TOKEN \
-     -t docker.bluespice.com/bluespice-qa/wire:latest .
+	--secret id=GIT_AUTH_TOKEN \
+	-t bluespice/wire:latest .
 ```
 
 ## ENV vars
