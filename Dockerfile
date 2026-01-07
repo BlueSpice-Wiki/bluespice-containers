@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim-bookworm AS builder
 
 # To be eventually replaced by clone of a build release
 ARG REPO_BRANCH="1.0.x"
@@ -7,12 +7,30 @@ ADD "$REPO_URL#$REPO_BRANCH" /tmp/ai/
 RUN date >> /tmp/ai/BUILDINFO
 RUN find /tmp/ai -type d -name '.git' | xargs rm -rf {} \;
 
-FROM python:3.12-slim
+# Create virtual environment and install dependencies in builder stage
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r /tmp/ai/requirements.txt
+
+FROM python:3.12-slim-bookworm
+
+# Security: Install latest security updates
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+
+# Security: Create non-root user
+RUN groupadd -r bluespice && useradd -r -g bluespice bluespice
 
 WORKDIR /app
-COPY root-fs/* ./
-COPY --from=builder /tmp/ai ./ai
-# Have to run in this step, as it installes to the system, not the local build dir
-RUN cd ai && pip install --no-cache-dir -r requirements.txt
+
+# Copy the virtual environment from builder with correct ownership
+COPY --from=builder --chown=bluespice:bluespice /opt/venv /opt/venv
+COPY --chown=bluespice:bluespice root-fs/* ./
+COPY --from=builder --chown=bluespice:bluespice /tmp/ai ./ai
+
+# Set PATH to use the virtual environment
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Security: Run as non-root user
+USER bluespice
 
 CMD ["/app/bin/entrypoint"]
