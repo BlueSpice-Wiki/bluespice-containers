@@ -3,13 +3,14 @@ ARG BASE_IMAGE=alpine:3
 FROM $BASE_IMAGE AS builder
 
 
-ARG TOMCAT_VERSION=10.1.49
-ARG TOMCAT_SHA512SUM=a46c8e37d4767b56a16dbdd8e81b80f25ad2edd5fba68b5099b9165cfffbe32bc923a601db8bb5cba50e8b1047a7906eb8c30ca176e1c0b8dfd85fbb9c54c6c2
-ARG DRAWIO_VERSION=29.2.2
-ARG DRAWIO_SHA256SUM=28a043b381818b765e1c414551fbc089930166e3f217abffa60cad28ee5e9b88
+ARG TOMCAT_VERSION=10.1.50
+ARG TOMCAT_SHA512SUM=c7702b0304257d80dc5bd615005fe037bd0c518e3fe77d22a58e5313fe53e6af6f4a2cf00790e3e9a669d1ae5470fb11177c9ef42f8c846d2b20dfac93e2d551
+ARG DRAWIO_VERSION=29.2.9
+ARG DRAWIO_SHA256SUM=2b2583f359171652aa157450e191c9cd2eae86f17960829cfe517b6d833df645
 
 RUN apk add --no-cache wget tar \
-    && wget https://archive.apache.org/dist/tomcat/tomcat-10/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+    && (wget https://downloads.apache.org/tomcat/tomcat-10/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+        || wget https://archive.apache.org/dist/tomcat/tomcat-10/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz) \
     && echo "$TOMCAT_SHA512SUM  apache-tomcat-$TOMCAT_VERSION.tar.gz" | sha512sum -c - \
     && mkdir -p /opt/tomcat \
     && tar xzf apache-tomcat-$TOMCAT_VERSION.tar.gz -C /opt/tomcat --strip-components 1 \
