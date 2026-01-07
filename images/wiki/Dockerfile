@@ -4,42 +4,41 @@ ENV LC_ALL=C.UTF-8
 ENV VERSION=84
 RUN apk add \
 	bash \
-	openssl \
-	clamav-clamdscan \
 	ca-certificates \
-	imagemagick \
- 	libc6-compat \
+	clamav-clamdscan \
 	ghostscript \
-	xpdf \
+	imagemagick \
+	libc6-compat \
 	nginx \
+	openssl \
 	php \
-	php$VERSION-fpm \
-	php$VERSION-xml \
-	php$VERSION-mbstring \
-	php$VERSION-curl \
-	php$VERSION-zip \
-	php$VERSION-cli \
-	php$VERSION-json \
-	php$VERSION-mysqli \
-	php$VERSION-ldap \
-	php$VERSION-opcache \
 	php$VERSION-apcu \
-	php$VERSION-intl \
+	php$VERSION-cli \
+	php$VERSION-ctype \
+	php$VERSION-curl \
+	php$VERSION-fileinfo \
+	php$VERSION-fpm \
 	php$VERSION-gd \
 	php$VERSION-gmp \
-	php$VERSION-ctype \
 	php$VERSION-iconv \
-	php$VERSION-fileinfo \
+	php$VERSION-intl \
+	php$VERSION-json \
+	php$VERSION-ldap \
+	php$VERSION-mbstring \
+	php$VERSION-mysqli \
+	php$VERSION-opcache \
+	php$VERSION-pdo \
+	php$VERSION-pdo_mysql \
+	php$VERSION-phar \
+	php$VERSION-posix \
+	php$VERSION-session \
+	php$VERSION-simplexml \
+ 	php$VERSION-tokenizer \
+	php$VERSION-xml \
 	php$VERSION-xml \
 	php$VERSION-xmlreader \
 	php$VERSION-xmlwriter \
-	php$VERSION-simplexml \
-	php$VERSION-session \
-	php$VERSION-phar \
-	php$VERSION-pdo \
-	php$VERSION-pdo_mysql \
-	php$VERSION-posix \
- 	php$VERSION-tokenizer \
+	php$VERSION-zip \
 	poppler-utils \
 	procps \
 	python3 \
@@ -47,6 +46,7 @@ RUN apk add \
 	supercronic \
 	tzdata \
 	vim \
+	xpdf \
 	&& echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
 	&& apk add php$VERSION-pecl-excimer@testing
 RUN echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
@@ -76,7 +76,7 @@ COPY --chown=$USER:$GROUPNAME --chmod=666 ./root-fs/app/bin/config /app/bin/conf
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/conf /app/conf
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/simplesamlphp/ /app/simplesamlphp
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/cron /app/cron
-ADD --chown=$USER:$GROUPNAME --chmod=755 https://raw.githubusercontent.com/hallowelt/docker-bluespice-formula/main/_client/mathoid-remote /app/bin
+ADD --chown=$USER:$GROUPNAME --chmod=755 https://raw.githubusercontent.com/hallowelt/docker-bluespice-formula/refs/heads/5.1.x/_client/mathoid-remote /app/bin
 ADD --chown=$USER:$GROUPNAME --chmod=755 https://github.com/hallowelt/misc-mediawiki-adm/releases/latest/download/mediawiki-adm /app/bin
 ADD --chown=$USER:$GROUPNAME --chmod=755 https://github.com/hallowelt/misc-parallel-runjobs-service/releases/latest/download/parallel-runjobs-service /app/bin
 COPY ./root-fs/etc/php/8.x/fpm/php-fpm.conf /etc/php$VERSION

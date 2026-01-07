@@ -106,6 +106,20 @@ The main directory for application data is `/data/`. The setup routine will crea
 └── .wikienv                     -> Automatically created during installation. Contains various keys.
 ```
 
+## Custom content import
+If the directory `/data/bluespice/content-install` exists during installation, the content found in there will be imported into the wiki.
+
+Example:
+
+```
+/data/bluespice/content-install
+├── files
+│   ├── HappyGnu.jpg
+│   └── Desiderata.pdf
+├── 01-templates.xml
+└── 02-pages.xml
+```
+
 ## Custom SSL certificates
 
 If the application needs to connect to external services that use self-signed certificates, make sure to add those to the `/etc/ssl/certs/ca-certificates.crt` of the **hostmachine** and then mount it into the container like this:
