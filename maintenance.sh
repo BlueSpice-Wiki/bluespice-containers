@@ -4,6 +4,7 @@ source .env
 
 show_usage() {
     echo "Usage: $0 [OPTIONS]"
+    echo "To build certain images that need special access, pass GITHUB_TOKEN and GITLAB_HW_TOKEN"
     echo "Options:"
     echo "  -a, --add-remote     Add remote repositories. Current remotes can be listed with 'git remote -v'"
     echo "  -b, --build          Build Docker images. Run after preparing build environment"
@@ -100,12 +101,15 @@ dry_run_build() {
         echo "Preparing missing codebase in images/wiki/_codebase...."
         iterate_components prepare_build
     fi
+    local SECRET_ARGS=""
+    [[ -n "$GITHUB_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.github.com,env=GITHUB_TOKEN"
+    [[ -n "$GITLAB_HW_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.gitlab.hallowelt.com,env=GITLAB_HW_TOKEN"
     for dir in images/*/; do
         if [[ -d "$dir" && -f "$dir/Dockerfile" ]]; then
             local image_name=$(basename "$dir")
             local temp_file="/tmp/build_test_${image_name}"
             echo "Testing build for $image_name..."
-            docker build --iidfile "$temp_file" "$dir" && \
+            docker build --iidfile "$temp_file" $SECRET_ARGS "$dir" && \
             docker rmi "$(cat "$temp_file")" 2>/dev/null && \
             rm -f "$temp_file"
         fi
@@ -119,11 +123,14 @@ build_images() {
         echo "Preparing missing codebase in images/wiki/_codebase...."
         iterate_components prepare_build
     fi
+    local SECRET_ARGS=""
+    [[ -n "$GITHUB_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.github.com,env=GITHUB_TOKEN"
+    [[ -n "$GITLAB_HW_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.gitlab.hallowelt.com,env=GITLAB_HW_TOKEN"
     for dir in images/*/; do
         if [[ -d "$dir" && -f "$dir/Dockerfile" ]]; then
             local image_name=$(basename "$dir")
             echo "Building $image_name..."
-            docker build -t "bluespice/$image_name:$IMAGES_VERSION_TAG" "$dir"
+            docker build -t "bluespice/$image_name:$IMAGES_VERSION_TAG" $SECRET_ARGS "$dir"
         fi
     done
     echo "Build completed!"
