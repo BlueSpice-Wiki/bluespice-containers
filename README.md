@@ -1,11 +1,11 @@
 ## Build
 
-Assuming you have a valid access token for https://gitlab.hallowelt.com/BlueSpice/webservice-wire.git stored in `~/gitlab-token.txt`, you can run
+Assuming you have a valid access token for https://github.com/hallowelt/webservice-wire.git stored in `~/github-token.txt`, you can run
 
 ```bash
-GIT_AUTH_TOKEN=$(cat ~/gitlab-token.txt) \
+GITHUB_TOKEN=$(cat ~/github-token.txt) \
 docker build \
-	--secret id=GIT_AUTH_TOKEN \
+	--secret id=GIT_AUTH_TOKEN.github.com,env=GITHUB_TOKEN \
 	-t bluespice/wire:latest .
 ```
 
