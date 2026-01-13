@@ -20,6 +20,11 @@ docker build \
 
 ### Minimal set of variables, these **are required**
 
+> [!WARNING]
+> Variabled for specific providers (AZURE, IONOS, OLLAMA...) are only requied if that provider is used.
+>
+> I.e. If you are not using OLLAMA it's not necessary to set AI__OLLAMA* variables
+
 For more details, see [Environment Variables](#available-environment-variables) below
 
 ```dotenv
