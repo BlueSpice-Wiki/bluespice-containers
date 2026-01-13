@@ -9,4 +9,5 @@ for secret in $(find /run/secrets/ -maxdepth 1 -type f | grep -E '/[A-Z_]+$' | x
   export "$secret"="$(cat /run/secrets/$secret)"
 done
 
+cd /app/chat
 /app/chat/start.sh
