@@ -3,6 +3,7 @@
 installdbuser=${DB_USER}
 installdbpass=${DB_PASS}
 lang=${WIKI_LANG:-en}
+name=${WIKI_NAME:-BlueSpice}
 
 echo "Installing database with values:"
 echo "dbserver: $DB_HOST"
@@ -14,7 +15,7 @@ echo "installdbpass: ${installdbpass:0:1}********${installdbpass: -1}"
 echo "lang: $lang"
 echo "admin user: $adminUserName"
 echo "pass: ${adminPass:0:1}********${adminPass: -1}"
-echo "wiki name: $WIKI_NAME"
+echo "wiki name: $name"
 echo ""
 
 # If there is for whatever reason a LocalSettings.php file in the appDir, we need to remove it
@@ -34,7 +35,7 @@ php $appDir/maintenance/install.php \
 	--pass=$adminPass \
 	--lang=$lang \
 	--scriptpath=/w \
-	"$WIKI_NAME" \
+	"$name" \
 	"$adminUserName" \
 	| tee -a /data/bluespice/logs/install-$timestamp.log
 
