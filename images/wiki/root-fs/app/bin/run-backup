@@ -24,7 +24,7 @@ if [ $minute == 01 ]; then
 	##mediawiki-adm is not able to get Systemvariables from /app/conf/LocalSettings.php
 	TempSettingsFile=/tmp/LocalSettings.local.php 
 	echo "<?php" > $TempSettingsFile
-	echo "\$wgSitename = \"${WIKI_NAME}\";" | tee  -a  $TempSettingsFile
+	echo "\$wgSitename = \"${WIKI_NAME:-BlueSpice}\";" | tee  -a  $TempSettingsFile
 	substitutePlaceholders /app/bin/config/mediawiki_adm_backup_conf.json
 	mediawiki-adm \
 			wiki-backup \
