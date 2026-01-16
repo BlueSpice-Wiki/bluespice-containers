@@ -7,4 +7,3 @@ for f in /app/bin/prepare.d/*; do
     $f $*
   fi
 done
-
