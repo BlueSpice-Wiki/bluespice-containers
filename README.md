@@ -1,12 +1,7 @@
 ## Build
 
-Assuming you have a valid access token for https://github.com/hallowelt/webservice-wire.git stored in `~/github-token.txt`, you can run
-
 ```bash
-GITHUB_TOKEN=$(cat ~/github-token.txt) \
-docker build \
-	--secret id=GIT_AUTH_TOKEN.github.com,env=GITHUB_TOKEN \
-	-t bluespice/wire:latest .
+docker build -t bluespice/wire:latest .
 ```
 
 ## ENV vars
