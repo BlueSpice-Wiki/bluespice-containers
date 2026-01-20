@@ -18,7 +18,15 @@ FROM python:3.12-slim-bookworm
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Security: Create non-root user
-RUN groupadd -r bluespice && useradd -r -g bluespice bluespice
+ARG UID
+ENV UID=1002
+ARG USER
+ENV USER=bluespice
+ARG GID
+ENV GID=$UID
+ARG GROUPNAME
+ENV GROUPNAME=$USER
+RUN groupadd -r -g $GID $GROUPNAME && useradd -r -u $UID -g $GROUPNAME $USER
 
 WORKDIR /app
 
