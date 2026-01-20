@@ -7,12 +7,11 @@ show_usage() {
     echo "To build certain images that need special access, pass GITHUB_TOKEN and GITLAB_HW_TOKEN"
     echo "Options:"
     echo "  -a, --add-remote     Add remote repositories. Current remotes can be listed with 'git remote -v'"
-    echo "  -b, --build          Build Docker images. Run after preparing build environment"
-    echo "  -d, --dry-run        Test Docker builds (no images created)"
+    echo "  -b, --build          Build Docker images"
+    echo "  -d, --dry-run        Test to build Docker images (no images will actually be saved)"
     echo "  -h, --help           Show this help message"
     echo "  -i, --init-subtree   Show initializing commands of git subtree. Decide whether to run them on your own"
-    echo "  -p, --prepare        Prepare build environment"
-    echo "  -u, --update         Update git subtree repositories. Run after initializing git subtree"
+    echo "  -u, --update         Update git subtree repositories. Run after adding remote repos"
 }
 
 ACTION="help"
@@ -23,7 +22,6 @@ while [[ $# -gt 0 ]]; do
         -d|--dry-run) ACTION="dry-run"; shift ;;
         -h|--help) show_usage; exit 0 ;;
         -i|--init-subtree) ACTION="init"; shift ;;
-        -p|--prepare) ACTION="prepare"; shift ;;
         -u|--update) ACTION="update"; shift ;;
         *) echo "Unknown option: $1"; show_usage; exit 1 ;;
     esac
@@ -71,36 +69,8 @@ update_repos_git_subtree() {
     }
 }
 
-prepare_build() {
-    local key="$1"
-    local prefix="$2"
-    local repo="$3"
-    local branch="$4"
-    if [[ "$key" == "bluespice-image-wiki" ]]; then
-        if [[ ! -d "$prefix/_codebase/bluespice" ]]; then
-            echo "Codebase for BlueSpice missing. Adding an empty placeholder..."
-            mkdir -p "$prefix/_codebase/bluespice"
-        fi
-        # Load (latest) Simplesamlphp
-        local sp_latest=$(curl -s https://api.github.com/repos/simplesamlphp/simplesamlphp/releases/latest | \
-            grep -o '"tag_name": "v[^"]*"' | cut -d'"' -f4 | sed 's/^v//' || echo "2.4.2")
-        echo "Downloading simplesamlphp v$sp_latest (latest)..."
-        curl -sL "https://github.com/simplesamlphp/simplesamlphp/releases/download/v${sp_latest}/simplesamlphp-${sp_latest}-slim.tar.gz" | \
-            tar -xzf - -C "$prefix/_codebase"
-        if [[ -d "$prefix/_codebase/simplesamlphp" ]]; then
-            rm -rf "$prefix/_codebase/simplesamlphp"
-        fi
-        mv "$prefix/_codebase/simplesamlphp-${sp_latest}" "$prefix/_codebase/simplesamlphp" 2>/dev/null || true
-        echo "Build environment ready: bluespice/ and simplesamlphp/ created"
-    fi
-}
-
 dry_run_build() {
     echo "Testing Docker builds in images/ directory (no images created)..."
-    if [[ ! -d "images/wiki/_codebase/bluespice" || ! -d "images/wiki/_codebase/simplesamlphp" ]]; then
-        echo "Preparing missing codebase in images/wiki/_codebase...."
-        iterate_components prepare_build
-    fi
     local SECRET_ARGS=""
     [[ -n "$GITHUB_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.github.com,env=GITHUB_TOKEN"
     [[ -n "$GITLAB_HW_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.gitlab.hallowelt.com,env=GITLAB_HW_TOKEN"
@@ -119,10 +89,6 @@ dry_run_build() {
 
 build_images() {
     echo "Building Docker images in images/ directory..."
-    if [[ ! -d "images/wiki/_codebase/bluespice" || ! -d "images/wiki/_codebase/simplesamlphp" ]]; then
-        echo "Preparing missing codebase in images/wiki/_codebase...."
-        iterate_components prepare_build
-    fi
     local SECRET_ARGS=""
     [[ -n "$GITHUB_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.github.com,env=GITHUB_TOKEN"
     [[ -n "$GITLAB_HW_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.gitlab.hallowelt.com,env=GITLAB_HW_TOKEN"
@@ -147,7 +113,6 @@ case $ACTION in
         echo "If you would like to keep all change histories, remove --squash flags.";
         echo "";
         iterate_components init_git_subtree ;;
-    prepare) iterate_components prepare_build ;;
     update) iterate_components update_repos_git_subtree ;;
 esac
 
