@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bookworm AS builder
+FROM python:3.12-slim-trixie AS builder
 
 # To be eventually replaced by clone of a build release
 ARG REPO_BRANCH="1.0.x"
