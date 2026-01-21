@@ -6,7 +6,7 @@ server {
 	server_name _;
 	listen 9090 default_server;
 	root /app/bluespice;
-	client_max_body_size 1024m;
+	client_max_body_size ###MAX_UPLOAD_SIZE|1024m###;
 	access_log /proc/1/fd/1;
 	error_log /proc/1/fd/2 ###WIKI_LOG_LEVEL###;
 	server_tokens off;

@@ -1,3 +1,12 @@
+FROM composer:2 AS workaround-erm-45965
+# Build SimpleSAMLphp from source, bypassing the original way of loading
+ENV SIMPLESAMLPHP_VERSION=2.3.10
+WORKDIR /build
+RUN git clone https://github.com/simplesamlphp/simplesamlphp.git -b v${SIMPLESAMLPHP_VERSION} /build/simplesamlphp && \
+	cd /build/simplesamlphp && \
+	composer require psr/http-message:^1.1 psr/container:^1.1 --update-no-dev --prefer-dist --optimize-autoloader && \
+	rm -rf /build/simplesamlphp/.git
+
 FROM alpine:3 AS builder
 
 # We use SimpleSAMLphp SLIM version to reduce the image size
@@ -102,7 +111,7 @@ RUN addgroup -g $GID $GROUPNAME \
 	&& chown $USER:$GROUPNAME /app/bluespice/ \
 	&& chmod -R 777 /var/log
 COPY --chown=$USER:$GROUPNAME --from=builder /build/bluespice /app/bluespice/w
-COPY --chown=$USER:$GROUPNAME --from=builder /build/simplesamlphp /app/simplesamlphp
+COPY --chown=$USER:$GROUPNAME --from=workaround-erm-45965 /build/simplesamlphp /app/simplesamlphp
 COPY --chown=$USER:$GROUPNAME --chmod=755 ./root-fs/app/bin /app/bin
 COPY --chown=$USER:$GROUPNAME --chmod=666 ./root-fs/app/bin/config /app/bin/config
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/conf /app/conf
