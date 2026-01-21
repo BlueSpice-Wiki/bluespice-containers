@@ -1,0 +1,3 @@
+vulnerabilities:
+  - id: CVE-2025-7458
+    reason: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
