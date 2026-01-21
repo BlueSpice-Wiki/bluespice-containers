@@ -12,7 +12,7 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir -r /tmp/ai/requirements.txt
 
-FROM python:3.12-slim-bookworm
+FROM python:3.12-slim-trixie
 
 # Security: Install latest security updates
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
