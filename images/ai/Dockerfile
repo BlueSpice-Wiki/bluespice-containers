@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bookworm AS builder
+FROM python:3.12-slim-trixie AS builder
 
 # To be eventually replaced by clone of a build release
 ARG REPO_BRANCH="1.0.x"
@@ -12,7 +12,7 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir -r /tmp/ai/requirements.txt
 
-FROM python:3.12-slim-bookworm
+FROM python:3.12-slim-trixie
 
 # Security: Install latest security updates
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
