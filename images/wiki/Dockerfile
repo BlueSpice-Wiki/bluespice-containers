@@ -23,7 +23,7 @@ ENV MEDIAWIKIADM_SHA256=c038de94ce49c66584556bc03c58bf0f9388d109b9428c800d0b74c9
 ENV PARALLELRUNJOBSSERVICE_URL=https://github.com/hallowelt/misc-parallel-runjobs-service/releases/latest/download/parallel-runjobs-service
 ENV PARALLELRUNJOBSSERVICE_SHA256=ec8ea7e8a79242baba862448bcba952376267c0db19785d6266ab9a01a29e241
 
-ARG BLUESPICE_VERSION=5.1.4
+ARG BLUESPICE_VERSION=5.1.5
 ARG BLUESPICE_URL=https://github.com/BlueSpice-Wiki/bluespice-free-release.git
 
 WORKDIR /build
