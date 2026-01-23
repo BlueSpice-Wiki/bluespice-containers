@@ -6,20 +6,44 @@ show_usage() {
     echo "Usage: $0 [OPTIONS]"
     echo "To build certain images that need special access, pass GITHUB_TOKEN and GITLAB_HW_TOKEN"
     echo "Options:"
-    echo "  -a, --add-remote     Add remote repositories. Current remotes can be listed with 'git remote -v'"
-    echo "  -b, --build          Build Docker images"
-    echo "  -d, --dry-run        Test to build Docker images (no images will actually be saved)"
-    echo "  -h, --help           Show this help message"
-    echo "  -i, --init-subtree   Show initializing commands of git subtree. Decide whether to run them on your own"
-    echo "  -u, --update         Update git subtree repositories. Run after adding remote repos"
+    echo "  -a, --add-remote                Add remote repositories"
+    echo "  -b, --build [OPTIONS]           Build Docker images"
+    echo "    --dry-run                     Test build without saving images"
+    echo "    --buildargs KEY=VALUE         Pass build arguments to docker build"
+    echo "    --images IMAGE1,IMAGE2        Build only specific images (comma-separated)"
+    echo "  -h, --help                      Show this help message"
+    echo "  -i, --init-subtree              Show initializing commands of git subtree"
+    echo "  -u, --update                    Update git subtree repositories"
 }
 
 ACTION="help"
+BUILD_DRY_RUN=0
+BUILD_ARGS=""
+SELECTED_IMAGES=""
+
 while [[ $# -gt 0 ]]; do
     case $1 in
         -a|--add-remote) ACTION="add"; shift ;;
-        -b|--build) ACTION="build"; shift ;;
-        -d|--dry-run) ACTION="dry-run"; shift ;;
+        -b|--build)
+            ACTION="build"
+            shift
+            while [[ $# -gt 0 && "$1" == --* ]]; do
+                case $1 in
+                    --dry-run) BUILD_DRY_RUN=1; shift ;;
+                    --buildargs)
+                        if [[ -z "$2" ]]; then
+                            echo "Error: --buildargs requires a value"; show_usage; exit 1
+                        fi
+                        BUILD_ARGS="$BUILD_ARGS --build-arg $2"; shift 2 ;;
+                    --images)
+                        if [[ -z "$2" ]]; then
+                            echo "Error: --images requires a value"; show_usage; exit 1
+                        fi
+                        SELECTED_IMAGES="$2"; shift 2 ;;
+                    --*) echo "Error: Unknown build option: $1"; show_usage; exit 1 ;;
+                esac
+            done
+            ;;
         -h|--help) show_usage; exit 0 ;;
         -i|--init-subtree) ACTION="init"; shift ;;
         -u|--update) ACTION="update"; shift ;;
@@ -69,34 +93,49 @@ update_repos_git_subtree() {
     }
 }
 
-dry_run_build() {
-    echo "Testing Docker builds in images/ directory (no images created)..."
-    local SECRET_ARGS=""
-    [[ -n "$GITHUB_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.github.com,env=GITHUB_TOKEN"
-    [[ -n "$GITLAB_HW_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.gitlab.hallowelt.com,env=GITLAB_HW_TOKEN"
-    for dir in images/*/; do
-        if [[ -d "$dir" && -f "$dir/Dockerfile" ]]; then
-            local image_name=$(basename "$dir")
-            local temp_file="/tmp/build_test_${image_name}"
-            echo "Testing build for $image_name..."
-            docker build --iidfile "$temp_file" $SECRET_ARGS "$dir" && \
-            docker rmi "$(cat "$temp_file")" 2>/dev/null && \
-            rm -f "$temp_file"
+should_build_image() {
+    local image_name="$1"
+    if [[ -z "$SELECTED_IMAGES" ]]; then
+        return 0  # Build all images
+    fi
+    IFS=',' read -ra images_array <<< "$SELECTED_IMAGES"
+    for img in "${images_array[@]}"; do
+        if [[ "$image_name" == "${img// /}" ]]; then
+            return 0
         fi
     done
-    echo "Dry-run build tests completed!"
+    return 1
 }
 
-build_images() {
-    echo "Building Docker images in images/ directory..."
+build_docker_images() {
+    local dry_run=$1
+    local dry_run_text=""
+    [[ $dry_run -eq 1 ]] && dry_run_text=" (dry-run mode)"
+
+    echo "Building Docker images in images/ directory$dry_run_text..."
     local SECRET_ARGS=""
     [[ -n "$GITHUB_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.github.com,env=GITHUB_TOKEN"
     [[ -n "$GITLAB_HW_TOKEN" ]] && SECRET_ARGS+=" --secret id=GIT_AUTH_TOKEN.gitlab.hallowelt.com,env=GITLAB_HW_TOKEN"
+
     for dir in images/*/; do
         if [[ -d "$dir" && -f "$dir/Dockerfile" ]]; then
             local image_name=$(basename "$dir")
+
+            if ! should_build_image "$image_name"; then
+                echo "Skipping $image_name (not in selected images)"
+                continue
+            fi
+
             echo "Building $image_name..."
-            docker build -t "bluespice/$image_name:$IMAGES_VERSION_TAG" $SECRET_ARGS "$dir"
+            local temp_file="/tmp/build_test_${image_name}"
+
+            if [[ $dry_run -eq 1 ]]; then
+                docker build --iidfile "$temp_file" $SECRET_ARGS $BUILD_ARGS "$dir" && \
+                docker rmi "$(cat "$temp_file")" 2>/dev/null && \
+                rm -f "$temp_file"
+            else
+                docker build -t "bluespice/$image_name:$IMAGES_VERSION_TAG" $SECRET_ARGS $BUILD_ARGS "$dir"
+            fi
         fi
     done
     echo "Build completed!"
@@ -104,8 +143,7 @@ build_images() {
 
 case $ACTION in
     add) iterate_components add_git_remote_repos; git remote -v ;;
-    build) build_images ;;
-    dry-run) dry_run_build ;;
+    build) build_docker_images $BUILD_DRY_RUN ;;
     help) echo "Too few options provided"; show_usage; exit 1 ;;
     init)
         echo "To initialize git subtree, run the following commands.";
@@ -115,4 +153,3 @@ case $ACTION in
         iterate_components init_git_subtree ;;
     update) iterate_components update_repos_git_subtree ;;
 esac
-
