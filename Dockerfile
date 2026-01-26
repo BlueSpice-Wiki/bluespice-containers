@@ -26,8 +26,9 @@ ARG GID
 ENV GID=$UID
 ARG GROUPNAME
 ENV GROUPNAME=$USER
-RUN groupadd -r -g $GID $GROUPNAME && useradd -r -u $UID -g $GROUPNAME $USER
-
+RUN groupadd -g "$GID" "$GROUPNAME" \
+ && useradd  -u "$UID" -g "$GROUPNAME" -M -s /bin/sh -c "" "$USER"
+ 
 WORKDIR /app
 
 # Copy the virtual environment from builder with correct ownership
