@@ -26,8 +26,9 @@ ARG GID
 ENV GID=$UID
 ARG GROUPNAME
 ENV GROUPNAME=$USER
-RUN addgroup -g $GID $GROUPNAME && adduser -u $UID -G $GROUPNAME -D $USER
-
+RUN addgroup -g "$GID" "$GROUPNAME" \
+ && adduser -u "$UID" -G "$GROUPNAME" -S -h /nonexistent -s /bin/sh "$USER"
+ 
 WORKDIR /app
 
 # Copy the virtual environment from builder with correct ownership
