@@ -59,7 +59,7 @@ inside the container.
 
 | Variable Name                           | Description                                                                                                                                            | Default                                   |
 |:----------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------|
-| AI__ENVIRONMENT                         | production or development                                                                                                                              | production                                |
+| AI__ENVIRONMENT                         | production, development, or 'mock' for dummy responses                                                                                                 | production                                |
 | AI__LOGGING__LEVEL                      | DEBUG, INFO, WARNING, ERROR, or CRITICAL                                                                                                               | ERROR                                     |
 | AI__LOGGING__LOGGER_NAME                | Specifies the name of the logger instance                                                                                                              | webservice-ai.logger                      |
 | AI__FASTAPI__HOST                       | Self explanatory                                                                                                                                       | 0.0.0.0 or localhost                      |
