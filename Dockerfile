@@ -1,7 +1,7 @@
 FROM python:3.12-alpine AS builder
 
 # To be eventually replaced by clone of a build release
-ARG REPO_BRANCH="1.0.x"
+ARG REPO_BRANCH="main"
 ENV REPO_URL="https://gitlab.hallowelt.com/ai/webservice-ai.git"
 ADD "$REPO_URL#$REPO_BRANCH" /tmp/ai/
 RUN date >> /tmp/ai/BUILDINFO
