@@ -1,0 +1,16 @@
+name: Build test stage
+
+on:
+  pull_request:
+    branches: [ "5.2.x" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build --target test . --file Dockerfile --tag docker-bluespice-formula:$(date +%s)
