@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:25-alpine AS builder
 RUN apk update && apk add --no-cache git
 RUN git clone --depth 1 https://gitlab.wikimedia.org/repos/mediawiki/services/mathoid.git /opt/mathoid
 WORKDIR /opt/mathoid
@@ -13,7 +13,7 @@ FROM builder AS cleanup
 RUN find /opt/mathoid -type d -name '.git' | xargs rm -rf {} \;
 RUN find /opt/mathoid -type d -name 'test' | xargs rm -rf {} \;
 
-FROM node:18-alpine
+FROM node:25-alpine
 WORKDIR /opt/mathoid
 RUN apk update && apk add --no-cache librsvg
 COPY --from=cleanup /opt/mathoid /opt/mathoid
