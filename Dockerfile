@@ -1,1 +1,1 @@
-FROM memcached:1.6.39-alpine
+FROM memcached:1.6.40-alpine
