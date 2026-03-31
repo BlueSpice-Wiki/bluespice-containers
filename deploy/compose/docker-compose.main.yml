@@ -1,4 +1,4 @@
-name: dev-5.2.x
+name: ${COMPOSE_PROJECT_NAME:-bluespice}
 
 x-common-environment: &common-environment
   VERSION: ${VERSION}
@@ -28,6 +28,8 @@ x-common-environment: &common-environment
   SMTP_PASS: ${SMTP_PASS}
   SMTP_ID_HOST: ${SMTP_ID_HOST}
 
+  CHAT_HOST: ${CHAT_HOST:--}
+
 x-common-secrets: &common-secrets
   - INTERNAL_SIMPLESAMLPHP_ADMIN_PASS
   - INTERNAL_SIMPLESAMLPHP_SECRET_SALT
@@ -37,6 +39,17 @@ x-common-secrets: &common-secrets
   - INTERNAL_WIRE_API_KEY
 
 services:
+  wiki-installer:
+    image: ${BLUESPICE_WIKI_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-wiki-installer
+    restart: no
+    environment:
+      <<: *common-environment
+    command: start-installer
+    volumes:
+      - ${DATADIR}/wiki:/data
+    secrets: *common-secrets
+
   wiki-web:
     image: ${BLUESPICE_WIKI_IMAGE}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-wiki-web
@@ -47,6 +60,9 @@ services:
     volumes:
       - ${DATADIR}/wiki:/data
     secrets: *common-secrets
+    depends_on:
+      wiki-installer:
+        condition: service_completed_successfully
 
   wiki-task:
     image: ${BLUESPICE_WIKI_IMAGE}
@@ -59,3 +75,6 @@ services:
     volumes:
       - ${DATADIR}/wiki:/data
     secrets: *common-secrets
+    depends_on:
+      wiki-installer:
+        condition: service_completed_successfully
