@@ -125,13 +125,15 @@ services:
     image: osixia/openldap:1.5.0
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-dev-ldap
     environment:
-      LDAP_ORGANISATION: "ACME Corporation"
-      LDAP_DOMAIN: "acme.local"
+      LDAP_ORGANISATION: "Example Com"
+      LDAP_DOMAIN: "example.com"
+      # login name: cn=admin,dc=example,dc=com
       LDAP_ADMIN_PASSWORD: admin
     volumes:
       - ${DATADIR}/ldap:/var/lib/ldap
     profiles:
       - sso
+      - ldap
 
   dev-ldapadmin:
     image: osixia/phpldapadmin:latest
@@ -146,3 +148,4 @@ services:
       - dev-ldap
     profiles:
       - sso
+      - ldap
