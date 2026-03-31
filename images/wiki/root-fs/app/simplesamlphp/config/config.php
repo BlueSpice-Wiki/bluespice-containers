@@ -2,11 +2,7 @@
 
 include (__DIR__ . '/config.php.dist');
 
-$baseUrl = $GLOBALS['wgServer'] = bsAssembleURL(
-	[ 'WIKI_PROTOCOL', 'https' ],
-	[ 'WIKI_HOST', 'localhost' ],
-	[ 'WIKI_PORT', '443' ]
-);
+$baseUrl = $GLOBALS['wgServer'] = bsAssembleURL( 'WIKI_PROTOCOL', 'WIKI_HOST', 'WIKI_PORT' );
 
 // TODO calculate from environment variable
 $loglevel = SimpleSAML\Logger::WARNING;
@@ -35,11 +31,11 @@ $customConfig = [
 	'session.cookie.secure' => true,
 	'session.cookie.name' =>
 		getenv('DB_NAME') .
-		( getenv('DB_PREFIX') ?? '' ) .
+		( getenv('DB_PREFIX') ) .
 		'SAMLSessionID',
 	'session.authtoken.cookiename' =>
 		getenv('DB_NAME') .
-		( getenv('DB_PREFIX') ?? '' ) .
+		( getenv('DB_PREFIX') ) .
 		'SAMLAuthToken',
 	'enable.http_post' => true,
 	'secretsalt' => getenv('INTERNAL_SIMPLESAMLPHP_SECRET_SALT'),
@@ -59,23 +55,23 @@ $customConfig = [
 	'showerrors' => getenv( 'DEV_WIKI_DEBUG' ) ?: false,
 	'errorreporting' => true,
 
-	'technicalcontact_name' => getenv('WIKI_NAME') ?? 'BlueSpice',
-	'technicalcontact_email' => getenv('WIKI_EMERGENCYCONTACT') ?? '',
+	'technicalcontact_name' => getenv('WIKI_NAME'),
+	'technicalcontact_email' => getenv('WIKI_EMERGENCYCONTACT'),
 	'mail.transport.method' => 'smtp',
 	'mail.transport.options' => [
 		'host' => getenv( 'SMTP_HOST' ),
-		'port' => getenv( 'SMTP_PORT' ) ?: 25,
+		'port' => getenv( 'SMTP_PORT' ),
 		'username' => getenv( 'SMTP_USER' ),
 		'password' => getenv( 'SMTP_PASS' ),
 		'security' => 'tls'
 	],
-	'sendmail_from' => getenv('WIKI_EMERGENCYCONTACT') ?: '',
+	'sendmail_from' => getenv('WIKI_EMERGENCYCONTACT'),
 
 	'store.type' => 'sql',
-	'store.sql.dsn' => 'mysql:dbname=' . (getenv('DB_NAME') ?? 'database') . ';host=' . getenv('DB_HOST'),
+	'store.sql.dsn' => 'mysql:dbname=' . ( getenv('DB_NAME') ) . ';host=' . getenv('DB_HOST'),
 	'store.sql.username' => getenv('DB_USER'),
 	'store.sql.password' => getenv('DB_PASS'),
-	'store.sql.prefix' => (getenv('DB_PREFIX') ?? '') . 'SimpleSAMLphp_',
+	'store.sql.prefix' => ( getenv('DB_PREFIX') ) . 'SimpleSAMLphp_',
 ];
 
 $config = $customConfig + $config;

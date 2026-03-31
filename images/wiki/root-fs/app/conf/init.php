@@ -24,7 +24,40 @@ if ( isset( $_REQUEST['_profiler'] ) ) {
 	} );
 }
 
+/**
+ * Assembles a URL from ENV variables. Parameters can either be
+ * the ENV variable names as strings, or arrays with the ENV
+ * variable names as the first element and a fallback value as
+ * the second element.
+ *
+ * Examples:
+ * ```
+ *	$GLOBALS['wgServer'] = bsAssembleURL( 'WIKI_PROTOCOL', 'WIKI_HOST','WIKI_PORT' );
+ * ```
+ *
+ * ```
+ *	$GLOBALS['wgServer'] = bsAssembleURL(
+ *		[ 'WIKI_PROTOCOL', 'https' ],
+ *		[ 'WIKI_HOST', 'localhost' ],
+ *		[ 'WIKI_PORT', '443' ]
+ *	);
+ * ```
+ *
+ * @param array|string $proto
+ * @param array|string $hostname
+ * @param array|string $port
+ * @param array|string $path
+ * @return string The assembled URL
+ */
 function bsAssembleURL( $proto, $hostname, $port, $path = [] ) {
+
+	// Allow for ENV variable names without fallback, as fallbacks are now
+	// set centrally in `/app/bin/init-envs`
+	$proto = is_string( $proto ) ? [ $proto, '' ] : $proto;
+	$hostname = is_string( $hostname ) ? [ $hostname, '' ] : $hostname;
+	$port = is_string( $port ) ? [ $port, '' ] : $port;
+	$path = is_string( $path ) ? [ $path, '' ] : $path;
+
 	$protocol = trim( getenv( $proto[0] ) ?: $proto[1] );
 	$host = trim( getenv( $hostname[0] ) ?: $hostname[1] );
 	if ( !empty( $path ) ) {

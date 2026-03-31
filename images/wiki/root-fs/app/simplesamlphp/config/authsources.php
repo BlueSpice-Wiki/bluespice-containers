@@ -2,11 +2,7 @@
 
 $idpRemoteMetaData = require( __DIR__ . '/_bluespice-saml20-idp-remote-meta.php' );
 
-$baseUrl = $GLOBALS['wgServer'] = bsAssembleURL(
-	[ 'WIKI_PROTOCOL', 'https' ],
-	[ 'WIKI_HOST', 'localhost' ],
-	[ 'WIKI_PORT', '443' ]
-);
+$baseUrl = $GLOBALS['wgServer'] = bsAssembleURL( 'WIKI_PROTOCOL', 'WIKI_HOST', 'WIKI_PORT' );
 
 $config = [
 	'admin' => [

@@ -1,16 +1,5 @@
 #!/bin/bash
 
-check-database
-if [ $? -ne 0 ]; then
-	date > /data/maintenance
-	run-installation
-	if [ $? -ne 0 ]; then
-		echo "Installation failed"
-		exit 1
-	fi
-	rm /data/maintenance
-fi
-
 ##add Variables to Scripts
 substitutePlaceholders /app/bin/config/mediawiki_adm_backup_conf.json
 substitutePlaceholders /app/bin/config/runJobs_conf.yaml
