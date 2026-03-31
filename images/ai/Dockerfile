@@ -1,4 +1,4 @@
-FROM python:3.12-slim-trixie AS builder
+FROM python:3.12-alpine AS builder
 
 # To be eventually replaced by clone of a build release
 ARG REPO_BRANCH="1.0.x"
@@ -12,10 +12,10 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir -r /tmp/ai/requirements.txt
 
-FROM python:3.12-slim-trixie
+FROM python:3.12-alpine
 
 # Security: Install latest security updates
-RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade
 
 # Security: Create non-root user
 ARG UID
@@ -26,8 +26,9 @@ ARG GID
 ENV GID=$UID
 ARG GROUPNAME
 ENV GROUPNAME=$USER
-RUN groupadd -r -g $GID $GROUPNAME && useradd -r -u $UID -g $GROUPNAME $USER
-
+RUN addgroup -g "$GID" "$GROUPNAME" \
+ && adduser -u "$UID" -G "$GROUPNAME" -S -h /nonexistent -s /bin/sh "$USER"
+ 
 WORKDIR /app
 
 # Copy the virtual environment from builder with correct ownership

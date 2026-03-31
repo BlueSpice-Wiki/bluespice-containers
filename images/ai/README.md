@@ -37,7 +37,7 @@ AI__MYSQL__DB_NAME=ai-service
 
 AI__NEO4J__USERNAME=neo4j
 AI__NEO4J__PASSWORD=mysecretpass
-AI__NEO4J__URL=neo4j://localhost:7687"
+AI__NEO4J__URL="neo4j://localhost:7687"
 
 AI__AZURE__OPENAI_API_KEY=<azure_openai_key>
 AI__AZURE__OPENAI_ENDPOINT=<azure_endpoint>
@@ -59,7 +59,7 @@ inside the container.
 
 | Variable Name                           | Description                                                                                                                                            | Default                                   |
 |:----------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------|
-| AI__ENVIRONMENT                         | production or development                                                                                                                              | production                                |
+| AI__ENVIRONMENT                         | production, development, or 'mock' for dummy responses                                                                                                 | production                                |
 | AI__LOGGING__LEVEL                      | DEBUG, INFO, WARNING, ERROR, or CRITICAL                                                                                                               | ERROR                                     |
 | AI__LOGGING__LOGGER_NAME                | Specifies the name of the logger instance                                                                                                              | webservice-ai.logger                      |
 | AI__FASTAPI__HOST                       | Self explanatory                                                                                                                                       | 0.0.0.0 or localhost                      |
