@@ -175,7 +175,7 @@ services:
       - ${DATADIR}/s3:/data
     environment:
       MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-bioueot}
     command: server /data --console-address ":9001"
     profiles: [s3]
 
@@ -221,8 +221,8 @@ services:
     image: rabbitmq:3-management
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-messagebroker
     environment:
-      RABBITMQ_DEFAULT_USER: ${MESSAGEBROKER_USER}
-      RABBITMQ_DEFAULT_PASS: ${MESSAGEBROKER_PASS}
+      RABBITMQ_DEFAULT_USER: ${MESSAGEBROKER_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${MESSAGEBROKER_PASS:-a3robun}
     profiles: [messagebroker, rabbitmq]
 
   monitoring:
