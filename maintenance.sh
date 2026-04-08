@@ -11,6 +11,7 @@ show_usage() {
     echo "    --dry-run                     Test build without saving images"
     echo "    --buildargs KEY=VALUE         Pass build arguments to docker build"
     echo "    --images IMAGE1,IMAGE2        Build only specific images (comma-separated)"
+    echo "  -d, --dev-setup                 Setup deploy/compose/.env and override yml"
     echo "  -h, --help                      Show this help message"
     echo "  -i, --init-subtree              Show initializing commands of git subtree"
     echo "  -u, --update                    Update git subtree repositories"
@@ -44,6 +45,7 @@ while [[ $# -gt 0 ]]; do
                 esac
             done
             ;;
+        -d|--dev-setup) ACTION="devsetup"; shift ;;
         -h|--help) show_usage; exit 0 ;;
         -i|--init-subtree) ACTION="init"; shift ;;
         -u|--update) ACTION="update"; shift ;;
@@ -141,9 +143,84 @@ build_docker_images() {
     echo "Build completed!"
 }
 
+generate_dev_env() {
+    local sample="$1"
+    local dst="$2"
+    local version_tag="$3"
+    local project_name="$4"
+    {
+        echo "COMPOSE_PROJECT_NAME=$project_name"
+        echo "CODEDIR=/path/to/your/bluespice/codebase"
+        echo "# VERSION tag for images are overwritten below"
+        echo ""
+        cat "$sample"
+        echo ""
+        echo "VERSION=$version_tag"
+        echo 'BLUESPICE_WIKI_IMAGE=bluespice/wiki:$VERSION'
+        echo "SMTP_HOST=dev-mailhog"
+        echo "SMTP_PORT=1025"
+        echo "WIKI_LOG_LEVEL=debug"
+    } > "$dst"
+    echo "Created $dst"
+    echo "Please continue editing $dst to finish your setup:"
+    echo "Fill in your wanted CODEDIR, DATADIR and EDITION, DB_USER and DB_PASS"
+}
+
+backup_file_append() {
+    local target="$1"
+    local backup="${target}.backup"
+    if [[ -f "$backup" ]]; then
+        { echo ""; echo "# --- Backup from $(date) ---"; cat "$target"; } >> "$backup"
+    else
+        cp "$target" "$backup"
+    fi
+    echo "Old file backed up to $backup"
+}
+
+dev_setup() {
+    local version_tag="$IMAGES_VERSION_TAG"
+    local project_name
+    project_name=$(echo "$version_tag" | tr -d '.')
+    local override_src="dev/docker-compose.override.yml"
+    local override_dst="deploy/compose/docker-compose.override.yml"
+    local env_dst="deploy/compose/.env"
+    local env_sample="deploy/compose/.env.sample"
+
+    # --- Handle docker-compose.override.yml ---
+    if [[ -f "$override_dst" ]]; then
+        echo "File $override_dst already exists."
+        read -r -p "Replace it? [y/N] " answer
+        if [[ "$answer" =~ ^[Yy]$ ]]; then
+            backup_file_append "$override_dst"
+            cp "$override_src" "$override_dst"
+            echo "Replaced $override_dst"
+        else
+            echo "Skipping $override_dst replacement."
+        fi
+    else
+        cp "$override_src" "$override_dst"
+        echo "Copied $override_src to $override_dst"
+    fi
+
+    # --- Handle .env ---
+    if [[ -f "$env_dst" ]]; then
+        echo "File $env_dst already exists."
+        read -r -p "Replace it? [y/N] " answer
+        if [[ "$answer" =~ ^[Yy]$ ]]; then
+            backup_file_append "$env_dst"
+            generate_dev_env "$env_sample" "$env_dst" "$version_tag" "$project_name"
+        else
+            echo "Skipping $env_dst replacement."
+        fi
+    else
+        generate_dev_env "$env_sample" "$env_dst" "$version_tag" "$project_name"
+    fi
+}
+
 case $ACTION in
     add) iterate_components add_git_remote_repos; git remote -v ;;
     build) build_docker_images $BUILD_DRY_RUN ;;
+    devsetup) dev_setup ;;
     help) echo "Too few options provided"; show_usage; exit 1 ;;
     init)
         echo "To initialize git subtree, run the following commands.";
