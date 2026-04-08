@@ -94,7 +94,6 @@ RUN apk add \
 	&& apk add php$VERSION-pecl-excimer@testing
 RUN echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
 	&& apk add openjpeg@edge
-
 FROM base AS bluespice-prepare
 ENV PATH="/app/bin:${PATH}"
 ARG UID
@@ -148,7 +147,9 @@ ARG EDITION # Intentionally left uninitialized
 RUN if [ -n "$EDITION" ]; then \
 		echo "EDITION=$EDITION" > /app/.env; \
 	fi
-
+RUN if [[ $(cat /app/bluespice/w/BLUESPICE-EDITION) == "cloud" ]] ; then \
+	apk add curl; \
+	fi
 FROM bluespice-prepare AS bluespice-final
 WORKDIR /app
 USER bluespice

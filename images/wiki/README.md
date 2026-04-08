@@ -56,6 +56,7 @@ docker build \
 | `INTERNAL_CHAT_WIKI_ACCESS_TOKEN` | `null` | Access token `bluespice/chat` | No       |
 | `INTERNAL_WIKI_SECRETKEY`    | `null`         | Secret key for the wiki                              | No       |
 | `INTERNAL_WIKI_UPGRADEKEY`   | `null`         | Upgrade key for the wiki                             | No       |
+| `MAX_UPLOAD_SIZE`            | `1024m`        | Max upload size for single file (Allowed: m or g)    | Yes      |
 | `PDF_HOST`                   | `pdf`          | Hostname of a `bluespice/pdf` compatible service     | Yes      |
 | `PDF_PORT`                   | `8080`         | Port of a `bluespice/pdf` compatible service         | Yes      |
 | `PDF_PROTOCOL`               | `http`         | Protocol of a `bluespice/pdf` compatible service     | Yes      |
@@ -89,7 +90,6 @@ docker build \
 | `WIRE_HOST`                  | `wire`         | Hostname of a `bluespice/wire` compatible service    | Yes      |
 | `WIRE_PORT`                  | `3333`         | Port of a `bluespice/wire` compatible service        | Yes      |
 | `WIRE_PROTOCOL`              | `http`         | Protocol of a `bluespice/wire` compatible service    | Yes      |
-| `MAX_UPLOAD_SIZE`            | `1024m`        | Max upload size for single file (Allowed: m or g)     | Yes      |
 
 *) External cache can be disabled by setting `-` as `CACHE_HOST`.
 **) Functions requiring `bluespice/chat` can be disabled by setting `-` as `CHAT_HOST`.
