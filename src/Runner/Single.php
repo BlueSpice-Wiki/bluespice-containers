@@ -16,7 +16,7 @@ class Single {
 	 * @param OutputInterface $output
 	 */
 	public function __construct(
-		protected Config          $config,
+		protected Config $config,
 		protected OutputInterface $output
 	) {
 	}
@@ -40,7 +40,6 @@ class Single {
 			$this->output->writeln( "<info>Cooldown for " . $this->config->getJobConfig()['cooldown'] . " seconds</info>" );
 			sleep( $this->config->getJobConfig()['cooldown'] );
 		}
-
 	}
 
 	/**

@@ -14,18 +14,6 @@ interface Queue {
 	 * @param string $instance
 	 * @return void
 	 */
-	public function skip( string $instance ): void;
-
-	/**
-	 * @param string $instance
-	 * @return void
-	 */
-	public function onStartFailed( string $instance ): void;
-
-	/**
-	 * @param string $instance
-	 * @return void
-	 */
 	public function onFailure( string $instance ): void;
 
 	/**

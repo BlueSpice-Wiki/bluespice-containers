@@ -4,77 +4,58 @@ namespace BlueSpice\Service\ParallelRunJobs\QueueLock;
 
 use BlueSpice\Service\ParallelRunJobs\Config;
 use Redis;
-use RedisException;
-use RuntimeException;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\Store\RedisStore;
 
-class RedisQueueLock implements QueueLock {
+class RedisQueueLock {
 
 	private const KEY_PREFIX = 'runjobs:lock:';
 
-	/** @var Redis */
-	private Redis $redis;
+	/** @var LockFactory */
+	private LockFactory $lockFactory;
 
-	/** @var int */
-	private int $lockTtl;
+	/** @var float */
+	private float $lockTtl;
+
+	/** @var array<string, LockInterface> */
+	private array $locks = [];
 
 	/**
-	 * @param string $runnerId
+	 * @param Redis $redis
 	 * @param Config $config
-	 * @throws RedisException
 	 */
-	public function __construct( private string $runnerId, Config $config ) {
-		$connection = $config->getRedisConnection();
-		if ( !$connection ) {
-			throw new RuntimeException( 'Redis connection not configured' );
-		}
-		$this->lockTtl = max( ( $config->getJobConfig()['maxtime'] ?? 30 ) * 2, 60 );
-		$this->redis = new Redis();
-		try {
-			$this->redis->connect( $connection['host'], $connection['port'] );
-		} catch ( RedisException $e ) {
-			throw new RuntimeException( 'Failed to connect to Redis: ' . $e->getMessage() );
-		}
-		if ( !empty( $connection['password'] ) ) {
-			$this->redis->auth( $connection['password'] );
-		}
-		if ( ( $connection['database'] ?? 0 ) > 0 ) {
-			$this->redis->select( $connection['database'] );
-		}
+	public function __construct( Redis $redis, Config $config ) {
+		$this->lockTtl = (float)max( ( $config->getJobConfig()['maxtime'] ?? 30 ) * 2, 60 );
+
+		$store = new RedisStore( $redis );
+		$this->lockFactory = new LockFactory( $store );
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param string $instance
+	 * @return bool
 	 */
-	public function isLocked( string $instance ): bool {
-		return (bool)$this->redis->exists( self::KEY_PREFIX . $instance );
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function obtainLock( string $instance ): string {
-		$lockId = uniqid( $this->runnerId . '_' );
-		$key = self::KEY_PREFIX . $instance;
-		$result = $this->redis->set( $key, $lockId, [ 'NX', 'EX' => $this->lockTtl ] );
-		if ( $result ) {
-			return $lockId;
+	public function obtainLock( string $instance ): bool {
+		$lock = $this->lockFactory->createLock( self::KEY_PREFIX . $instance, $this->lockTtl, false );
+		if ( !$lock->acquire( false ) ) {
+			// Could not acquire lock, likely because another runner has it. Skip this instance for now.
+			return false;
 		}
-		return '';
+		$this->locks[$instance] = $lock;
+		return true;
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param string $instance
+	 * @return bool
 	 */
 	public function release( string $instance ): bool {
-		$key = self::KEY_PREFIX . $instance;
-		// Atomically release only if this runner owns the lock
-		$script = <<<'LUA'
-			local val = redis.call('get', KEYS[1])
-			if val and string.find(val, ARGV[1], 1, true) == 1 then
-				return redis.call('del', KEYS[1])
-			end
-			return 0
-		LUA;
-		return $this->redis->eval( $script, [ $key, $this->runnerId . '_' ], 1 ) > 0;
+		if ( !isset( $this->locks[$instance] ) ) {
+			return false;
+		}
+		$this->locks[$instance]->release();
+		unset( $this->locks[$instance] );
+		return true;
 	}
 }

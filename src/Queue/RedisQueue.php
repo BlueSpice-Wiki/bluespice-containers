@@ -2,20 +2,23 @@
 
 namespace BlueSpice\Service\ParallelRunJobs\Queue;
 
+use BlueSpice\Service\ParallelRunJobs\Config;
+use BlueSpice\Service\ParallelRunJobs\QueueLock\RedisQueueLock;
 use Redis;
 use RedisException;
 use RuntimeException;
+use Symfony\Component\Console\Output\OutputInterface;
 
-class RedisQueue extends DatabaseQueue {
+class RedisQueue implements Queue {
 
 	private const UNCLAIMED_KEY_PATTERN = '*:jobqueue:*:l-unclaimed';
-	private const SKIP_COOLDOWN = 3;
+	private const SKIP_COOLDOWN = 10;
+
+	/** @var RedisQueueLock */
+	private RedisQueueLock $queueLock;
 
 	/** @var Redis|null */
 	private ?Redis $redis = null;
-
-	/** @var array */
-	private array $wikiIdMappingCache = [];
 
 	/** @var array<string, true> Instances currently in-flight (returned but not yet resolved) */
 	private array $inFlight = [];
@@ -24,40 +27,16 @@ class RedisQueue extends DatabaseQueue {
 	private array $skippedUntil = [];
 
 	/**
-	 * @inheritDoc
+	 * @param Config $config
+	 * @param OutputInterface $output
+	 * @throws RedisException
 	 */
-	public function getNext(): ?string {
-		return $this->fetchNextInstanceWithPendingJobs();
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function skip( string $instance ): void {
-		unset( $this->inFlight[$instance] );
-		// If skipped, let's wait a bit before trying this instance again to avoid loops
-		$this->skippedUntil[$instance] = time() + self::SKIP_COOLDOWN;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function onStartFailed( string $instance ): void {
-		unset( $this->inFlight[$instance] );
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function onFailure( string $instance ): void {
-		unset( $this->inFlight[$instance] );
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function onSuccess( string $instance ): void {
-		unset( $this->inFlight[$instance] );
+	public function __construct(
+		protected Config $config,
+		protected OutputInterface $output
+	) {
+		$this->assertRedisConnection();
+		$this->queueLock = new RedisQueueLock( $this->redis, $config );
 	}
 
 	/**
@@ -68,9 +47,7 @@ class RedisQueue extends DatabaseQueue {
 	 * @return string|null
 	 * @throws RedisException
 	 */
-	private function fetchNextInstanceWithPendingJobs(): ?string {
-		$this->assertRedisConnection();
-
+	public function getNext(): ?string {
 		$include = $this->config->getFarmConfig()['include-instances'] ?? [];
 		$exclude = $this->config->getFarmConfig()['exclude-instances'] ?? [];
 		$include = array_diff( $include, $exclude );
@@ -83,14 +60,13 @@ class RedisQueue extends DatabaseQueue {
 				break;
 			}
 			foreach ( $result as $key ) {
-				$wikiId = strstr( $key, ':', true );
-				if ( $wikiId === false || isset( $seen[$wikiId] ) ) {
+				$instance = strstr( $key, ':', true );
+				if ( $instance === false || isset( $seen[$instance] ) ) {
 					continue;
 				}
-				$seen[$wikiId] = true;
+				$seen[$instance] = true;
 
-				$instance = $this->wikiIdToInstance( $wikiId );
-				if ( $instance === null || isset( $this->inFlight[$instance] ) ) {
+				if ( isset( $this->inFlight[$instance] ) ) {
 					continue;
 				}
 				if ( isset( $this->skippedUntil[$instance] ) ) {
@@ -106,6 +82,12 @@ class RedisQueue extends DatabaseQueue {
 				} elseif ( !empty( $exclude ) && in_array( $instance, $exclude ) ) {
 					continue;
 				}
+				if ( !$this->queueLock->obtainLock( $instance ) ) {
+					// Another (or hopefully not, this) runner is running is, cool it down for some time
+					$this->skippedUntil[$instance] = time() + self::SKIP_COOLDOWN;
+					continue;
+				}
+				// Obtained lock, mark as in-flight and return instance
 				$this->inFlight[$instance] = true;
 				return $instance;
 			}
@@ -115,30 +97,19 @@ class RedisQueue extends DatabaseQueue {
 	}
 
 	/**
-	 * Map a wiki ID from the Redis queue to a farm instance name.
-	 *
-	 * @param string $wikiId
-	 * @return string|null
+	 * @inheritDoc
 	 */
-	private function wikiIdToInstance( string $wikiId ): ?string {
-		if ( isset( $this->wikiIdMappingCache[$wikiId] ) ) {
-			return $this->wikiIdMappingCache[$wikiId];
-		}
-		$this->assertManagementConnection();
-		$wikiIdEscaped = $this->managementDb->real_escape_string( $wikiId );
-		$table = $this->config->getConnection()['dbprefix'] . 'simple_farmer_instances';
-		$res = $this->managementDb->query(
-			"SELECT sfi_path FROM $table WHERE sfi_wiki_id = '" . $wikiIdEscaped . "' LIMIT 1"
-		);
-		if ( $res === false ) {
-			return 'w';
-		}
-		$row = $res->fetch_assoc();
-		if ( $row === null ) {
-			return 'w';
-		}
-		$this->wikiIdMappingCache[$wikiId] = $row['sfi_path'];
-		return $row['sfi_path'];
+	public function onFailure( string $instance ): void {
+		$this->queueLock->release( $instance );
+		unset( $this->inFlight[$instance] );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function onSuccess( string $instance ): void {
+		$this->queueLock->release( $instance );
+		unset( $this->inFlight[$instance] );
 	}
 
 	/**

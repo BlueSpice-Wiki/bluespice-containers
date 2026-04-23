@@ -6,18 +6,12 @@ use BlueSpice\Service\ParallelRunJobs\Config;
 use BlueSpice\Service\ParallelRunJobs\Queue\DatabaseQueue;
 use BlueSpice\Service\ParallelRunJobs\Queue\Queue;
 use BlueSpice\Service\ParallelRunJobs\Queue\RedisQueue;
-use BlueSpice\Service\ParallelRunJobs\QueueLock\NullQueueLock;
-use BlueSpice\Service\ParallelRunJobs\QueueLock\QueueLock;
-use BlueSpice\Service\ParallelRunJobs\QueueLock\RedisQueueLock;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Parallel extends Single {
 
 	/** @var Queue|null */
 	private ?Queue $queue;
-
-	/** @var QueueLock */
-	private QueueLock $queueLock;
 
 	/** @var string */
 	private string $runnerId;
@@ -26,7 +20,6 @@ class Parallel extends Single {
 	 * @var array
 	 */
 	private array $slots;
-
 
 	/**
 	 * @param Config $config
@@ -40,11 +33,9 @@ class Parallel extends Single {
 		switch ( $this->config->getQueue() ) {
 			case 'database':
 				$this->queue = new DatabaseQueue( $config, $output );
-				$this->queueLock = new NullQueueLock();
 				break;
 			case 'redis':
 				$this->queue = new RedisQueue( $config, $output );
-				$this->queueLock = new RedisQueueLock( $this->runnerId, $config );
 				break;
 			default:
 				$this->output->writeln( '<error>Invalid queue specified</error>' );
@@ -58,23 +49,13 @@ class Parallel extends Single {
 	 * @return void
 	 */
 	private function assignToSlot( int $slot, string $instance ): void {
-		if ( $this->queueLock->isLocked( $instance ) ) {
-			$this->queue->skip( $instance );
-			return;
-		}
-		$lock = $this->queueLock->obtainLock( $instance );
-		if ( !$lock ) {
-			$this->output->writeln( "<comment>Failed to obtain lock for \"$instance\", skipping</comment>" );
-			// Let queue know we could not start
-			$this->queue->onStartFailed( $instance );
-			return;
-		}
-		$process = $this->getProcess( $instance === 'w' ? [] : [ '--sfr=' . $instance ] );
+		$process = $this->getProcess( [ '--sfr=' . $instance ] );
 		$this->output->writeln( "<info>Starting for \"$instance\"</info>" );
 		$process->start();
 		$this->slots[$slot] = [
 			'instance' => $instance,
-			'process' => $process
+			'process' => $process,
+			'startedAt' => time(),
 		];
 	}
 
@@ -86,21 +67,30 @@ class Parallel extends Single {
 			if ( $slot === null ) {
 				return $index;
 			}
-			if ( !$slot['process']->isRunning() ) {
-				$this->output->writeln( "<info>Finished for \"{$slot['instance']}\"</info>" );
-				$this->output->write( $slot['process']->getOutput() );
-				if ( $slot['process']->getExitCode() !== 0 ) {
+			$maxRuntime = $this->config->getJobConfig()['maxtime'] * 2;
+			if ( $slot['process']->isRunning() ) {
+				// Prevent stuck slots, kill after a long time (2x max runtime)
+				if ( ( time() - $slot['startedAt'] ) > $maxRuntime ) {
+					$slot['process']->stop( 0 );
+					$this->output->writeln( "<error>Timed out for \"{$slot['instance']}\" after {$maxRuntime}s, killing</error>" );
 					$this->queue->onFailure( $slot['instance'] );
-					$this->output->writeln( "<error>Process failed\n" . $slot['process']->getErrorOutput() . "</error>" );
+					$this->slots[$index] = null;
+					return $index;
 				}
-				$this->queueLock->release( $slot['instance'] );
-				$this->queue->onSuccess( $slot['instance'] );
-				$this->slots[$index] = null;
-				return $index;
+				continue;
 			}
+			$this->output->writeln( "<info>Finished for \"{$slot['instance']}\"</info>" );
+			$this->output->write( $slot['process']->getOutput() );
+			if ( $slot['process']->getExitCode() !== 0 ) {
+				$this->queue->onFailure( $slot['instance'] );
+				$this->output->writeln( "<error>Process failed\n" . $slot['process']->getErrorOutput() . "</error>" );
+			} else {
+				$this->queue->onSuccess( $slot['instance'] );
+			}
+			$this->slots[$index] = null;
+			return $index;
 		}
 		return null;
-
 	}
 
 	/**

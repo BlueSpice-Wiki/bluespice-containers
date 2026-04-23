@@ -19,7 +19,8 @@ class DatabaseQueue implements Queue {
 	public function __construct(
 		protected Config $config,
 		protected OutputInterface $output
-	) {}
+	) {
+	}
 
 	public function getNext(): ?string {
 		if ( empty( $this->pending ) ) {
@@ -40,28 +41,25 @@ class DatabaseQueue implements Queue {
 
 		$rows = $this->managementDb->query( "SELECT sfi_path FROM $table WHERE sfi_status = 'ready'" );
 		$instances = [];
-		while ( $row = $rows->fetch_assoc() ) {
+		$row = $rows->fetch_assoc();
+
+		while ( $row !== null ) {
 			$path = $row['sfi_path'];
-			if ( !empty( $include ) ) {
-				if ( !in_array( $path, $include ) ) {
-					continue;
-				}
-			} elseif ( !empty( $exclude ) && in_array( $path, $exclude ) ) {
+
+			if (
+				( !empty( $include ) && !in_array( $path, $include ) ) ||
+				( empty( $include ) && !empty( $exclude ) && in_array( $path, $exclude ) )
+			) {
+				$row = $rows->fetch_assoc();
 				continue;
 			}
+
 			$instances[] = $path;
+			$row = $rows->fetch_assoc();
 		}
 
 		$instances[] = 'w';
 		return $instances;
-	}
-
-	public function skip( string $instance ): void {
-		// NOOP
-	}
-
-	public function onStartFailed( string $instance ): void {
-		$this->pending[] = $instance;
 	}
 
 	public function onFailure( string $instance ): void {
