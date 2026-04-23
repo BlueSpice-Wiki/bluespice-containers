@@ -12,7 +12,10 @@
 		"symfony/process": "^6.0",
 		"php": "^8.0",
 		"ext-mysqli": "*",
-		"ext-redis": "*"
+		"ext-redis": "*",
+		"symfony/lock": "^6.4",
+		"symfony/cache": "^6.4",
+		"psr/log": "^2.0"
 	},
 	"require-dev": {
 		"mediawiki/mediawiki-codesniffer": "43.0.0",
