@@ -116,7 +116,7 @@ fi
 # if /run/secrets/ exists
 if [ -d /run/secrets/ ]; then
   echo "# Secrets loaded from /run/secrets" >> /app/.env
-  for secret in $(find /run/secrets/ -maxdepth 1 -type f | grep -E '/[A-Z_]+$' | xargs -n1 basename); do
+  for secret in $(find /run/secrets/ -maxdepth 1 -type f | grep -E '/[A-Z_]+$' | xargs -n1 -r basename); do
     # For grep:
     # - INTERNAL_CHAT_TOKEN
     # - INTERNAL_SIMPLESAMLPHP_ADMIN_PASS
