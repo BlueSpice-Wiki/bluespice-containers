@@ -28,6 +28,16 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       DEV_WIKI_DEBUG: 1
+    # To enable xdbug and other dev tools, one needs `up -d --build` once
+    # The modified image will be applied for wiki-task as well.
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM ${BLUESPICE_WIKI_IMAGE} AS bluespice-dev
+        USER root
+        RUN apk add curl php-xdebug
+        USER bluespice
+      no_cache: true
 
   wiki-task:
     volumes:
@@ -293,3 +303,23 @@ services:
       timeout: 5s
       retries: 5
     profiles: [postgres]
+
+  # Third party service containers that will only start/end with profiles
+  # Available profiles: certbotcf
+  certbot:
+    image: certbot/dns-cloudflare
+    container_name: certbot
+    secrets:
+      - source: cloudflare_ini
+        target: /run/secrets/cloudflare.ini
+    volumes:
+      - ${DATADIR}/certbot:/etc/letsencrypt
+    command: >
+      certonly --dns-cloudflare --agree-tos --no-eff-email
+      --dns-cloudflare-credentials /run/secrets/cloudflare.ini
+      --email ${CERTBOT_CF_EMAIL} --domains *.${CERTBOT_CF_DOMAIN}
+    profiles: [certbotcf]
+
+secrets:
+  cloudflare_ini:
+    file: ${DATADIR}/.secrets/cloudflare.ini

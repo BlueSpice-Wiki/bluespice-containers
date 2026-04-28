@@ -11,6 +11,7 @@ show_usage() {
     echo "    --dry-run                     Test build without saving images"
     echo "    --buildargs KEY=VALUE         Pass build arguments to docker build"
     echo "    --images IMAGE1,IMAGE2        Build only specific images (comma-separated)"
+    echo "  -c, --compare                   Compare subtree subdirs with remote sources"
     echo "  -d, --dev-setup                 Setup deploy/compose/.env and override yml"
     echo "  -h, --help                      Show this help message"
     echo "  -i, --init-subtree              Show initializing commands of git subtree"
@@ -45,6 +46,7 @@ while [[ $# -gt 0 ]]; do
                 esac
             done
             ;;
+        -c|--compare) ACTION="compare"; shift ;;
         -d|--dev-setup) ACTION="devsetup"; shift ;;
         -h|--help) show_usage; exit 0 ;;
         -i|--init-subtree) ACTION="init"; shift ;;
@@ -93,6 +95,16 @@ update_repos_git_subtree() {
         echo "Failed to update $key. Please check the repository URL and branch."
         exit 1
     }
+}
+
+compare_subtree_dirs() {
+    local key="$1"
+    local prefix="$2"
+    local repo="$3"
+    local branch="$4"
+    git subtree split -P "$prefix" -b split-"$key"
+    git fetch "$key" "$branch" && git diff FETCH_HEAD split-"$key" | cat
+    git branch -D split-"$key"
 }
 
 should_build_image() {
@@ -181,7 +193,7 @@ dev_setup() {
     local version_tag="$IMAGES_VERSION_TAG"
     local project_name
     project_name=$(echo "$version_tag" | tr -d '.')
-    local override_src="dev/docker-compose.override.yml"
+    local override_src="docker-compose.override-template.yml"
     local override_dst="deploy/compose/docker-compose.override.yml"
     local env_dst="deploy/compose/.env"
     local env_sample="deploy/compose/.env.sample"
@@ -220,6 +232,7 @@ dev_setup() {
 case $ACTION in
     add) iterate_components add_git_remote_repos; git remote -v ;;
     build) build_docker_images $BUILD_DRY_RUN ;;
+    compare) iterate_components compare_subtree_dirs;;
     devsetup) dev_setup ;;
     help) echo "Too few options provided"; show_usage; exit 1 ;;
     init)
