@@ -1,0 +1,20 @@
+vulnerabilities:
+  - id: CVE-2024-47252
+    reason: "Fixed in distro package, false positive"
+  - id: CVE-2025-23048
+    reason: "Accepted risk, not exploitable in our setup"
+    expires: 2026-06-30
+  - id: CVE-2025-49630
+    reason: "mod_proxy_http2 not used"
+  - id: CVE-2025-49812
+    reason: "TLS upgrade not enabled"
+  - id: CVE-2025-55753
+    reason: "Waiting for upstream fix"
+  - id: CVE-2025-58098
+    reason: "SSI disabled"
+  - id: CVE-2023-2953
+    reason: "Patched by Debian backport"
+
+secrets:
+  - file: /etc/ssl/private/ssl-cert-snakeoil.key
+    reason: "Default Debian snakeoil key, not used in container"
