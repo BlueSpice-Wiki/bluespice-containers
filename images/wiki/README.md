@@ -31,7 +31,8 @@ docker build \
 | `AV_PORT`                    | `3310`         | Port of a `clamav` compatible service                | Yes      |
 | `BACKUP_HOUR`                | `1`            | Hour for daily backup. Set to `-1` to disable        | Yes      |
 | `CACHE_HOST`                 | `cache`        | Hostname of a `bluespice/cache` compatible service *)| Yes      |
-| `CACHE_PORT`                 | `11211`        | Port of a `bluespice/cache` compatible service       | Yes      |
+| `CACHE_PORT`                 | `11211`/`6379` | Port of a `bluespice/cache` compatible service. Default based on `CACHE_TYPE` | Yes      |
+| `CACHE_TYPE`                 | `memcached`    | Type of cache to use (memcached or redis/valkey)    | Yes      |
 | `CHAT_HOST`                  | `chat`         | Hostname of a `bluespice/chat` compatible service **)| Yes      |
 | `CHAT_PORT`                  | `3000`         | Port of a `bluespice/chat` compatible service        | Yes      |
 | `CHAT_PROTOCOL`              | `http`         | Protocol of a `bluespice/chat` compatible service    | Yes      |
@@ -56,6 +57,8 @@ docker build \
 | `INTERNAL_CHAT_WIKI_ACCESS_TOKEN` | `null` | Access token `bluespice/chat` | No       |
 | `INTERNAL_WIKI_SECRETKEY`    | `null`         | Secret key for the wiki                              | No       |
 | `INTERNAL_WIKI_UPGRADEKEY`   | `null`         | Upgrade key for the wiki                             | No       |
+| `JOBQUEUE_HOST`              | `jobqueue`     | Hostname of a `bluespice/jobqueue` compatible service| Yes      |
+| `JOBQUEUE_PORT`              | `6379`         | Port of a `bluespice/jobqueue` compatible service          | Yes      |
 | `MAX_UPLOAD_SIZE`            | `1024m`        | Max upload size for single file (Allowed: m or g)    | Yes      |
 | `PDF_HOST`                   | `pdf`          | Hostname of a `bluespice/pdf` compatible service     | Yes      |
 | `PDF_PORT`                   | `8080`         | Port of a `bluespice/pdf` compatible service         | Yes      |

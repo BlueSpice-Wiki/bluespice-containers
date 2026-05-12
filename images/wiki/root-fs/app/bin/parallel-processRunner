@@ -8,11 +8,15 @@ appDir=/app/bluespice/w
 processRunnerScript=$appDir/vendor/mwstake/mediawiki-component-processmanager/maintenance/processRunner.php
 
 while true; do
-	php \
-	$processRunnerScript \
-	$appDir/maintenance/Maintenance.php \
-	--max-processes=100 \
-	--wait \
-	&
-	sleep 60
+	if php \
+		$processRunnerScript \
+		$appDir/maintenance/Maintenance.php \
+		--max-processes=100 \
+		--wait; then
+		echo "processRunner exited cleanly; not restarting" >&2
+		exit 0
+	fi
+
+	echo "processRunner crashed; restarting in 1s" >&2
+	sleep 1
 done

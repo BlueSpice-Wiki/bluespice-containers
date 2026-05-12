@@ -1,10 +1,10 @@
 FROM composer:2 AS workaround-erm-45965
 # Build SimpleSAMLphp from source, bypassing the original way of loading
-ENV SIMPLESAMLPHP_VERSION=2.3.10
+ENV SIMPLESAMLPHP_VERSION=2.3.11
 WORKDIR /build
 RUN git clone https://github.com/simplesamlphp/simplesamlphp.git -b v${SIMPLESAMLPHP_VERSION} /build/simplesamlphp && \
 	cd /build/simplesamlphp && \
-	composer require psr/http-message:^1.1 psr/container:^1.1 --update-no-dev --prefer-dist --optimize-autoloader && \
+	composer require psr/http-message:^1.1 psr/container:^1.1 symfony/expression-language:^6.0 --update-no-dev --prefer-dist --optimize-autoloader && \
 	rm -rf /build/simplesamlphp/.git
 
 FROM alpine:3 AS builder
@@ -23,7 +23,7 @@ ENV MEDIAWIKIADM_SHA256=c038de94ce49c66584556bc03c58bf0f9388d109b9428c800d0b74c9
 ENV PARALLELRUNJOBSSERVICE_URL=https://github.com/hallowelt/misc-parallel-runjobs-service/releases/latest/download/parallel-runjobs-service
 ENV PARALLELRUNJOBSSERVICE_SHA256=ec8ea7e8a79242baba862448bcba952376267c0db19785d6266ab9a01a29e241
 
-ARG BLUESPICE_VERSION=5.2.3
+ARG BLUESPICE_VERSION=5.2.x
 ARG BLUESPICE_URL=https://github.com/BlueSpice-Wiki/bluespice-free-release.git
 
 WORKDIR /build
@@ -71,6 +71,7 @@ RUN apk add \
 	php$VERSION-pdo_mysql \
 	php$VERSION-pdo_pgsql \
 	php$VERSION-pdo_sqlite \
+	php$VERSION-pecl-redis \
 	php$VERSION-pgsql \
 	php$VERSION-phar \
 	php$VERSION-posix \
