@@ -5,5 +5,5 @@ RUN chown -R 1000:1000 /app
 WORKDIR /app
 
 EXPOSE 8080
-
+USER 1000
 CMD ["java", "-jar", "html2pdf.jar"]
