@@ -17,6 +17,8 @@ RUN apk update \
 
 RUN pip install --no-cache-dir -r /tmp/ai/requirements.txt
 
+RUN apk del build-deps
+
 FROM python:3.12-alpine
 
 # Security: Install latest security updates
