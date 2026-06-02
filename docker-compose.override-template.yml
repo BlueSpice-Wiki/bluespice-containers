@@ -16,39 +16,44 @@ configs:
       xdebug.client_port=9003
   # Example your-workspace-dir/.vscode/launch.json configuration in this case: 
   # {"configurations":[{"name":"Listen xdebug","type":"php","request":"launch"}]}
+  99_dev_overrides_ini:
+    content: |
+      ;memory_limit = 2048M
+      ;opcache.memory_consumption=2048
+
+x-common-dev: &common-dev
+  # optionally use certain already-built images from private registry
+  # image: docker.bluespice.com/bluespice-qa/wiki:latest
+  volumes:
+    - ${CODEDIR}:/app/bluespice/w/
+  configs:
+    - source: 50_xdebug_ini
+      target: /etc/php84/conf.d/50-xdebug.ini
+    - source: 99_dev_overrides_ini
+      target: /etc/php84/conf.d/99-dev-overrides.ini
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  environment:
+    DEV_WIKI_DEBUG: 1
+  # To enable xdbug and other dev tools, one needs `up -d --build` once
+  # The modified image will be applied for wiki-task as well.
+  build:
+    context: .
+    dockerfile_inline: |
+      FROM ${BLUESPICE_WIKI_IMAGE} AS bluespice-dev
+      USER root
+      RUN apk add curl php84-xdebug
+      COPY --from=composer:2 /usr/bin/composer /app/bin/composer
+      USER bluespice
+    no_cache: true
 
 services:
+  wiki-installer:
+    <<: *common-dev
   wiki-web:
-    volumes:
-      - ${CODEDIR}:/app/bluespice/w
-    configs:
-      - source: 50_xdebug_ini
-        target: /etc/php84/conf.d/50_xdebug.ini
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    environment:
-      DEV_WIKI_DEBUG: 1
-    # To enable xdbug and other dev tools, one needs `up -d --build` once
-    # The modified image will be applied for wiki-task as well.
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM ${BLUESPICE_WIKI_IMAGE} AS bluespice-dev
-        USER root
-        RUN apk add curl php-xdebug
-        USER bluespice
-      no_cache: true
-
+    <<: *common-dev
   wiki-task:
-    volumes:
-      - ${CODEDIR}:/app/bluespice/w
-    configs:
-      - source: 50_xdebug_ini
-        target: /etc/php84/conf.d/50_xdebug.ini
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    environment:
-      DEV_WIKI_DEBUG: 1
+    <<: *common-dev
 
   # optionally expose database ports for external DB apps:
   # database:
