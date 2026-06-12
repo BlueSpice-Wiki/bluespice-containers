@@ -1,3 +1,4 @@
+# See also: https://en.wiki.bluespice.com/wiki/Development
 configs:
   50_xdebug_ini:
     content: |
