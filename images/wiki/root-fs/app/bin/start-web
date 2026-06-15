@@ -22,6 +22,14 @@ case "${WIKI_LOG_LEVEL}" in
     ;;
 esac
 
+while [ ! -s /data/.wikienv ]; do
+    sleep 5
+    echo "Waiting for wikienv to be created by wiki-task..."
+done
+
+init-envs
+source /app/.env
+
 substitutePlaceholders /app/conf/90-bluespice-overrides.ini
 substitutePlaceholders /app/conf/nginx_bluespice
 

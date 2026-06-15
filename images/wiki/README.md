@@ -6,7 +6,7 @@ For the free edition the GitHub can be used for both.
 Example FREE edition build command:
 
 ```bash
-docker build -t bluespice/wiki:latest .
+docker build --build-arg EDITION=free -t bluespice/wiki:latest .
 ```
 
 Example custom edition build command:
@@ -37,7 +37,7 @@ docker build \
 | `DB_PASS`                    | `null`         | Database password                                    | No       |
 | `DB_PREFIX`                  | `''`           | Database prefix **)                                  | Yes      |
 | `DB_ROOT_PASS`               | ``             | Database root password **)                           | Yes      |
-| `DB_ROOT_USER`               | ``             | Database root user                                   | Yes      |
+| `DB_ROOT_USER`               | `root`         | Database root user                                   | Yes      |
 | `DB_TYPE`                    | `mysql`        | Database type                                        | Yes      |
 | `DB_USER`                    | `bluespice`    | Database user                                        | Yes      |
 | `DEV_WIKI_DEBUG`             | `null`         | Enable debug mode                                    | Yes      |
@@ -52,6 +52,7 @@ docker build \
 | `FORMULA_PROTOCOL`           | `http`         | Protocol of a `bluespice/formula` compatible service | Yes      |
 | `INTERNAL_WIKI_SECRETKEY`    | `null`         | Secret key for the wiki                              | No       |
 | `INTERNAL_WIKI_UPGRADEKEY`   | `null`         | Upgrade key for the wiki                             | No       |
+| `MAX_UPLOAD_SIZE`            | `1024m`        | Max upload size for single file (Allowed: m or g)    | Yes      |
 | `PDF_HOST`                   | `pdf`          | Hostname of a `bluespice/pdf` compatible service     | Yes      |
 | `PDF_PORT`                   | `8080`         | Port of a `bluespice/pdf` compatible service         | Yes      |
 | `PDF_PROTOCOL`               | `http`         | Protocol of a `bluespice/pdf` compatible service     | Yes      |
@@ -82,7 +83,6 @@ docker build \
 | `WIKI_PROXY`                 | `null`         | IP address(es) of proxy server. Will fall back to `proxy` service of `bluespice-deploy` | Yes      |
 | `WIKI_SUBSCRIPTION_KEY`      | `null`         | Only used by PRO edition. Overrides in-app config    | Yes      |
 | `WIKI_STATUSCHECK_ALLOWED`   | `null`         | IP or CIDR range for status check REST endpoint      | Yes      |
-| `MAX_UPLOAD_SIZE`            | `1024m`        | Max upload size for single file (Allowed: m or g)     | Yes      |
 
 *) External cache can be disabled by setting `-` as `CACHE_HOST`.
 **) See section "Database requirements for FARM edition"

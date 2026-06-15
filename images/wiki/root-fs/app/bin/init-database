@@ -4,7 +4,7 @@
 $dbHost = getenv('DB_HOST');
 $dbUser = getenv('DB_USER');
 $dbName = getenv('DB_NAME');
-$dbNamePrefix = getenv('WIKI_FARM_DB_PREFIX') ?: 'sfr_';
+$dbNamePrefix = getenv('WIKI_FARM_DB_PREFIX');
 // Attention: In contrast to the `install-database` script, we must not fall
 // back to `DB_USER`/`DB_PASS` here, as these operations require real root privileges.
 $dbRootUser = getenv('DB_ROOT_USER');
