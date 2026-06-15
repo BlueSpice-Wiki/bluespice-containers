@@ -1,21 +1,22 @@
-FROM node:18-alpine AS builder
-
+FROM node:25-alpine AS builder
 RUN apk update && apk add --no-cache git
-RUN git clone --depth 1 https://gitlab.wikimedia.org/repos/mediawiki/services/mathoid.git /tmp/mathoid
-RUN cd /tmp/mathoid && npm install --omit=dev
-RUN cp /tmp/mathoid/config.dev.yaml /tmp/mathoid/config.yaml
-RUN find /tmp/mathoid -type d -name '.git' | xargs rm -rf {} \;
-RUN find /tmp/mathoid -type d -name 'test' | xargs rm -rf {} \;
-RUN apk del git
+RUN git clone --depth 1 https://gitlab.wikimedia.org/repos/mediawiki/services/mathoid.git /opt/mathoid
+WORKDIR /opt/mathoid
+RUN npm install --omit=dev
+RUN cp config.dev.yaml config.yaml
 
-FROM node:18-alpine
+FROM builder AS test
+RUN npm install
+RUN npm run test
 
+FROM builder AS cleanup
+RUN find /opt/mathoid -type d -name '.git' | xargs rm -rf {} \;
+RUN find /opt/mathoid -type d -name 'test' | xargs rm -rf {} \;
+
+FROM node:25-alpine
+WORKDIR /opt/mathoid
 RUN apk update && apk add --no-cache librsvg
-RUN mkdir -p /opt/mathoid
-
-COPY --from=builder /tmp/mathoid /opt/mathoid
+COPY --from=cleanup /opt/mathoid /opt/mathoid
 COPY ./root-fs/opt/init.sh /opt/init.sh
-
 EXPOSE 10044
-
 ENTRYPOINT [ "/opt/init.sh"]
