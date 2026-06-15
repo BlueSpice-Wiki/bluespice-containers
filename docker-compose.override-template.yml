@@ -56,6 +56,15 @@ services:
   wiki-task:
     <<: *common-dev
 
+  # Needed for opensearch when running on arm64: 
+  # search:
+  #   build:
+  #     context: .
+  #     dockerfile_inline: |
+  #       FROM ${BLUESPICE_SERVICE_REPOSITORY}/search:${VERSION}
+  #       ENV _JAVA_OPTIONS=-XX:UseSVE=0
+  #     no_cache: true
+
   # optionally expose database ports for external DB apps:
   # database:
   #   ports:
@@ -297,8 +306,8 @@ services:
     image: postgres:16-alpine
     restart: always
     environment:
-      POSTGRES_USER: {$DB_USER}
-      POSTGRES_PASSWORD: {$DB_PASS}
+      #POSTGRES_USER: {$DB_USER}
+      #POSTGRES_PASSWORD: {$DB_PASS}
       POSTGRES_DB: testdb
     volumes:
       - ${DATADIR}/postgres/data:/var/lib/postgresql/data
@@ -323,7 +332,7 @@ services:
     command: >
       certonly --dns-cloudflare --agree-tos --no-eff-email
       --dns-cloudflare-credentials /run/secrets/cloudflare.ini
-      --email ${CERTBOT_CF_EMAIL} --domains *.${CERTBOT_CF_DOMAIN}
+      --email ${CERTBOT_CF_EMAIL:-} --domains *.${CERTBOT_CF_DOMAIN:-}
     profiles: [certbotcf]
 
 secrets:
