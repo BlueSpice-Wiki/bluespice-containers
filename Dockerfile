@@ -13,7 +13,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 RUN apk update \
     && apk add --virtual build-deps gcc musl-dev \
-    && apk add --no-cache mariadb-dev
+    && apk add --no-cache mariadb-connector-c-dev
 
 RUN pip install --no-cache-dir -r /tmp/ai/requirements.txt
 
@@ -23,6 +23,7 @@ FROM python:3.12-alpine
 
 # Security: Install latest security updates
 RUN apk update && apk upgrade
+RUN apk add --no-cache mariadb-connector-c
 
 # Security: Create non-root user
 ARG UID
