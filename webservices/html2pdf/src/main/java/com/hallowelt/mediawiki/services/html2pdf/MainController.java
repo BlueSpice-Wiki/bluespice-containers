@@ -8,6 +8,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
@@ -21,9 +25,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.w3c.dom.Document;
 
+import com.openhtmltopdf.extend.FSCacheEx;
+import com.openhtmltopdf.extend.FSCacheValue;
 import com.openhtmltopdf.outputdevice.helper.ExternalResourceControlPriority;
 import com.openhtmltopdf.outputdevice.helper.ExternalResourceType;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder.CacheStore;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,7 +42,82 @@ public class MainController {
 
 	private File tempPathFile = null;
 
+	private FallbackFontMapping fallbackFontMapping = new FallbackFontMapping();
+
+	/**
+	 * Persistent font metrics cache shared across all PDF render requests.
+	 * Populated by the static classpath fonts (Base 14 and Noto fallback fonts).
+	 * User-uploaded fonts referenced via CSS {@code @font-face} do not interact
+	 * with this cache and are therefore never stored here.
+	 */
+	private final FSCacheEx<String, FSCacheValue> fontMetricsCache = new FSCacheEx<String, FSCacheValue>() {
+		private final ConcurrentHashMap<String, FSCacheValue> store = new ConcurrentHashMap<>();
+
+		@Override
+		public void put(String key, FSCacheValue value) {
+			store.put(key, value);
+		}
+
+		@Override
+		public FSCacheValue get(String key, Callable<? extends FSCacheValue> loader) {
+			FSCacheValue cached = store.get(key);
+			if (cached != null) {
+				return cached;
+			}
+			try {
+				FSCacheValue value = loader.call();
+				if (value != null) {
+					store.put(key, value);
+				}
+				return value;
+			} catch (Exception e) {
+				return null;
+			}
+		}
+
+		@Override
+		public FSCacheValue get(String key) {
+			return store.get(key);
+		}
+	};
+
 	private static final Logger logger = LoggerFactory.getLogger(MainController.class);
+
+	/**
+	 * Matches either a complete CSS {@code @font-face} block (group 1) or a
+	 * {@code font-family}/{@code font} shorthand declaration outside such a block,
+	 * capturing the property prefix (group 2) and the value (group 3).
+	 *
+	 * <p>The {@code @font-face} alternative is listed first so that any
+	 * {@code font-family} property inside a {@code @font-face} rule is consumed by
+	 * group 1 and is therefore never seen by the rewriting logic.
+	 *
+	 * <p>The property pattern {@code font(?:-family)?} matches {@code font} and
+	 * {@code font-family} but never {@code font-size}, {@code font-weight}, etc.,
+	 * because those properties have a further {@code -} suffix that prevents the
+	 * trailing {@code \\s*:} from matching.
+	 */
+	private static final Pattern FONT_DECLARATION_PATTERN = Pattern.compile(
+		"(@font-face\\s*\\{[^}]*\\})|(font(?:-family)?\\s*:\\s*)([^;}]+)",
+		Pattern.CASE_INSENSITIVE
+	);
+
+	/**
+	 * Matches the five CSS generic font-family keywords as whole tokens, guarded by
+	 * negative look-behind/ahead so that:
+	 * <ul>
+	 *   <li>{@code serif} inside {@code sans-serif} is not matched (the preceding
+	 *       {@code -} triggers the look-behind);</li>
+	 *   <li>already-rewritten values (e.g. {@code sans-serif-fallback}) are not
+	 *       matched again (negative look-ahead {@code (?!-fallback)}).</li>
+	 * </ul>
+	 * {@code sans-serif} must appear before {@code serif} in the alternation so the
+	 * longer token is tried first.
+	 */
+	private static final Pattern GENERIC_FONT_FAMILY_PATTERN = Pattern.compile(
+		"(?<![a-zA-Z0-9-])(sans-serif|serif|monospace|cursive|fantasy)(?!-fallback)(?![a-zA-Z0-9-])",
+		Pattern.CASE_INSENSITIVE
+	);
 
 	public MainController() {
 		String tempPath = System.getProperty("html2pdf.temp.dir");
@@ -58,7 +140,7 @@ public class MainController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("success", true);
 		response.put("msg", "Service is running");
-		response.put( "version", "1.1.3");
+		response.put( "version", "2.0.0");
 		return response;
 	}
 
@@ -79,7 +161,10 @@ public class MainController {
 
 			PdfRendererBuilder builder = new PdfRendererBuilder();
 
+			builder.useCacheStore(CacheStore.PDF_FONT_METRICS, fontMetricsCache);
+
 			BaseFontMapping.registerFonts(builder);
+			fallbackFontMapping.registerFallbackFonts(builder);
 
 			builder.useFastMode();
 			builder.usePdfUaAccessibility(true);
@@ -284,6 +369,62 @@ public class MainController {
 				el.attr("style", sanitizedStyle);
 			}
 		}
+
+		Elements styleElements = doc.select("style");
+		for (org.jsoup.nodes.Element el : styleElements) {
+			String css = el.text();
+			String rewrittenCss = rewriteGenericFontFamilies(css);
+			if (!css.equals(rewrittenCss)) {
+				logger.debug("Sanitize: update font-family in style element");
+				el.text(rewrittenCss);
+			}
+		}
+
+		doc.select("head").prepend("<style>html{font-family:serif-fallback," + fallbackFontMapping.getFontFamilyNames() + "}</style>");
+	}
+
+	/**
+	 * Rewrites the five CSS generic font-family keywords ({@code serif},
+	 * {@code sans-serif}, {@code monospace}, {@code cursive}, {@code fantasy}) to
+	 * their {@code -fallback}-suffixed counterparts within {@code font-family} and
+	 * {@code font} shorthand declarations found in {@code content}.
+	 * {@code fallbackFontFamilies} is
+	 * appended to the end of all found values so that the full Noto fallback chain is
+	 * available for any characters not covered by the named fonts.
+	 *
+	 * <p>The replacement is scoped to declaration values only, so occurrences inside
+	 * URL paths, comments, or other CSS constructs are left untouched.
+	 * {@code @font-face} blocks are passed through unchanged — the {@code font-family}
+	 * property inside them declares a font name rather than selecting a font, so it
+	 * must never be rewritten.
+	 * Within {@code font} shorthand values the keyword pattern only matches the five
+	 * specific generic family tokens — not font-weight keywords, sizes, etc. — so
+	 * co-existing values like {@code bold} or {@code 14px} are preserved as-is.
+	 *
+	 * @param content raw CSS (or any text containing CSS declarations)
+	 * @return the content with generic font-family keywords postfixed by
+	 *         {@code -fallback} and the fallback chain appended
+	 */
+	private String rewriteGenericFontFamilies(String content) {
+		Matcher m = FONT_DECLARATION_PATTERN.matcher(content);
+		StringBuffer sb = new StringBuffer();
+		String fallbackFontFamilies = fallbackFontMapping.getFontFamilyNames();
+		while (m.find()) {
+			if (m.group(1) != null) {
+				// @font-face block — keep entirely unchanged
+				m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1)));
+			} else {
+				String prefix = m.group(2);
+				String value = m.group(3);
+				String rewrittenValue = GENERIC_FONT_FAMILY_PATTERN.matcher(value).replaceAll("$1-fallback");
+				if (!fallbackFontFamilies.isEmpty()) {
+					rewrittenValue = rewrittenValue.stripTrailing() + ", " + fallbackFontFamilies;
+				}
+				m.appendReplacement(sb, Matcher.quoteReplacement(prefix + rewrittenValue));
+			}
+		}
+		m.appendTail(sb);
+		return sb.toString();
 	}
 
 	private void deleteDirectory(File directroy) {
@@ -363,7 +504,14 @@ public class MainController {
 				Map<String, Object> fileObject = new HashMap<>();
 				File fileToSave = new File(typePath, submittedFileName);
 				try {
-					part.write(fileToSave.getAbsolutePath());
+					if (submittedFileName.toLowerCase().endsWith(".css")) {
+						String cssContent = org.apache.commons.io.IOUtils.toString(part.getInputStream(), "UTF-8");
+						String rewrittenContent = rewriteGenericFontFamilies(cssContent);
+						org.apache.commons.io.FileUtils.writeStringToFile(fileToSave, rewrittenContent, "UTF-8");
+						logger.info("Saved CSS with rewritten generic font families: " + fileToSave.getAbsolutePath());
+					} else {
+						part.write(fileToSave.getAbsolutePath());
+					}
 					fileObject.put("fieldName", fieldName);
 					fileObject.put("fileName", submittedFileName);
 					fileObject.put("contentType", part.getContentType());

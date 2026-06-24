@@ -28,9 +28,11 @@ public class BaseFontMapping {
 		Map.entry("Courier-BoldOblique","/fonts/NimbusMonoPS-BoldItalic.ttf"),
 
 		// Generic fallbacks
-		Map.entry("serif",              "/fonts/NimbusRoman-Regular.ttf"),
-		Map.entry("sans-serif",         "/fonts/NimbusSans-Regular.ttf"),
-		Map.entry("monospace",          "/fonts/NimbusMonoPS-Regular.ttf"),
+		// We replace the generic names `serif` etc. with a `-fallback` version in
+		// HTML and CSS to enforce PDF/A-compatible font embedding.
+		Map.entry("serif-fallback",      "/fonts/NimbusRoman-Regular.ttf"),
+		Map.entry("sans-serif-fallback", "/fonts/NimbusSans-Regular.ttf"),
+		Map.entry("monospace-fallback",  "/fonts/NimbusMonoPS-Regular.ttf"),
 
 		// Symbol & Dingbats
 		Map.entry("Symbol",             "/fonts/StandardSymbolsPS.ttf"),
