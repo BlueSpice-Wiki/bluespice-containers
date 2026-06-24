@@ -131,7 +131,7 @@ class OpenHandler {
 
 		// Proving already established connections must be done after all
 		// init processes - that's important for normal work of disconnect event
-		$answer = $this->authorAlreadyLogged( $configs );
+		$answer = $this->authorAlreadyLogged( $configs, $connectionList );
 		if ( $answer ) {
 			$this->logger->debug( "Already logged: {$answer}" );
 			// User has already opened this session
@@ -315,15 +315,25 @@ class OpenHandler {
 
 	/**
 	 * @param array $config
+	 * @param ConnectionList $connectionList
 	 * @return string
 	 */
-	private function authorAlreadyLogged( array $config ): string {
+	private function authorAlreadyLogged( array $config, ConnectionList $connectionList ): string {
 		$author = $this->sessionDAO->getAuthorInSession( $config['sessionId'], $config['authorId'] );
-		// if author is still inactive after init - don't have connections.
-		// cause an alreadyLoggedIn event to prevent incorrect execution of program
-		if ( $author && count( $author['value']['connection'] ) !== 1 ) {
-			// if user has more than one connection
-			return $this->response( EventType::CONTENT, 'alreadyLoggedIn' );
+		if ( !$author ) {
+			return "";
+		}
+
+		$connections = $author['value']['connection'] ?? [];
+		// Only block if there is another connection that is *actively live* in the
+		// in-memory ConnectionList. Stale DB entries left over from a prior crash
+		// or unclean disconnect must not prevent a legitimate reconnect.
+		foreach ( $connections as $connId ) {
+			if ( (int)$connId !== (int)$config['connectionId']
+				&& $connectionList->get( (int)$connId ) !== null
+			) {
+				return $this->response( EventType::CONTENT, 'alreadyLoggedIn' );
+			}
 		}
 
 		return "";
