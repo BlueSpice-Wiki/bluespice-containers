@@ -10,8 +10,9 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 RUN install-php-extensions mongodb-stable
 RUN mkdir -p /usr/src/CollabpadsBackend
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-COPY --from=builder /usr/src/CollabpadsBackend/ /usr/src/CollabpadsBackend/
+COPY --from=builder --chown=1000:1000 /usr/src/CollabpadsBackend/ /usr/src/CollabpadsBackend/
 WORKDIR /usr/src/CollabpadsBackend
 # ps is required for the init.sh script
 RUN apk add procps
+USER 1000
 ENTRYPOINT [ "sh", "./bin/init.sh" ]
