@@ -17,6 +17,14 @@ $GLOBALS['wgPDFCreatorHtml2PdfServiceUrl'] = 'http://localhost:8080/Html2PDF/v1'
 docker build -t bluespice/pdf:latest .
 ```
 
+If you want to build from a local JAR file (e.g. for testing), use
+```sh
+docker build \
+    --build-arg JAR_URL=./html2pdf.jar \
+    --build-arg SHA256sum=$(sha256sum ./html2pdf.jar | awk '{print $1}') \
+    -t bluespice/pdf:latest .
+```
+
 ### Apply proper tags
 HINT: We align the image tags with the version of BlueSpice that it is compatible with.
 
