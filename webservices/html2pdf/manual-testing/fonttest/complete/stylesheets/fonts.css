@@ -1,0 +1,75 @@
+@font-face {
+	font-family: "DejaVuSans";
+	src: url("DejaVuSans.ttf");
+	font-weight: normal;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+
+@font-face {
+	font-family: "DejaVuSans";
+	src: url("DejaVuSans-Bold.ttf");
+	font-weight: bold;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+
+@font-face {
+	font-family: "DejaVuSans";
+	src: url("DejaVuSans-Oblique.ttf");
+	font-style: oblique;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+
+@font-face {
+	font-family: "DejaVuSans";
+	src: url("DejaVuSans-BoldOblique.ttf");
+	font-weight: bold;
+	font-style: oblique;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+
+@font-face {
+	font-family: "DejaVuSansMono";
+	src: url("DejaVuSansMono.ttf");
+	font-weight: normal;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+
+@font-face {
+	font-family: "DejaVuSansMono";
+	src: url("DejaVuSansMono-Bold.ttf");
+	font-weight: bold;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+
+@font-face {
+	font-family: "DejaVuSansMono";
+	src: url("DejaVuSansMono-Oblique.ttf");
+	font-style: oblique;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+
+@font-face {
+	font-family: "DejaVuSansMono";
+	src: url("DejaVuSansMono-BoldOblique.ttf");
+	font-weight: bold;
+	font-style: oblique;
+	-fs-pdf-font-embed: embed;
+	-fs-pdf-font-encoding: Identity-H;
+}
+
+
+body {
+	font-size: 9pt;
+	font-family: "DejaVuSans";
+}
+
+pre, code {
+	font-family: "DejaVuSansMono";
+}
