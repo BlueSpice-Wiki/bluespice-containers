@@ -165,6 +165,33 @@ if ( getenv( 'DEV_WIKI_DEBUG' ) ) {
 	$GLOBALS['wgDebugDumpSql'] = true;
 }
 
+# See https://github.com/edwardspec/mediawiki-aws-s3/tree/master?tab=readme-ov-file#using-another-s3-compatible-service-not-amazon-s3-itself
+if ( getenv( 'FILESTORE_HOST' ) ) {
+	$GLOBALS['wgAWSCredentials'] = [
+		'key' => trim( getenv( 'FILESTORE_ACCESS_KEY' ) ?: '' ),
+		'secret' => trim( getenv( 'FILESTORE_SECRET_KEY' ) ?: '' ),
+		'token' => trim( getenv( 'FILESTORE_TOKEN' ) ?: false ),
+	];
+	$GLOBALS['wgAWSBucketName'] = trim( getenv( 'FILESTORE_BUCKET_NAME' ) ?: $GLOBALS['wgDBname'].$GLOBALS['wgDBprefix'] );
+	// Use `img_auth.php` or `nsfr_img_auth.php` for frontend URLs
+	$GLOBALS['wgAWSBucketDomain'] = $GLOBALS['wgServer'] . $GLOBALS['wgUploadPath'];
+	// Has to be set to make AWS SDK work; Not required for non-AWS S3 services
+	$GLOBALS['wgAWSRegion'] = trim( getenv( 'FILESTORE_REGION' ) ?: 'us-east-1' );
+	// By default we use the `$wgScriptPath` as top subdirectory
+	// For farm instances we change the top subdirectory to the respective Sub-WikiID
+	$GLOBALS['wgAWSBucketTopSubdirectory'] = $GLOBALS['wgScriptPath'];
+	// For b/c to legacy FS layout
+	$GLOBALS['wgAWSRepoHashLevels'] = '2';
+	$GLOBALS['wgAWSRepoDeletedHashLevels'] = '3';
+
+	$GLOBALS['wgFileBackends']['s3']['use_path_style_endpoint'] = true;
+	$GLOBALS['wgFileBackends']['s3']['endpoint'] = bsAssembleURL(
+		[ 'FILESTORE_PROTOCOL', 'http' ],
+		[ 'FILESTORE_HOST', 'filestore' ],
+		[ 'FILESTORE_PORT', '9000' ]
+	);
+}
+
 if ( getenv( 'DEV_WIKI_DEBUG_LOGCHANNELS' ) ) {
 	$logChannels = explode( ',', trim( getenv( 'DEV_WIKI_DEBUG_LOGCHANNELS' ) ) );
 	$logChannels = array_map( 'trim', $logChannels );
@@ -269,6 +296,8 @@ if ( getenv( 'EDITION' ) === 'farm' ) {
 		// We must store L10N cache file of ROOT_WIKI and INSTANCEs independently, as they have different extensions enabled,
 		// which otherwise causes the cache to be invalidated all the time.
 		$GLOBALS['wgLocalisationCacheConf']['storeDirectory'] = '/tmp/cache/l10n-instances';
+		// Overwrite S3 bucket top subdirectory to use Sub-WikiID (see above)
+		$GLOBALS['wgAWSBucketTopSubdirectory'] = $GLOBALS['wgScriptPath'];
 
 		// Setup process runner/wikicron to use Redis, if configured
 		// Has to be done in post-init due to farm consts

@@ -51,6 +51,10 @@ docker build \
 | `DIAGRAM_PORT`               | `$WIKI_PORT`   | Port of a `bluespice/diagram` compatible service     | Yes      |
 | `DIAGRAM_PROTOCOL`           | `$WIKI_PROTOCOL`| Protocol of a `bluespice/diagram` compatible service| Yes      |
 | `EDITION`                    | `null`         | Edition of the wiki                                  | Yes      |
+| `FILESTORE_HOST`            | `filestore`    | Hostname of a `bluespice/filestore` compatible service| Yes      |
+| `FILESTORE_ACCESS_KEY`      | `''`         | Access key for `bluespice/filestore` compatible service | No, if `FILESTORE_HOST` is set       |
+| `FILESTORE_SECRET_KEY`    | `''`         | Secret key for `bluespice/filestore` compatible service | No, if `FILESTORE_HOST` is set       |
+| `FILESTORE_BUCKET_NAME`    | `<wikiid>`         | Bucket name for `bluespice/filestore` compatible service | Yes      |
 | `FORMULA_HOST`               | `formula`      | Hostname of a `bluespice/formula` compatible service | Yes      |
 | `FORMULA_PORT`               | `10044`        | Port of a `bluespice/formula` compatible service     | Yes      |
 | `FORMULA_PROTOCOL`           | `http`         | Protocol of a `bluespice/formula` compatible service | Yes      |

@@ -93,9 +93,9 @@ RUN apk add \
 	procps \
 	python3 \
 	rsvg-convert \
-	supercronic \
 	tzdata \
 	vim \
+	vips-tools \
 	xpdf \
 	&& echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
 	&& apk add php$VERSION-pecl-excimer@testing
@@ -127,7 +127,6 @@ COPY --chown=$USER:$GROUPNAME --chmod=755 ./root-fs/app/bin /app/bin
 COPY --chown=$USER:$GROUPNAME --chmod=666 ./root-fs/app/bin/config /app/bin/config
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/conf /app/conf
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/simplesamlphp/ /app/simplesamlphp
-COPY --chown=$USER:$GROUPNAME ./root-fs/app/cron /app/cron
 COPY --chown=$USER:$GROUPNAME --from=builder --chmod=755 /build/mathoid-remote /app/bin
 COPY --chown=$USER:$GROUPNAME --from=builder --chmod=755 /build/mediawiki-adm /app/bin
 COPY --chown=$USER:$GROUPNAME --from=builder --chmod=755 /build/parallel-runjobs-service /app/bin
