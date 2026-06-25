@@ -1,3 +1,8 @@
 deploy/compose/*.backup
+images/mcp/
+images/prompt/
+images/statisticsdashboard/
 webservices/ai/
 webservices/chat/
+webservices/mcp/
+webservices/prompt/
