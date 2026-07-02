@@ -46,4 +46,17 @@ Optionally:
 - to run wiki in `https` protocol, add the `.key` and `.crt` certificate files of your domain name to `${DATADIR}/proxy/certs`, then run `./bluespice-deploy restart proxy` to load the certificate
 - use `--build` tag for the first run to utilize inline Dockerfile in the override yml
 
+## Advanced usages
+
+### Run PHPUnit tests inside a wiki container
+1. Run `./bluespice-deploy up -d --build` for once, so that composer is added to your wiki containers
+2. If you are running farm edition, please add the following lines to your `pre-init-settings.php`:
+```php
+if ( defined( 'MW_PHPUNIT_TEST' ) && MW_PHPUNIT_TEST ) {
+	$GLOBALS['wgSharedTables'] = [];
+}
+```
+3. Inside a wiki container (e.g `./bluespice-deploy exec -it wiki-web bash`), go to `/app/bluespice/w`
+4. Run your tests, for example `composer phpunit extensions/WikiRAG/tests/phpunit/integration/`
+
 
