@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# wrapper script of deploy/compose/bluespice-deploy
+# making it executable in arbitrary location
+
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Handle symlinks - get real path if needed
+if [ -L "$0" ]; then
+    PROJECT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+fi
+
+cd "${PROJECT_DIR}/deploy/compose" || exit 1
+exec "${PROJECT_DIR}/deploy/compose/bluespice-deploy" "$@"
+
