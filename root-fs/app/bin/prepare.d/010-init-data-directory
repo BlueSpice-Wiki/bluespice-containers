@@ -30,7 +30,7 @@ directories=(
   /data/wiki/simplesamlphp/logs
 )
 
-if [[ "${EDITION}" == "farm" ]]; then
+if [[ "$EDITION" == "farm" || "$EDITION" == "galaxy" ]]; then
   directories+=(
     /data/wiki/bluespice/farm-archive
     /data/wiki/bluespice/farm-instances
