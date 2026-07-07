@@ -14,6 +14,25 @@ $GLOBALS['wgSessionCacheType'] = CACHE_DB;
 
 HINT: It is not recommended to store user sessions in Memcached, as it may cause session loss.
 
+## Configuration
+
+By default, the container runs memcached with 512MB max memory and optimized slab management:
+
+```
+memcached -m 512 -o slab_reassign,slab_automove=2
+```
+
+You can override these defaults using the `command` parameter in your `docker-compose.yml`:
+
+```yaml
+services:
+  cache:
+    image: bluespice/cache:latest
+    command: ["memcached", "-m", "1024", "-o", "slab_reassign,slab_automove=2"]
+```
+
+This replaces the entire default command, so include all desired flags when overriding.
+
 ## How to release a new version
 
 ### Build a new version of the image
