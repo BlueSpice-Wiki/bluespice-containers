@@ -122,13 +122,12 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-dev-mongodbadmin
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://collabpads-database:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: ""
-      ME_CONFIG_BASICAUTH_PASSWORD: ""
-      ME_CONFIG_SITE_BASEURL: /_mongodbadmin
+      ME_CONFIG_BASICAUTH_USERNAME: "admin"
+      ME_CONFIG_BASICAUTH_PASSWORD: "pass"
+      ME_CONFIG_SITE_BASEURL: /_mongodbadmin/
       VIRTUAL_HOST: ${WIKI_HOST}
       VIRTUAL_PORT: 8081
       VIRTUAL_PATH: /_mongodbadmin/
-      VIRTUAL_DEST: /
 
 
   # Any service below will be called only when its profile is specified
