@@ -31,7 +31,7 @@ switch ( strtolower( $config['log-level'] ) ) {
 		$logLevel = Logger::ERROR;
 		break;
 	default:
-		$logLevel = Logger::WARNING;
+		$logLevel = Logger::INFO;
 }
 $logger = new Logger( 'collabpads-backend' );
 $logger->setHandlers( [ new StreamHandler( 'php://stdout', $logLevel ) ] );
@@ -59,7 +59,7 @@ for ( $x = 0; $x < 5; $x++ ) {
 			$logger->error( "Max retries reached, exiting..." );
 			exit( 1 );
 		}
-		$logger->error( "Retrying in $retryTime seconds..." );
+		$logger->warning( "Retrying in $retryTime seconds..." );
 		sleep( $retryTime );
 		continue;
 	}

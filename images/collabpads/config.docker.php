@@ -23,6 +23,6 @@ return [
 	'db-user' => getenv( 'COLLABPADS_BACKEND_MONGO_DB_USER' ) ?: '',
 	'db-password' => getenv( 'COLLABPADS_BACKEND_MONGO_DB_PASSWORD' ) ?: '',
 	'db-defaultauthdb' => getenv( 'COLLABPADS_BACKEND_MONGO_DB_DEFAULT_AUTH_DB' ) ?: 'admin',
-	'log-level' => getenv( 'COLLABPADS_BACKEND_LOG_LEVEL' ) ?: 'warn',
+	'log-level' => getenv( 'COLLABPADS_BACKEND_LOG_LEVEL' ) ?: 'info',
 	'http-client-options' => $httpClientOptions
 ];
