@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.w3c.dom.Document;
 
+import com.openhtmltopdf.bidi.support.ICUBidiReorderer;
+import com.openhtmltopdf.bidi.support.ICUBidiSplitter;
 import com.openhtmltopdf.extend.FSCacheEx;
 import com.openhtmltopdf.extend.FSCacheValue;
 import com.openhtmltopdf.outputdevice.helper.ExternalResourceControlPriority;
@@ -43,6 +45,16 @@ public class MainController {
 	private File tempPathFile = null;
 
 	private FallbackFontMapping fallbackFontMapping = new FallbackFontMapping();
+
+	/**
+	 * CSS snippet containing {@code @font-face} rules for all Base-14 fonts,
+	 * injected into every rendered document so that Apache Batik's SVG font
+	 * resolver can locate the correct font files.
+	 *
+	 * <p>Populated once in the constructor by extracting font resources from
+	 * the classpath to {@code <tempDir>/fonts/}.
+	 */
+	private String baseFontFaceCSS = "";
 
 	/**
 	 * Persistent font metrics cache shared across all PDF render requests.
@@ -96,9 +108,13 @@ public class MainController {
 	 * {@code font-family} but never {@code font-size}, {@code font-weight}, etc.,
 	 * because those properties have a further {@code -} suffix that prevents the
 	 * trailing {@code \\s*:} from matching.
+	 *
+	 * <p>A negative look-behind {@code (?<![\\w-])} anchors the match so that
+	 * {@code font} is only recognised as a property name, not as a suffix inside
+	 * selectors or other identifiers (e.g. {@code .ico-font::before}).
 	 */
 	private static final Pattern FONT_DECLARATION_PATTERN = Pattern.compile(
-		"(@font-face\\s*\\{[^}]*\\})|(font(?:-family)?\\s*:\\s*)([^;}]+)",
+		"(@font-face\\s*\\{[^}]*\\})|(?<![\\w-])(font(?:-family)?\\s*:\\s*)([^;}]+)",
 		Pattern.CASE_INSENSITIVE
 	);
 
@@ -132,6 +148,13 @@ public class MainController {
 		tempPathFile = new File(tempPath);
 		if (!tempPathFile.exists()) {
 			tempPathFile.mkdirs();
+		}
+
+		File fontsDir = new File(tempPathFile, "fonts");
+		try {
+			baseFontFaceCSS = BaseFontMapping.extractFontsAndGenerateCSS(fontsDir);
+		} catch (Exception e) {
+			logger.error("Failed to extract Base-14 fonts for SVG rendering", e);
 		}
 	}
 
@@ -169,6 +192,9 @@ public class MainController {
 			builder.useFastMode();
 			builder.usePdfUaAccessibility(true);
 			builder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U);
+			builder.useUnicodeBidiSplitter(new ICUBidiSplitter.ICUBidiSplitterFactory());
+			builder.useUnicodeBidiReorderer(new ICUBidiReorderer());
+			builder.defaultTextDirection(PdfRendererBuilder.TextDirection.LTR);
 			builder.useSVGDrawer(new BatikSVGDrawer());
 			builder.useExternalResourceAccessControl(
 				(uri, type) -> {
@@ -340,6 +366,10 @@ public class MainController {
 			// * font-family:Wingdings;mso-fareast-font-family:Wingdings;mso-bidi-font-family:Wingdings
 			// * mso-list:Ignore
 			// * font:7.0pt "Times New Roman"
+			//
+			// Examples of things to keep/rewrite:
+			// * font-family:Helvetica => font-family:Helvetica
+			// * font: serif => font: serif-fallback
 			String[] parts = normalizedStyle.split(";");
 			List<String> sanitizedParts = new ArrayList<>();
 			for (int i = 0; i < parts.length; i++) {
@@ -356,6 +386,23 @@ public class MainController {
 				if (normalizedProperty.equals("font-family")
 					||normalizedProperty.equals("font")
 					||normalizedProperty.startsWith("mso-")) {
+					Boolean isBaseFontFamily = false;
+					for (String baseFont : BaseFontMapping.BASE_14_TO_TTF.keySet()) {
+						if (normalizedValue.equals(baseFont.toLowerCase())) {
+							isBaseFontFamily = true;
+							break;
+						}
+						if ((normalizedValue + "-fallback").equals(baseFont.toLowerCase())) {
+							isBaseFontFamily = true;
+							value = value + "-fallback";
+							break;
+						}
+					}
+					if (isBaseFontFamily) {
+						sanitizedParts.add(property + ": " + value);
+						logger.info("Sanitize: rewrite font-family: " + property + ":" + value);
+						continue;
+					}
 					logger.debug("Sanitize: remove property: " + normalizedProperty + ":" + normalizedValue);
 					continue;
 				}
@@ -380,7 +427,7 @@ public class MainController {
 			}
 		}
 
-		doc.select("head").prepend("<style>html{font-family:serif-fallback," + fallbackFontMapping.getFontFamilyNames() + "}</style>");
+		doc.select("head").prepend("<style>" + baseFontFaceCSS + "html{font-family:serif-fallback," + fallbackFontMapping.getFontFamilyNames() + "}</style>");
 	}
 
 	/**
@@ -416,9 +463,16 @@ public class MainController {
 			} else {
 				String prefix = m.group(2);
 				String value = m.group(3);
-				String rewrittenValue = GENERIC_FONT_FAMILY_PATTERN.matcher(value).replaceAll("$1-fallback");
+				boolean isImportant = value.strip().toLowerCase().endsWith("!important");
+				String workingValue = isImportant
+					? value.replaceAll("(?i)\\s*!important\\s*$", "")
+					: value;
+				String rewrittenValue = GENERIC_FONT_FAMILY_PATTERN.matcher(workingValue).replaceAll("$1-fallback");
 				if (!fallbackFontFamilies.isEmpty()) {
 					rewrittenValue = rewrittenValue.stripTrailing() + ", " + fallbackFontFamilies;
+				}
+				if (isImportant) {
+					rewrittenValue = rewrittenValue.stripTrailing() + " !important";
 				}
 				m.appendReplacement(sb, Matcher.quoteReplacement(prefix + rewrittenValue));
 			}
