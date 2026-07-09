@@ -68,6 +68,8 @@ docker build \
 | `SMTP_USER`                  | `null`         | SMTP username                                        | Yes      |
 | `TZ`                         | `UTC`          | Timezone for BlueSpice and container system time     | Yes      |
 | `WIKI_BASE_PATH`             | `''`           | Base path for the wiki. Must be aligned with proxy   | Yes      |
+| `WIKI_ARTICE_PATH`           | `wiki`         |  Change Pretty-URL                                   | Yes      |
+| `FARM_DEFAULT_INSTANCE`      | `''`           |  Default return Instance  for FarmWikis              | Yes      |
 | `WIKI_EMERGENCYCONTACT`      | `''`           | Emergency contact email                              | No       |
 | `WIKI_FARM_DB_PREFIX`        | `sfr_`         | Database name prefix for wiki farm instances **)     | Yes      |
 | `WIKI_FARM_USE_SHARED_DB`    | `null`         | Store wiki farm instances in `DB_NAME` **)           | Yes      |

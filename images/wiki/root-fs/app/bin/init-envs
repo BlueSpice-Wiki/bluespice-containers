@@ -77,6 +77,8 @@ export WIKI_PRE_INIT_SETTINGS_FILE=${WIKI_PRE_INIT_SETTINGS_FILE:-/data/bluespic
 export WIKI_PROTOCOL=${WIKI_PROTOCOL:-https}
 export WIKI_SUBSCRIPTION_KEY=${WIKI_SUBSCRIPTION_KEY:-}
 export WIKI_STATUSCHECK_ALLOWED=${WIKI_STATUSCHECK_ALLOWED:-}
+export FARM_DEFAULT_INSTANCE=${FARM_DEFAULT_INSTANCE:-wiki}
+export WIKI_ARTICLE_PATH=${WIKI_ARTICLE_PATH:-wiki}
 
 # WIKI_PROXY - more sophisticated detection
 export WIKI_PROXY=${WIKI_PROXY:-$(getent hosts proxy | awk '{ print $1 ; exit }')}
