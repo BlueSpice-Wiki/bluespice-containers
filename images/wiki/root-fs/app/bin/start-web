@@ -29,10 +29,10 @@ init-envs
 source /app/.env
 
 substitutePlaceholders /app/conf/90-bluespice-overrides.ini
-if [[ ${FARM_DEFAULT_INSTANCE} ]]; then
-export WIKI_RETURN_PATH=${FARM_DEFAULT_INSTANCE}
+if [[ -n "${FARM_DEFAULT_INSTANCE}" ]]; then
+  export WIKI_RETURN_PATH="${FARM_DEFAULT_INSTANCE}"
 else
-export WIKI_RETURN_PATH=${WIKI_ARTICLE_PATH}
+  export WIKI_RETURN_PATH="${WIKI_ARTICLE_PATH}"
 fi
 substitutePlaceholders /app/conf/nginx_bluespice
 

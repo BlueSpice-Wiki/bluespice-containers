@@ -68,8 +68,8 @@ docker build \
 | `SMTP_USER`                  | `null`         | SMTP username                                        | Yes      |
 | `TZ`                         | `UTC`          | Timezone for BlueSpice and container system time     | Yes      |
 | `WIKI_BASE_PATH`             | `''`           | Base path for the wiki. Must be aligned with proxy   | Yes      |
-| `WIKI_ARTICE_PATH`           | `wiki`         |  Change Pretty-URL                                   | Yes      |
-| `FARM_DEFAULT_INSTANCE`      | `''`           |  Default return Instance  for FarmWikis              | Yes      |
+| `WIKI_ARTICE_PATH`           | `wiki`         | Definition of $wgArticlePath for pretty URLs ***)    | Yes      |
+| `FARM_DEFAULT_INSTANCE`      | `''`           | Farm instance to redirect to by default ***)         | Yes      |
 | `WIKI_EMERGENCYCONTACT`      | `''`           | Emergency contact email                              | No       |
 | `WIKI_FARM_DB_PREFIX`        | `sfr_`         | Database name prefix for wiki farm instances **)     | Yes      |
 | `WIKI_FARM_USE_SHARED_DB`    | `null`         | Store wiki farm instances in `DB_NAME` **)           | Yes      |
@@ -87,7 +87,10 @@ docker build \
 | `WIKI_STATUSCHECK_ALLOWED`   | `null`         | IP or CIDR range for status check REST endpoint      | Yes      |
 
 *) External cache can be disabled by setting `-` as `CACHE_HOST`.
+
 **) See section "Database requirements for FARM edition"
+
+***) For a farm with non-default `WIKI_ARTICLE_PATH`, set `FAMR_DEFAULT_INSTANCE` as well, e.g `w` the root farm instance.
 
 ## Directories and Volumes
 
