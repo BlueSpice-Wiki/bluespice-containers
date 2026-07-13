@@ -4,8 +4,10 @@ ARG JAR_URL=https://github.com/hallowelt/webservice-html2pdf/releases/download/2
 ADD $JAR_URL /app/html2pdf.jar
 RUN echo "$SHA256sum  /app/html2pdf.jar" | sha256sum -c -
 RUN chown -R 1000:1000 /app
+RUN mkdir -p /tmp/.cache/fontconfig && chown -R 1000:1000 /tmp/.cache
+ENV XDG_CACHE_HOME=/tmp/.cache
 WORKDIR /app
 
 EXPOSE 8080
-USER 1000
+USER 1000:1000
 CMD ["java", "-jar", "html2pdf.jar"]
