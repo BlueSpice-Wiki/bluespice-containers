@@ -33,14 +33,14 @@ docker build \
 | `CACHE_HOST`                 | `cache`        | Hostname of a `bluespice/cache` compatible service *)| Yes      |
 | `CACHE_PORT`                 | `11211`/`6379` | Port of a `bluespice/cache` compatible service. Default based on `CACHE_TYPE` | Yes      |
 | `CACHE_TYPE`                 | `memcached`    | Type of cache to use (memcached or redis/valkey)    | Yes      |
-| `CHAT_HOST`                  | `chat`         | Hostname of a `bluespice/chat` compatible service **)| Yes      |
+| `CHAT_HOST`                  | `chat`         | Hostname of a `bluespice/chat` compatible service ****)| Yes      |
 | `CHAT_PORT`                  | `3000`         | Port of a `bluespice/chat` compatible service        | Yes      |
 | `CHAT_PROTOCOL`              | `http`         | Protocol of a `bluespice/chat` compatible service    | Yes      |
 | `DB_HOST`                    | `database`     | Database host                                        | Yes      |
 | `DB_NAME`                    | `bluespice`    | Database name                                        | Yes      |
 | `DB_PASS`                    | `null`         | Database password                                    | No       |
-| `DB_PREFIX`                  | `''`           | Database prefix ***)                                 | Yes      |
-| `DB_ROOT_PASS`               | ``             | Database root password ***)                          | Yes      |
+| `DB_PREFIX`                  | `''`           | Database prefix **)                                  | Yes      |
+| `DB_ROOT_PASS`               | ``             | Database root password **)                           | Yes      |
 | `DB_ROOT_USER`               | `root`         | Database root user                                   | Yes      |
 | `DB_TYPE`                    | `mysql`        | Database type                                        | Yes      |
 | `DB_USER`                    | `bluespice`    | Database user                                        | Yes      |
@@ -75,11 +75,11 @@ docker build \
 | `SMTP_USER`                  | `null`         | SMTP username                                        | Yes      |
 | `TZ`                         | `UTC`          | Timezone for BlueSpice and container system time     | Yes      |
 | `WIKI_BASE_PATH`             | `''`           | Base path for the wiki. Must be aligned with proxy   | Yes      |
-| `WIKI_ARTICE_PATH`           | `wiki`         |  Change Pretty-URL                                   | Yes      |
-| `FARM_DEFAULT_INSTANCE`      | `''`           |  Default return Instance  for FarmWikis              | Yes      |
+| `WIKI_ARTICE_PATH`           | `wiki`         | Definition of $wgArticlePath for pretty URLs ***)    | Yes      |
+| `FARM_DEFAULT_INSTANCE`      | `''`           | Farm instance to redirect to by default ***)         | Yes      |
 | `WIKI_EMERGENCYCONTACT`      | `''`           | Emergency contact email                              | No       |
-| `WIKI_FARM_DB_PREFIX`        | `sfr_`         | Database name prefix for wiki farm instances ***)     | Yes      |
-| `WIKI_FARM_USE_SHARED_DB`    | `null`         | Store wiki farm instances in `DB_NAME` ***)           | Yes      |
+| `WIKI_FARM_DB_PREFIX`        | `sfr_`         | Database name prefix for wiki farm instances **)     | Yes      |
+| `WIKI_FARM_USE_SHARED_DB`    | `null`         | Store wiki farm instances in `DB_NAME` **)           | Yes      |
 | `WIKI_HOST`                  | `localhost`    | Host for the wiki                                    | Yes      |
 | `WIKI_INITIAL_ADMIN_PASS`    | `null`         | Initial admin password. Uses random, if not set      | Yes      |
 | `WIKI_INITIAL_ADMIN_USER`    | `Admin`        | Admin user name use during initial installation      | Yes      |
@@ -97,8 +97,12 @@ docker build \
 | `WIRE_PROTOCOL`              | `http`         | Protocol of a `bluespice/wire` compatible service    | Yes      |
 
 *) External cache can be disabled by setting `-` as `CACHE_HOST`.
-**) Functions requiring `bluespice/chat` can be disabled by setting `-` as `CHAT_HOST`.
-***) See section "Database requirements for FARM edition"
+
+**) See section "Database requirements for FARM edition"
+
+***) For a farm with non-default `WIKI_ARTICLE_PATH`, set `FAMR_DEFAULT_INSTANCE` as well, e.g `w` the root farm instance.
+
+****) Functions requiring `bluespice/chat` can be disabled by setting `-` as `CHAT_HOST`.
 
 ## Directories and Volumes
 

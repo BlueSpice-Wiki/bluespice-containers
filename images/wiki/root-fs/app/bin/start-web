@@ -21,7 +21,7 @@ esac
 
 substitutePlaceholders /app/conf/90-bluespice-overrides.ini
 if [[ -n "${FARM_DEFAULT_INSTANCE}" ]]; then
-export WIKI_RETURN_PATH=${FARM_DEFAULT_INSTANCE}
+  export WIKI_RETURN_PATH="${FARM_DEFAULT_INSTANCE}"
 else
   export WIKI_RETURN_PATH="${WIKI_ARTICLE_PATH}"
 fi
