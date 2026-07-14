@@ -2,13 +2,13 @@ name: Build and Push Container Images
 
 on:
 #  push:
-#    branches: [ 'main' ]
+#    branches: [ 'dev-5.2.x' ]
 #  pull_request:
-#    branches: [ 'main' ]
+#    branches: [ 'dev-5.2.x' ]
   workflow_dispatch:
 
 env:
-  VERSION: ${{ github.event.inputs.version || '5.1.4-alpha' }}
+  VERSION: ${{ github.event.inputs.version || 'dev-5.2.x' }}
 
 jobs:
   discover:

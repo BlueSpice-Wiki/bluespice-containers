@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    // This config assumes that the workspace dir is the parent of your bluespice-containers dir
+    // To use it, copy or link it to your real {workspaceFolder}/.vscode/launch.json
+    "configurations": [
+        {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                // This mapping is in correspondence with bluespice-containers/images/wiki/Dockerfile
+                "/app/bluespice/w": "${workspaceFolder}/code",
+                "/app/simplesamlphp": "${workspaceFolder}/bluespice-containers/images/wiki/root-fs/app/simplesamlphp",
+                "/app/bin": "${workspaceFolder}/bluespice-containers/images/wiki/root-fs/app/bin",
+                "/app/conf": "${workspaceFolder}/bluespice-containers/images/wiki/root-fs/app/conf",
+                // BlueSpice-specific ./root-fs/app/simplesamlphp/ config missing, as they are difficult to map
+                "/app/cron": "${workspaceFolder}/bluespice-containers/images/wiki/root-fs/app/cron",
+                "/app/bin/mathoid-remote": "${workspaceFolder}/bluespice-containers/images/formula/_client/mathoid-remote",
+                // Run composer update in the misc dirs, so that vendor dirs can be mapped
+                "/app/bin/mediawiki-adm": "${workspaceFolder}/bluespice-containers/misc/mediawiki-adm",
+                "/app/bin/parallel-runjobs-service": "${workspaceFolder}/bluespice-containers/misc/parallel-runjobs-service",
+                "/data": "${workspaceFolder}/data/wiki"
+            }
+        }
+    ]
+}
