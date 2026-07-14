@@ -69,6 +69,19 @@ class MessageHandler {
 		$this->logger->debug( "Received raw message: $msg" );
 		// Parse incoming message to extract eventID, eventName, and optional eventData
 		preg_match( '/(?<eventId>\w+)(\[\"(?<eventName>\w+)\"(?:\,(?<eventData>[\s\S]+))?\])?/', $msg, $msgArgs );
+
+		// Handle the engine.io heartbeat ping (type 2) immediately, before any
+		// database lookup. Delaying the pong behind a MongoDB round-trip can push
+		// response time past pingTimeout and cause spurious disconnects.
+		if ( (int)( $msgArgs['eventId'] ?? -1 ) === EventType::IS_ALIVE ) {
+			$this->logger->debug( "Received keep-alive message from {$from->resourceId}" );
+			$conn = $connectionList->get( $from->resourceId );
+			if ( $conn ) {
+				$conn->send( (string)EventType::KEEP_ALIVE );
+			}
+			return;
+		}
+
 		// Add additional connection and author details
 		$msgArgs['connectionId'] = $from->resourceId;
 		$author = $this->authorDAO->getAuthorByConnection( $from->resourceId );
@@ -81,11 +94,6 @@ class MessageHandler {
 
 		$message = null;
 		switch ( $msgArgs['eventId'] ) {
-			case EventType::IS_ALIVE:
-				$this->logger->debug( "Received keep-alive message from {$msgArgs['connectionId']}" );
-				$message = EventType::KEEP_ALIVE;
-				$relevantConnections[] = $msgArgs['connectionId'];
-				break;
 			case EventType::CONNECTION_REFUSED:
 				$message = $this->authorDisconnect( $msgArgs );
 
@@ -100,7 +108,7 @@ class MessageHandler {
 					case 'changeAuthor':
 						$message = $this->authorChange( $msgArgs );
 
-						$this->logger->info(
+						$this->logger->debug(
 							"Session (ID:{$msgArgs['sessionId']}) "
 							. "author data (ID:{$msgArgs['authorId']}) changed"
 						);
@@ -132,7 +140,7 @@ class MessageHandler {
 						if ( !$change->isEmpty() ) {
 							$message = $this->newChange( $msgArgs['sessionId'], $change );
 						} else {
-							$this->logger->error( "Change is empty, skipping" );
+							$this->logger->warning( "Change is empty, skipping" );
 						}
 						break;
 					case 'deleteSession':
@@ -210,7 +218,6 @@ class MessageHandler {
 	 * @return string
 	 */
 	private function saveRevision( int $authorId ): string {
-		$this->logger->info( "Author (ID:$authorId) saved revision" );
 		return $this->response( EventType::CONTENT, 'saveRevision', $authorId );
 	}
 
@@ -309,7 +316,7 @@ class MessageHandler {
 		}
 		$eventData = json_decode( $rawJson, true );
 		if ( json_last_error() === JSON_ERROR_UTF16 ) {
-			$this->logger->info( 'JSON_ERROR_UTF16... fixing Surrogate Pairs' );
+			$this->logger->debug( 'JSON_ERROR_UTF16... fixing Surrogate Pairs' );
 			$cleanedJson = $this->fixSurrogatePairs( $rawJson );
 			$eventData = json_decode( $cleanedJson, true );
 		}

@@ -69,11 +69,11 @@ class OpenHandler {
 		$queryArgs = [];
 
 		parse_str( $conn->httpRequest->getURI()->getQuery(), $queryArgs );
-		$this->logger->info( 'Opening connection for: ' . $queryArgs['docName'] );
+		$this->logger->debug( 'Opening connection for: ' . $queryArgs['docName'] );
 
 		$configs = $this->createCurlRequest( $conn, $queryArgs['docName'] );
 		if ( !$configs['access'] ) {
-			$this->logger->info( 'Access denied' );
+			$this->logger->warning( 'Access denied for: ' . $queryArgs['docName'] );
 			$conn->close();
 			return;
 		}
@@ -83,9 +83,9 @@ class OpenHandler {
 		$author = $this->authorDAO->getAuthorByName( $configs['user']['userName'] );
 		if ( !$author ) {
 			$author = $this->newAuthor( $configs['user']['userName'] );
-			$this->logger->info( "Created new author: Name '{$author->getName()}', ID '{$author->getId()}'" );
+			$this->logger->debug( "Created new author: Name '{$author->getName()}', ID '{$author->getId()}'" );
 		} else {
-			$this->logger->info( "Found existing author: Name '{$author->getName()}', ID '{$author->getId()}'" );
+			$this->logger->debug( "Found existing author: Name '{$author->getName()}', ID '{$author->getId()}'" );
 		}
 
 		$configs['authorId'] = $author->getId();
@@ -94,11 +94,11 @@ class OpenHandler {
 		// Check if session exists & create if not
 		$session = $this->sessionDAO->getSessionByName( $configs['wikiScriptPath'], $configs['pageTitle'], $configs['pageNamespace'] ); // phpcs:ignore Generic.Files.LineLength.TooLong
 		if ( !$session ) {
-			$this->logger->info( "No existing session found for page title '{$configs['pageTitle']}' in namespace '{$configs['pageNamespace']}'. Creating a new session." ); // phpcs:ignore Generic.Files.LineLength.TooLong
+			$this->logger->debug( "No existing session found for page title '{$configs['pageTitle']}' in namespace '{$configs['pageNamespace']}'. Creating a new session." ); // phpcs:ignore Generic.Files.LineLength.TooLong
 			$session = $this->newSession( $configs );
-			$this->logger->info( "New session created. Token '{$session['s_token']}', ID '{$session['s_id']}', Page Title '{$session['s_page_title']}', Namespace '{$session['s_page_namespace']}'" ); // phpcs:ignore Generic.Files.LineLength.TooLong
+			$this->logger->info( "New session created (ID:{$session['s_id']})" );
 		} else {
-			$this->logger->info( "Found existing session. Token '{$session['s_token']}', ID '{$session['s_id']}', Page Title '{$session['s_page_title']}', Namespace '{$session['s_page_namespace']}'" ); // phpcs:ignore Generic.Files.LineLength.TooLong
+			$this->logger->debug( "Found existing session. Token '{$session['s_token']}', ID '{$session['s_id']}', Page Title '{$session['s_page_title']}', Namespace '{$session['s_page_namespace']}'" ); // phpcs:ignore Generic.Files.LineLength.TooLong
 		}
 
 		$configs['sessionToken'] = "" . $session['s_token'];
@@ -131,12 +131,14 @@ class OpenHandler {
 
 		// Proving already established connections must be done after all
 		// init processes - that's important for normal work of disconnect event
-		$answer = $this->authorAlreadyLogged( $configs );
+		$answer = $this->authorAlreadyLogged( $configs, $connectionList );
 		if ( $answer ) {
 			$this->logger->debug( "Already logged: {$answer}" );
 			// User has already opened this session
 			$conn->send( $answer );
 		}
+
+		$this->logger->info( "Author (ID:{$configs['authorId']}) connected to session (ID:{$configs['sessionId']})" );
 	}
 
 	/**
@@ -153,7 +155,7 @@ class OpenHandler {
 
 		$url = $this->serverConfigs['baseurl'] . $scriptPath . "/rest.php/collabpads/acl/" .
 			str_replace( "/", "|", $pageName ) . '/' . $accessToken;
-		$this->logger->info( "Calling: {$url}" );
+		$this->logger->debug( "Calling: {$url}" );
 
 		try {
 			$res = $this->httpClient->get( $url );
@@ -189,7 +191,7 @@ class OpenHandler {
 		} else {
 			$userName = $response['user']['mName'];
 		}
-		$this->logger->info( "Request complete. {$response['message']} for user {$userName}" );
+		$this->logger->debug( "Request complete. {$response['message']} for user {$userName}" );
 
 		// Add some information to identify wiki where collab session is created
 		$response['wikiScriptPath'] = $scriptPath;
@@ -315,15 +317,25 @@ class OpenHandler {
 
 	/**
 	 * @param array $config
+	 * @param ConnectionList $connectionList
 	 * @return string
 	 */
-	private function authorAlreadyLogged( array $config ): string {
+	private function authorAlreadyLogged( array $config, ConnectionList $connectionList ): string {
 		$author = $this->sessionDAO->getAuthorInSession( $config['sessionId'], $config['authorId'] );
-		// if author is still inactive after init - don't have connections.
-		// cause an alreadyLoggedIn event to prevent incorrect execution of program
-		if ( $author && count( $author['value']['connection'] ) !== 1 ) {
-			// if user has more than one connection
-			return $this->response( EventType::CONTENT, 'alreadyLoggedIn' );
+		if ( !$author ) {
+			return "";
+		}
+
+		$connections = $author['value']['connection'] ?? [];
+		// Only block if there is another connection that is *actively live* in the
+		// in-memory ConnectionList. Stale DB entries left over from a prior crash
+		// or unclean disconnect must not prevent a legitimate reconnect.
+		foreach ( $connections as $connId ) {
+			if ( (int)$connId !== (int)$config['connectionId']
+				&& $connectionList->get( (int)$connId ) !== null
+			) {
+				return $this->response( EventType::CONTENT, 'alreadyLoggedIn' );
+			}
 		}
 
 		return "";
