@@ -109,7 +109,6 @@ services:
     environment:
       # https://github.com/opensearch-project/OpenSearch-Dashboards/blob/main/config/opensearch_dashboards.yml
       SERVER_BASEPATH: /_searchdashboards
-      SERVER_REWRITEBASEPATH: true
       OPENSEARCH_HOSTS: '["http://search:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: true
       VIRTUAL_HOST: ${WIKI_HOST}
