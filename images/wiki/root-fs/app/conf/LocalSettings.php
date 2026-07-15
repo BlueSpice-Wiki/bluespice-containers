@@ -301,6 +301,36 @@ else {
 }
 
 $GLOBALS['wgArticlePath'] = ( trim(  getenv( 'WIKI_BASE_PATH' ) ) ) . 'wiki/$1';
+
+if ( $s3Used ) {
+	$GLOBALS['wgAWSBucketDomain'] = $GLOBALS['wgServer'] . $GLOBALS['wgUploadPath'];
+	$GLOBALS['wgHooks']['SetupAfterCache'][] = static function () {
+		// Setup "global" repo for farm. Actual bucket root
+		$bucketName = $GLOBALS['wgAWSBucketName'];
+		$wikiId = \MediaWiki\WikiMap\WikiMap::getCurrentWikiId();
+		$GLOBALS['wgFileBackends']['s3']['containerPaths']["$wikiId-instances-public"] = $bucketName;
+		$GLOBALS['wgFileBackends']['s3']['containerPaths']["$wikiId-archive-public"] = "$bucketName/_archive";
+
+		/**
+		 * Extension:AWS adds the $wgAWSBucketTopSubdirectory to the Zone-URLs. While this technically works,
+		 * it results in odd URLs for farm instances and is not necessary.
+		 * Example::
+		 *  - IS:        https://<server>/<instance>/*img_auth.php/<instance>/thumb
+		 *  - SHOULD BE: https://<server>/<instance>/*img_auth.php/thumb
+		 * Therefore we replace the URLs here to remove the $wgAWSBucketTopSubdirectory from them.
+		 */
+		$instanceName = defined( 'FARMER_CALLED_INSTANCE' ) ? FARMER_CALLED_INSTANCE : 'w';
+		$search = $GLOBALS['wgUploadPath'] . '/' . $instanceName;
+		$replace = $GLOBALS['wgUploadPath'];
+		foreach ( $GLOBALS['wgLocalFileRepo']['zones'] as $zone => $info ) {
+			if ( !isset( $info['url'] ) || !$info['url']) {
+				continue;
+			}
+			$GLOBALS['wgLocalFileRepo']['zones'][$zone]['url'] = str_replace( $search, $replace, $info['url'] );
+		}
+	};
+}
+
 if ( getenv( 'EDITION' ) === 'farm' ) {
 	if( FARMER_IS_ROOT_WIKI_CALL === false ) {
 		$GLOBALS['wgScriptPath'] =  trim( getenv( 'WIKI_BASE_PATH' ) ) . FARMER_CALLED_INSTANCE;
@@ -314,16 +344,6 @@ if ( getenv( 'EDITION' ) === 'farm' ) {
 		if ( $s3Used ) {
 			// Overwrite S3 bucket top subdirectory to use Sub-WikiID (see above)
 			$GLOBALS['wgAWSBucketTopSubdirectory'] = $GLOBALS['wgScriptPath'];
-			$GLOBALS['wgWikiFarmConfig_instanceStorageBackend'] = $GLOBALS['mwsgFileStorageBackend'];
-			$GLOBALS['wgHooks']['SetupAfterCache'][] = static function () {
-				// Setup "global" repo for farm. Actual bucket root
-				$bucketName = $GLOBALS['wgAWSBucketName'];
-				$wikiId = \MediaWiki\WikiMap\WikiMap::getCurrentWikiId();
-				$GLOBALS['wgFileBackends']['s3']['containerPaths']["$wikiId-instances-public"] = $bucketName;
-				$GLOBALS['wgFileBackends']['s3']['containerPaths']["$wikiId-archive-public"] = "$bucketName/_archive";
-			};
-			// Original local FS backend configured in Extension:BlueSpiceWikiFarm is not used.
-			unset( $GLOBALS['wgFileBackends']['_instances'] );
 		}
 
 		// Setup process runner/wikicron to use Redis, if configured
@@ -350,6 +370,13 @@ if ( getenv( 'EDITION' ) === 'farm' ) {
 				] ]
 			];
 		}
+	}
+
+	// Setup file storage of uploadfiles _and_ farm instance vaults/archives to use S3, if configured
+	if ( $s3Used ) {
+		// Original local FS backend configured in Extension:BlueSpiceWikiFarm is not used.
+		unset( $GLOBALS['wgFileBackends']['_instances'] );
+		$GLOBALS['wgWikiFarmConfig_instanceStorageBackend'] = $GLOBALS['mwsgFileStorageBackend'];
 	}
 }
 
