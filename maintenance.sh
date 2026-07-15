@@ -97,6 +97,26 @@ update_repos_git_subtree() {
     }
 }
 
+update_ignored_git_repos() {
+    local failed=0
+    local parent=""
+    local dir=""
+    for parent in images misc webservices; do
+        [[ -d "$parent" ]] || continue
+        while IFS= read -r -d '' dir; do
+            git check-ignore -q "$dir/" || continue
+            [[ -e "$dir/.git" ]] || continue
+            git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 || continue
+            echo "Updating ignored git repo: $dir"
+            git -C "$dir" pull --ff-only || {
+                echo "Failed to update ignored git repo: $dir"
+                failed=1
+            }
+        done < <(find "$parent" -mindepth 1 -maxdepth 1 -type d -print0)
+    done
+    [[ $failed -eq 0 ]] || exit 1
+}
+
 compare_subtree_dirs() {
     local key="$1"
     local prefix="$2"
@@ -241,5 +261,5 @@ case $ACTION in
         echo "If you would like to keep all change histories, remove --squash flags.";
         echo "";
         iterate_components init_git_subtree ;;
-    update) iterate_components update_repos_git_subtree ;;
+    update) iterate_components update_repos_git_subtree; update_ignored_git_repos ;;
 esac
