@@ -70,6 +70,11 @@ docker build \
 | `JOBQUEUE_HOST`              | `jobqueue`     | Hostname of a `bluespice/jobqueue` compatible service| Yes      |
 | `JOBQUEUE_PORT`              | `6379`         | Port of a `bluespice/jobqueue` compatible service          | Yes      |
 | `MAX_UPLOAD_SIZE`            | `1024m`        | Max upload size for single file (Allowed: m or g)    | Yes      |
+| `METADATASTORE_PROTOCOL`     | `http`         | Protocol of a `bluespice/metadatastore` compatible service      | Yes      |
+| `METADATASTORE_HOST`         | `metadatastore`| Hostname of a `bluespice/metadatastore` compatible service      | Yes      |
+| `METADATASTORE_PORT`         | `3306`         | Port of a `bluespice/metadatastore` compatible service          | Yes      |
+| `METADATASTORE_USER`         | `null`         | User of a `bluespice/metadatastore` compatible service          | Yes      |
+| `METADATASTORE_PASS`         | `null`         | Password of a `bluespice/metadatastore` compatible service      | No       |
 | `PDF_HOST`                   | `pdf`          | Hostname of a `bluespice/pdf` compatible service     | Yes      |
 | `PDF_PORT`                   | `8080`         | Port of a `bluespice/pdf` compatible service         | Yes      |
 | `PDF_PROTOCOL`               | `http`         | Protocol of a `bluespice/pdf` compatible service     | Yes      |

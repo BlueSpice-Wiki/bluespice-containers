@@ -163,6 +163,12 @@ $GLOBALS['wgMathoidCli'] = [
 	$GLOBALS['wgMathMathMLUrl']
 ];
 
+$GLOBALS['wgNeoWikiNeo4jInternalWriteUrl'] = $GLOBALS['wgNeoWikiNeo4jInternalReadUrl']
+	= bsAssembleURL(
+		'METADATASTORE_PROTOCOL', 'METADATASTORE_HOST', 'METADATASTORE_PORT', '',
+		[ 'METADATASTORE_USER', 'neo4j' ], [ 'METADATASTORE_PASS', '' ]
+	);
+
 $GLOBALS['bsgInstanceStatusCheckAllowedIP'] = trim( getenv( 'WIKI_STATUSCHECK_ALLOWED' ) );
 
 
@@ -223,7 +229,7 @@ $GLOBALS['wgDeletedDirectory'] = "{$GLOBALS['wgUploadDirectory']}/deleted";
 $GLOBALS['wgCacheDirectory'] = "/data/bluespice/cache";
 define( 'BSROOTDIR', '/data/bluespice/extensions/BlueSpiceFoundation' );
 
-if ( getenv( 'EDITION' ) === 'farm' ) {
+if ( getenv( 'EDITION' ) === 'farm' || getenv( 'EDITION' ) === 'galaxy' ) {
 	$GLOBALS['wgWikiFarmConfig_instanceDirectory'] = '/data/bluespice/farm-instances/';
 	$GLOBALS['wgWikiFarmConfig_archiveDirectory'] = '/data/bluespice/farm-archives/';
 	$GLOBALS['wgWikiFarmConfig_dbAdminUser'] = trim( getenv( 'DB_ROOT_USER' ) ?: $GLOBALS['wgDBuser'] );
@@ -237,6 +243,41 @@ if ( getenv( 'EDITION' ) === 'farm' ) {
 	$GLOBALS['wgSharedTables'] = [ 'bs_translationtransfer_translations' ];
 }
 
+if ( getenv( 'EDITION' ) === 'galaxy' ) {
+	$GLOBALS['wgWikiFarmConfig_shareUsers'] = true;
+	$GLOBALS['wgWikiFarmConfig_useUnifiedSearch'] = true;
+	// Do not check for permissions per-title when searching, as it cannot be done on foreign pages
+	// Neo ACL takes care of that on its own
+	$GLOBALS['bsgESSecureResults'] = false;
+	$GLOBALS['bsgESIndexPrefix'] = 'farm-shared-index';
+	$GLOBALS['wgWikiFarmConfig_useGlobalAccessControl'] =true;
+	$GLOBALS['wgWikiFarmConfig_shareUserSessions'] = true;
+	$GLOBALS['wgWikiFarmConfig_useSharedResources'] = true;
+	$GLOBALS['wgWikiFarmConfig_showInstancesMenu'] = true;
+	// Share notifications
+	$GLOBALS['wgSharedTables'][] = 'notifications_event';
+	$GLOBALS['wgSharedTables'][] = 'notifications_instance';
+	$GLOBALS['wgSharedTables'][] = 'notifications_web_query_store';
+	// Share PageReadConfirmations
+	$GLOBALS['wgSharedTables'][] = 'page_read_confirmations';
+	$GLOBALS['wgSharedTables'][] = 'page_read_confirmations_assignments';
+	$GLOBALS['wgSharedTables'][] = 'page_read_confirmations_requests';
+	// Share PageVersions
+	$GLOBALS['wgSharedTables'][] = 'page_version';
+	// Share Appointments
+	$GLOBALS['wgSharedTables'][] = 'calendars';
+	$GLOBALS['wgSharedTables'][] = 'appointments';
+	$GLOBALS['wgSharedTables'][] = 'appointment_participant_assignments';
+	$GLOBALS['wgSharedTables'][] = 'appointment_participants';
+	$GLOBALS['wgSharedTables'][] = 'appointment_event_types';
+	$GLOBALS['wgSharedTables'][] = 'appointment_event_type_assignments';
+	// Share user index, to enable global user store (restricted further by access control)
+	$GLOBALS['wgSharedTables'][] = 'mws_user_index';
+	$GLOBALS['wgSharedTables'][] = 'wikifarm_groups';
+	$GLOBALS['wgSharedTables'][] = 'mws_data_stash';
+	$GLOBALS['wgSharedTables'][] = 'mws_title_index';
+	$GLOBALS['wgSharedTables'][] = 'page_excerpts';
+}
 
 $GLOBALS['mwsgTokenAuthenticatorSalt'] = getenv( 'INTERNAL_WIKI_TOKEN_AUTH_SALT' );
 
@@ -289,7 +330,7 @@ if ( getenv( 'CHAT_HOST' ) !== '-' ) {
 }
 
 require_once trim( getenv( 'WIKI_PRE_INIT_SETTINGS_FILE' ) );
-if ( getenv( 'EDITION' ) === 'farm' ) {
+if ( getenv( 'EDITION' ) === 'farm' || getenv( 'EDITION' ) === 'galaxy' ) {
 	require_once "$IP/extensions/BlueSpiceWikiFarm/WikiFarm.setup.php";
 }
 else {
@@ -331,7 +372,7 @@ if ( $s3Used ) {
 	};
 }
 
-if ( getenv( 'EDITION' ) === 'farm' ) {
+if ( getenv( 'EDITION' ) === 'farm' || getenv( 'EDITION' ) === 'galaxy' ) {
 	if( FARMER_IS_ROOT_WIKI_CALL === false ) {
 		$GLOBALS['wgScriptPath'] =  trim( getenv( 'WIKI_BASE_PATH' ) ) . FARMER_CALLED_INSTANCE;
 		$GLOBALS['wgArticlePath'] = trim( getenv( 'WIKI_BASE_PATH' ) ) . FARMER_CALLED_INSTANCE . '/wiki/$1';

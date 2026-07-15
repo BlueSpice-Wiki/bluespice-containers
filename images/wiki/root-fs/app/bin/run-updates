@@ -37,7 +37,7 @@ run-maintenance update \
 
 echo $version > /data/bluespice/logs/baseversion
 
-if [ "${EDITION}" == "farm" ]; then
+if [ "${EDITION}" == "farm" ] || [ "${EDITION}" == "galaxy" ]; then
 	run-maintenance BlueSpiceWikiFarm:RunForAll \
 		--script='maintenance/update.php' \
 		--args='--quick --doshared' \

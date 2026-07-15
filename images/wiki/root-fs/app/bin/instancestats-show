@@ -2,7 +2,7 @@
 
 run-maintenance BlueSpiceUsageTracker:showInstanceStats
 # Conditionally run for farm setups
-if [ "${EDITION}" == "farm" ]; then
+if [ "${EDITION}" == "farm" ] || [ "${EDITION}" == "galaxy" ]; then
 	run-maintenance BlueSpiceWikiFarm:RunForAll \
 		--script='extensions/BlueSpiceUsageTracker/maintenance/showInstanceStats.php'
 fi
