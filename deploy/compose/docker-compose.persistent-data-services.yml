@@ -12,6 +12,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
   database:
     image: ${BLUESPICE_SERVICE_REPOSITORY}/database:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-database
@@ -31,13 +32,23 @@ services:
       timeout: 5s
       retries: 10
 
+  jobqueue:
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/keyvaluestore:${VERSION}
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-jobqueue
+    healthcheck:
+      test: redis-cli ping || exit 1
+    volumes:
+      - ${DATADIR}/keyvaluestore:/data
+    restart: unless-stopped
+    command: valkey-server /etc/valkey/valkey.conf
+
   wiki-installer:
     depends_on:
         database:
             condition: service_healthy
         search:
             condition: service_healthy
-      
+
   wiki-web:
     depends_on:
         database:
