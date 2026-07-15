@@ -60,7 +60,7 @@ curl http://localhost:8080/Html2PDF/v1/
 ```
 will return somthing like:
 ```
-{"msg":"Service is running","success":true,"version":"2.0.0"}
+{"msg":"Service is running","success":true,"version":"2.1.0"}
 ```
 
 ## Fonts and Multi-Script Support
