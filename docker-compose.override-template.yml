@@ -1,3 +1,4 @@
+# See also: https://en.wiki.bluespice.com/wiki/Development
 configs:
   50_xdebug_ini:
     content: |
@@ -55,6 +56,15 @@ services:
   wiki-task:
     <<: *common-dev
 
+  # Needed for opensearch when running on arm64: 
+  # search:
+  #   build:
+  #     context: .
+  #     dockerfile_inline: |
+  #       FROM ${BLUESPICE_SERVICE_REPOSITORY}/search:${VERSION}
+  #       ENV _JAVA_OPTIONS=-XX:UseSVE=0
+  #     no_cache: true
+
   # optionally expose database ports for external DB apps:
   # database:
   #   ports:
@@ -99,7 +109,6 @@ services:
     environment:
       # https://github.com/opensearch-project/OpenSearch-Dashboards/blob/main/config/opensearch_dashboards.yml
       SERVER_BASEPATH: /_searchdashboards
-      SERVER_REWRITEBASEPATH: true
       OPENSEARCH_HOSTS: '["http://search:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: true
       VIRTUAL_HOST: ${WIKI_HOST}
@@ -112,13 +121,12 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-dev-mongodbadmin
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://collabpads-database:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: ""
-      ME_CONFIG_BASICAUTH_PASSWORD: ""
-      ME_CONFIG_SITE_BASEURL: /_mongodbadmin
+      ME_CONFIG_BASICAUTH_USERNAME: "admin"
+      ME_CONFIG_BASICAUTH_PASSWORD: "pass"
+      ME_CONFIG_SITE_BASEURL: /_mongodbadmin/
       VIRTUAL_HOST: ${WIKI_HOST}
       VIRTUAL_PORT: 8081
       VIRTUAL_PATH: /_mongodbadmin/
-      VIRTUAL_DEST: /
 
 
   # Any service below will be called only when its profile is specified
@@ -296,8 +304,8 @@ services:
     image: postgres:16-alpine
     restart: always
     environment:
-      POSTGRES_USER: {$DB_USER}
-      POSTGRES_PASSWORD: {$DB_PASS}
+      #POSTGRES_USER: {$DB_USER}
+      #POSTGRES_PASSWORD: {$DB_PASS}
       POSTGRES_DB: testdb
     volumes:
       - ${DATADIR}/postgres/data:/var/lib/postgresql/data
@@ -322,7 +330,7 @@ services:
     command: >
       certonly --dns-cloudflare --agree-tos --no-eff-email
       --dns-cloudflare-credentials /run/secrets/cloudflare.ini
-      --email ${CERTBOT_CF_EMAIL} --domains *.${CERTBOT_CF_DOMAIN}
+      --email ${CERTBOT_CF_EMAIL:-} --domains *.${CERTBOT_CF_DOMAIN:-}
     profiles: [certbotcf]
 
 secrets:
