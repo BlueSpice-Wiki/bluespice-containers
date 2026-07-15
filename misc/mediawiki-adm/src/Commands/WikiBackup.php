@@ -158,11 +158,23 @@ class WikiBackup extends Command {
 			$this->output->writeln( "<info> --> Backing up farm instance $this->instanceName</info>" );
 		}
 		$this->checkDatabaseConnection();
+		$destFilePath = $this->makeDestFilepath();
 		$this->initZipFile();
-		$this->addSettingsFiles();
-		$this->addImagesFolder();
-		$this->addCustomFilesAndFolders();
-		$this->dumpDatabase();
+		try {
+			$this->addSettingsFiles();
+			$this->addImagesFolder();
+			$this->addCustomFilesAndFolders();
+			$this->dumpDatabase();
+		} catch ( \Exception $e ) {
+			// Close the ZipArchive so libzip's internal temp file (e.g. somewiki.zip.XXXXXXXX)
+			// is flushed and renamed to $destFilePath — then we can safely delete it.
+			// Without this the temp file is abandoned on disk as a "fragment".
+			$this->zip->close();
+			if ( file_exists( $destFilePath ) ) {
+				unlink( $destFilePath );
+			}
+			throw $e;
+		}
 
 		$this->zip->close();
 		$this->cleanUp();
@@ -170,6 +182,7 @@ class WikiBackup extends Command {
 		$this->removeOldBackups();
 	}
 
+	protected $wikiName = '';
 	protected $dbname = '';
 	protected $dbuser = '';
 	protected $dbpassword = '';
@@ -193,17 +206,21 @@ class WikiBackup extends Command {
 		$requiredFields = [
 			'dbname', 'dbpassword', 'dbuser', 'dbserver', 'dbprefix'
 		];
+		$optionalFields = [
+			'wikiName'
+		];
+		$allFields = array_merge( $requiredFields, $optionalFields );
 
-		foreach( $requiredFields as $requiredField ) {
-			if ( $this->{$requiredField} ) {
+		foreach( $allFields as $field ) {
+			if ( $this->{$field} ) {
 				// Already set by the provided backup-profile
 				continue;
 			}
-			if( !isset( $settings[$requiredField] ) ) {
-				throw new \Exception( "Required information '$requiredField' "
+			if( in_array( $field, $requiredFields ) && !isset( $settings[$field] ) ) {
+				throw new \Exception( "Required information '$field' "
 						. "could not be extracted!" );
 			}
-			$this->{$requiredField} = $settings[$requiredField];
+			$this->{$field} = $settings[$field];
 		}
 		$farmOptions = $this->profile->getBlueSpiceFarmOptions();
 		if ( $farmOptions && $farmOptions['instance-name'] ) {
@@ -327,6 +344,10 @@ class WikiBackup extends Command {
 		if ( $this->isFarmContext ) {
 			return $this->instanceName;
 		}
+		// Use $wgSitename from `LocalSettings.php` if available
+		if ( !empty( $this->wikiName ) ) {
+			return $this->wikiName;
+		}
 		$default = $this->dbname . ( $this->dbprefix ? "-{$this->dbprefix}" : '' );
 		return $this->profile->getOption( 'target-filename', $default );
 	}
@@ -404,6 +425,7 @@ class WikiBackup extends Command {
 		$this->output->writeln( "Adding 'custom-paths' ..." );
 		foreach( $toBackup as $customFile ) {
 			$localPath = preg_replace( '#^' . preg_quote( $this->mediawikiRoot ) . '#', '', $customFile );
+			$localPath = trim( $localPath, '/' );
 			$this->zip->addFile( $customFile, "filesystem/$localPath" );
 			$progressBar->advance();
 		}
