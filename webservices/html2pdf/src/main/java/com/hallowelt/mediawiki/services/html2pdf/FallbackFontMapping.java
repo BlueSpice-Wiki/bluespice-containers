@@ -5,18 +5,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
 
-import com.openhtmltopdf.extend.FSSupplier;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.FontStyle;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FallbackFontMapping {
-    private List<CSSFont> fontsAdded;
+
+    private static final Logger logger = LoggerFactory.getLogger(FallbackFontMapping.class);
+
+    private List<BaseFontMapping.FontInfo> fontsAdded;
     private String fontFamilyNamesCache;
 
     public FallbackFontMapping() {
@@ -93,22 +97,32 @@ public class FallbackFontMapping {
             "/fonts/noto/NotoSansLisu-Regular.ttf"
         );
 
-        FontFileProcessor processor = new FontFileProcessor();
-        for (String fileName : orderedFileNames) {
-            try (InputStream is = FallbackFontMapping.class.getResourceAsStream(fileName)) {
+        List<BaseFontMapping.FontInfo> result = new ArrayList<>();
+        for (String path : orderedFileNames) {
+            try (InputStream is = FallbackFontMapping.class.getResourceAsStream(path)) {
                 if (is == null) {
-                    System.err.println("Font resource not found: " + fileName);
+                    logger.warn("Font resource not found: {}", path);
                     continue;
                 }
-                processor.visitFile(fileName, is);
+                Font f = Font.createFont(Font.TRUETYPE_FONT, is);
+                String family = f.getFamily();
+                // Short of parsing the font ourselves there doesn't seem to be a way
+                // of getting the font properties, so we use heuristics based on font name.
+                String name = f.getFontName(Locale.US).toLowerCase(Locale.US);
+                int weight = name.contains("bold") ? 700 : 400;
+                FontStyle style = name.contains("italic") ? FontStyle.ITALIC : FontStyle.NORMAL;
+                // Fallback fonts are never referenced by SVG by their family name, so
+                // svgFamily equals cssName.
+                result.add(new BaseFontMapping.FontInfo(family, family, weight, style, path));
             } catch (IOException e) {
-                System.err.println("Error processing font file: " + fileName);
-                e.printStackTrace();
+                logger.error("Error reading font file: {}", path, e);
+            } catch (FontFormatException e) {
+                logger.warn("Ignoring font file with invalid font format: {}", path, e);
             }
         }
 
-        this.fontsAdded = processor.getFontsAdded();
-        this.fontFamilyNamesCache = toCSSEscapedFontFamily(this.fontsAdded);
+        this.fontsAdded = result;
+        this.fontFamilyNamesCache = toCSSFontFamilyList(result);
     }
 
     /**
@@ -121,105 +135,17 @@ public class FallbackFontMapping {
     }
 
     public void registerFallbackFonts(PdfRendererBuilder builder) {
-        for (CSSFont font : fontsAdded) {
+        for (BaseFontMapping.FontInfo font : fontsAdded) {
             builder.useFont(
-                 () -> FallbackFontMapping.class.getResourceAsStream(font.resourceName),
-                font.family, font.weight, font.style, true);
+                () -> FallbackFontMapping.class.getResourceAsStream(font.resourcePath),
+                font.cssName, font.weight, font.style, true);
         }
     }
 
-    private String toCSSEscapedFontFamily(List<CSSFont> fontsList) {
+    private static String toCSSFontFamilyList(List<BaseFontMapping.FontInfo> fontsList) {
         return fontsList.stream()
-           .map(fnt -> '\'' + fnt.familyCssEscaped() + '\'')
-           .distinct()
-           .collect(Collectors.joining(", "));
-    }
-
-    private static class CSSFont {
-        public final String resourceName;
-        public final String family;
-
-        /**
-         * WARNING: Heuristics are used to determine if a font is bold (700) or normal (400) weight.
-         */
-        public final int weight;
-
-        /**
-         * WARNING: Heuristics are used to determine if a font is italic or normal style.
-         */
-        public final FontStyle style;
-
-        public CSSFont(String resourceName, String family, int weight, FontStyle style) {
-            this.resourceName = resourceName;
-            this.family = family;
-            this.weight = weight;
-            this.style = style;
-        }
-
-        /**
-         * WARNING: Basic escaping, may not be robust to attack.
-         */
-        public String familyCssEscaped() {
-            return this.family.replace("'", "\\'");
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(resourceName, family, weight, style);
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (other == this) {
-                return true;
-            }
-            
-            if (other == null ||
-                other.getClass() != this.getClass()) {
-                return false;
-            }
-
-            CSSFont b = (CSSFont) other;
-
-            return Objects.equals(this.resourceName, b.resourceName) &&
-                   Objects.equals(this.family, b.family) &&
-                   this.weight == b.weight &&
-                   this.style == b.style;
-        }
-    }
-
-    private static class FontFileProcessor {
-        private final List<CSSFont> fontsAdded = new ArrayList<>();
-
-        public FontFileProcessor() {}
-
-        public List<CSSFont> getFontsAdded() {
-            return this.fontsAdded;
-        }
-
-        public void visitFile(String fontFileName, InputStream fontStream) throws IOException {
-            try {
-                Font f = Font.createFont(Font.TRUETYPE_FONT, fontStream);
-                
-                String family = f.getFamily();
-                // Short of parsing the font ourselves there doesn't seem to be a way
-                // of getting the font properties, so we use heuristics based on font name.
-                String name = f.getFontName(Locale.US).toLowerCase(Locale.US);
-                int weight = name.contains("bold") ? 700 : 400;
-                FontStyle style = name.contains("italic") ? FontStyle.ITALIC : FontStyle.NORMAL;
-
-                CSSFont fnt = new CSSFont(fontFileName, family, weight, style);
-
-                fontsAdded.add(fnt);
-            } catch (FontFormatException ffe) {
-                onInvalidFont(fontFileName, ffe);
-            }
-        }
-
-        protected void onInvalidFont(String fontFileName, FontFormatException ffe) {
-            System.err.println("Ignoring font file with invalid font format: " + fontFileName);
-            System.err.println("Exception details: ");
-            ffe.printStackTrace();
-        }
+            .map(fi -> '\'' + fi.cssNameSingleQuoteEscaped() + '\'')
+            .distinct()
+            .collect(Collectors.joining(", "));
     }
 }
