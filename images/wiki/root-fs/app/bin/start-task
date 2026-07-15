@@ -1,7 +1,6 @@
 #!/bin/bash
 
 ##add Variables to Scripts
-substitutePlaceholders /app/bin/config/mediawiki_adm_backup_conf.json
 substitutePlaceholders /app/bin/config/runJobs_conf.yaml
 
 WIKI_LOG_LEVEL="${WIKI_LOG_LEVEL:-error}"
@@ -46,13 +45,6 @@ if [[ ( $1 == "--runProcessRunner" ) || ( "$1" == "--runAll" ) ]]; then
 	echo "Starting ProcessRunner"
 	echo "parallel-processRunner" >> /tmp/healthcheck
 	/app/bin/parallel-processRunner > /proc/1/fd/1 2>&1 &
-fi
-
-if [[ ( $1 == "--runBackup" ) || ( "$1" == "--runAll" ) ]] && [[ ( ${BACKUP_HOUR:-1} != -1 ) ]]; then
-	echo "Starting Backup-Agent"
-	echo "Backup daily at" ${BACKUP_HOUR:-1}
-	echo "backup-loop" >> /tmp/healthcheck
-	/app/bin/backup-loop > /proc/1/fd/1 2>&1  &
 fi
 
 echo "ready" > /tmp/state

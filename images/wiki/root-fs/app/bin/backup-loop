@@ -1,5 +1,0 @@
-#!/bin/bash
-
-while sleep 60; do
-    /app/bin/run-backup
-done

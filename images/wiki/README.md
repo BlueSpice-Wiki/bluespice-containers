@@ -29,7 +29,6 @@ docker build \
 |------------------------------|----------------|------------------------------------------------------|----------|
 | `AV_HOST`                    | `antivirus`    | Hostname of a `clamav` compatible service            | Yes      |
 | `AV_PORT`                    | `3310`         | Port of a `clamav` compatible service                | Yes      |
-| `BACKUP_HOUR`                | `1`            | Hour for daily backup. Set to `-1` to disable        | Yes      |
 | `CACHE_HOST`                 | `cache`        | Hostname of a `bluespice/cache` compatible service *)| Yes      |
 | `CACHE_PORT`                 | `11211`/`6379` | Port of a `bluespice/cache` compatible service. Default based on `CACHE_TYPE` | Yes      |
 | `CACHE_TYPE`                 | `memcached`    | Type of cache to use (memcached or redis/valkey)    | Yes      |
@@ -55,12 +54,19 @@ docker build \
 | `FILESTORE_ACCESS_KEY`      | `''`         | Access key for `bluespice/filestore` compatible service | No, if `FILESTORE_HOST` is set       |
 | `FILESTORE_SECRET_KEY`    | `''`         | Secret key for `bluespice/filestore` compatible service | No, if `FILESTORE_HOST` is set       |
 | `FILESTORE_BUCKET_NAME`    | `<wikiid>`         | Bucket name for `bluespice/filestore` compatible service | Yes      |
+| `FILESTORE_PORT`           | `9000`             | Port of a `bluespice/filestore` compatible service       | Yes      |
+| `FILESTORE_PROTOCOL`       | `http`             | Protocol of a `bluespice/filestore` compatible service   | Yes      |
+| `FILESTORE_REGION`         | `eu-north-1`        | AWS region for `bluespice/filestore` compatible service  | Yes      |
+| `FILESTORE_TOKEN`          | `''`               | Security token for `bluespice/filestore` compatible service | Yes   |
 | `FORMULA_HOST`               | `formula`      | Hostname of a `bluespice/formula` compatible service | Yes      |
 | `FORMULA_PORT`               | `10044`        | Port of a `bluespice/formula` compatible service     | Yes      |
 | `FORMULA_PROTOCOL`           | `http`         | Protocol of a `bluespice/formula` compatible service | Yes      |
+| `INTERNAL_CHAT_TOKEN`        | `null`         | Internal service token for `bluespice/chat`              | No, if `CHAT_HOST` is set |
 | `INTERNAL_CHAT_WIKI_ACCESS_TOKEN` | `null` | Access token `bluespice/chat` | No       |
 | `INTERNAL_WIKI_SECRETKEY`    | `null`         | Secret key for the wiki                              | No       |
-| `INTERNAL_WIKI_UPGRADEKEY`   | `null`         | Upgrade key for the wiki                             | No       |
+| `INTERNAL_WIKI_TOKEN_AUTH_SALT` | `null`      | Salt for token-based service authentication              | No       |
+| `INTERNAL_WIKI_UPGRADEKEY`   | `null`         | Upgrade key for the wiki                                 | No       |
+| `INTERNAL_WIRE_API_KEY`      | `null`         | API key for `bluespice/wire` service                     | No, if `WIRE_HOST` is set |
 | `JOBQUEUE_HOST`              | `jobqueue`     | Hostname of a `bluespice/jobqueue` compatible service| Yes      |
 | `JOBQUEUE_PORT`              | `6379`         | Port of a `bluespice/jobqueue` compatible service          | Yes      |
 | `MAX_UPLOAD_SIZE`            | `1024m`        | Max upload size for single file (Allowed: m or g)    | Yes      |
@@ -87,13 +93,16 @@ docker build \
 | `WIKI_INITIAL_ADMIN_USER`    | `Admin`        | Admin user name use during initial installation      | Yes      |
 | `WIKI_LANG`                  | `en`           | Language code for the wiki                           | Yes      |
 | `WIKI_LOG_LEVEL`             | `error`        | Set php and Nginx log level (error/warn/debug)       | Yes      |
-| `WIKI_NAME`                  | `BlueSpice`    | Name of the wiki                                     | Yes      |
+| `WIKI_NAME`                  | `BlueSpice`    | Name of the wiki                                         | Yes      |
+| `WIKI_OAUTH2_PRIVATE_KEY_FILE` | `null`       | Path to OAuth2 private key file                          | Yes      |
+| `WIKI_OAUTH2_PUBLIC_KEY_FILE`  | `null`       | Path to OAuth2 public key file                           | Yes      |
 | `WIKI_PASSWORDSENDER`        | `no-reply@$WIKI_HOST` | Password sender email                         | Yes      |
 | `WIKI_PORT`                  | `443`          | Port for the wiki                                    | Yes      |
 | `WIKI_PROTOCOL`              | `https`        | Protocol for the wiki                                | Yes      |
 | `WIKI_PROXY`                 | `null`         | IP address(es) of proxy server. Will fall back to `proxy` service of `bluespice-deploy` | Yes      |
-| `WIKI_SUBSCRIPTION_KEY`      | `null`         | Only used by PRO edition. Overrides in-app config    | Yes      |
+| `WIKI_SERVICE_TOKEN_AUTH_ALLOWED` | `null`    | CIDR range allowed to use service token authentication   | Yes      |
 | `WIKI_STATUSCHECK_ALLOWED`   | `null`         | IP or CIDR range for status check REST endpoint      | Yes      |
+| `WIKI_SUBSCRIPTION_KEY`      | `null`         | Only used by PRO edition. Overrides in-app config    | Yes      |
 | `WIRE_HOST`                  | `wire`         | Hostname of a `bluespice/wire` compatible service    | Yes      |
 | `WIRE_PORT`                  | `3333`         | Port of a `bluespice/wire` compatible service        | Yes      |
 | `WIRE_PROTOCOL`              | `http`         | Protocol of a `bluespice/wire` compatible service    | Yes      |

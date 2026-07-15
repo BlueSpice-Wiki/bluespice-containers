@@ -47,9 +47,11 @@ if ( isset( $_REQUEST['_profiler'] ) ) {
  * @param array|string $hostname
  * @param array|string $port
  * @param array|string $path
+ * @param array|string $username
+ * @param array|string $password
  * @return string The assembled URL
  */
-function bsAssembleURL( $proto, $hostname, $port, $path = [] ) {
+function bsAssembleURL( $proto, $hostname, $port, $path = [], $username = [], $password = [] ) {
 
 	// Allow for ENV variable names without fallback, as fallbacks are now
 	// set centrally in `/app/bin/init-envs`
@@ -57,6 +59,8 @@ function bsAssembleURL( $proto, $hostname, $port, $path = [] ) {
 	$hostname = is_string( $hostname ) ? [ $hostname, '' ] : $hostname;
 	$port = is_string( $port ) ? [ $port, '' ] : $port;
 	$path = is_string( $path ) ? [ $path, '' ] : $path;
+	$username = is_string( $username ) ? [ $username, '' ] : $username;
+	$password = is_string( $password ) ? [ $password, '' ] : $password;
 
 	$protocol = trim( getenv( $proto[0] ) ?: $proto[1] );
 	$host = trim( getenv( $hostname[0] ) ?: $hostname[1] );
@@ -75,7 +79,19 @@ function bsAssembleURL( $proto, $hostname, $port, $path = [] ) {
 		$portSuffix = '';
 	}
 
-	return "$protocol://$host{$portSuffix}$path";
+	$auth = '';
+	if ( !empty( $username ) && !empty( $password ) ) {
+		$username = trim( getenv( $username[0] ) ?: $username[1] );
+		$password = trim( getenv( $password[0] ) ?: $password[1] );
+
+		if ( $username && $password ) {
+			$encUsername = rawurlencode( $username );
+			$encPassword = rawurlencode( $password );
+			$auth = "$encUsername:$encPassword@";
+		}
+	}
+
+	return "$protocol://$auth$host{$portSuffix}$path";
 }
 
 // We must not set MW_CONFIG_FILE if we are running the CLI installer

@@ -7,9 +7,9 @@ RUN git clone --depth 1 https://github.com/simplesamlphp/simplesamlphp.git -b v$
 	composer require psr/http-message:^1.1 psr/container:^1.1 symfony/expression-language:^6.0 \
 		twig/twig:^3.26 twig/intl-extra:^3.26 symfony/twig-bridge:^6.4 \
 		symfony/cache:^6.4.40 symfony/routing:^6.4.40 symfony/yaml:^6.4.40 \
-		--no-cache --update-no-dev --prefer-dist --optimize-autoloader && \
-	rm -rf /build/simplesamlphp/.git
-# several 6.4.40 packages are specifically called, as symfony/console and symfony/string miss 6.4.40 tags
+		--no-cache --update-no-dev --prefer-dist --optimize-autoloader
+# The specific versions are taken from composer.json of MediaWiki REL1_43
+# To force psr/log:1.1.4, we remove simplesamlphp-test-framework (require-dev only)
 
 FROM alpine:3 AS builder
 
@@ -18,13 +18,14 @@ ENV SIMPLESAMLPHP_VERSION=2.4.4
 ENV SIMPLESAMLPHP_URL=https://github.com/simplesamlphp/simplesamlphp/releases/download/v${SIMPLESAMLPHP_VERSION}/simplesamlphp-${SIMPLESAMLPHP_VERSION}-slim.tar.gz
 ENV SIMPLESAMLPHP_SHA256=1c351342293d218447b27df9a03d2da7561d3831303524c173e8974b3168a57e
 
-ENV MATHOIDREMOTE_URL=https://raw.githubusercontent.com/hallowelt/docker-bluespice-formula/5.1.x/_client/mathoid-remote
+# HINT: This version is valid for 5.1 and 5.2; Later versions don't use this tool anymore. For the sake of reproducable builds, we hardcode the version here and adapt manually on demand
+ENV MATHOIDREMOTE_URL=https://raw.githubusercontent.com/hallowelt/docker-bluespice-formula/80786798646fe1bb105db2228a07c86f546d9f56/_client/mathoid-remote
 ENV MATHOIDREMOTE_SHA256=9a562346e8fcc662f2d4b1c2a674c23862782365807d30de317a1fe77affc36a
 
-ENV MEDIAWIKIADM_URL=https://github.com/hallowelt/misc-mediawiki-adm/releases/latest/download/mediawiki-adm
-ENV MEDIAWIKIADM_SHA256=c038de94ce49c66584556bc03c58bf0f9388d109b9428c800d0b74c90b528f15
+ENV MEDIAWIKIADM_URL=https://github.com/hallowelt/misc-mediawiki-adm/releases/download/1.2.3/mediawiki-adm
+ENV MEDIAWIKIADM_SHA256=1e5609d76f0c3ade1a33fd0bf204463747c8b99d86a49004ce00d50d8886666f
 
-ENV PARALLELRUNJOBSSERVICE_URL=https://github.com/hallowelt/misc-parallel-runjobs-service/releases/latest/download/parallel-runjobs-service
+ENV PARALLELRUNJOBSSERVICE_URL=https://github.com/hallowelt/misc-parallel-runjobs-service/releases/download/2.0.1/parallel-runjobs-service
 ENV PARALLELRUNJOBSSERVICE_SHA256=ec8ea7e8a79242baba862448bcba952376267c0db19785d6266ab9a01a29e241
 
 ARG BLUESPICE_VERSION=5.2.x
@@ -33,7 +34,6 @@ ARG BLUESPICE_URL=https://github.com/BlueSpice-Wiki/bluespice-free-release.git
 WORKDIR /build
 ADD --checksum=sha256:${SIMPLESAMLPHP_SHA256} ${SIMPLESAMLPHP_URL} /build/simplesamlphp.tar.gz
 ADD --checksum=sha256:${MATHOIDREMOTE_SHA256} ${MATHOIDREMOTE_URL} /build/mathoid-remote
-ADD --checksum=sha256:${MEDIAWIKIADM_SHA256} ${MEDIAWIKIADM_URL} /build/mediawiki-adm
 ADD --checksum=sha256:${PARALLELRUNJOBSSERVICE_SHA256} ${PARALLELRUNJOBSSERVICE_URL} /build/parallel-runjobs-service
 # HINT: Based on the type of URL, this can already be a tarball ( "Release-URL" ) or a git repository checkout ( "pre-release"/"custom-edition" )
 ADD ${BLUESPICE_URL}#${BLUESPICE_VERSION} /build/bluespice
@@ -128,7 +128,6 @@ COPY --chown=$USER:$GROUPNAME --chmod=666 ./root-fs/app/bin/config /app/bin/conf
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/conf /app/conf
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/simplesamlphp/ /app/simplesamlphp
 COPY --chown=$USER:$GROUPNAME --from=builder --chmod=755 /build/mathoid-remote /app/bin
-COPY --chown=$USER:$GROUPNAME --from=builder --chmod=755 /build/mediawiki-adm /app/bin
 COPY --chown=$USER:$GROUPNAME --from=builder --chmod=755 /build/parallel-runjobs-service /app/bin
 COPY ./root-fs/etc/php/8.x/fpm/php-fpm.conf /etc/php$VERSION
 COPY ./root-fs/etc/php/8.x/fpm/pool.d/www.conf /etc/php$VERSION/php-fpm.d/

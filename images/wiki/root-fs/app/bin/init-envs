@@ -6,9 +6,6 @@ cat <<'EOF' >> /app/.env
 export AV_HOST=${AV_HOST:--}
 export AV_PORT=${AV_PORT:-3310}
 
-# Backup defaults
-export BACKUP_HOUR=${BACKUP_HOUR:-1}
-
 # Cache service defaults
 export CACHE_HOST=${CACHE_HOST:-cache}
 export CACHE_PORT=${CACHE_PORT:-11211}
