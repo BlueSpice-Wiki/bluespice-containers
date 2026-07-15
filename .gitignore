@@ -1,9 +1,15 @@
+# common items to ignore
 deploy/compose/*.backup
+
+# for dev-5.2.x and dev-5.3.x
+webservices/ai/
+webservices/chat/
+
+# for dev-5.3.x
+images/keyvaluestore/
 images/mcp/
 images/prompt/
 images/statisticsdashboard/
-webservices/ai/
-webservices/chat/
 webservices/mcp/
 webservices/prompt/
 
