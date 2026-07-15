@@ -163,7 +163,7 @@ public class MainController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("success", true);
 		response.put("msg", "Service is running");
-		response.put( "version", "2.0.0");
+		response.put( "version", "2.1.0");
 		return response;
 	}
 
