@@ -108,7 +108,7 @@ class MessageHandler {
 					case 'changeAuthor':
 						$message = $this->authorChange( $msgArgs );
 
-						$this->logger->info(
+						$this->logger->debug(
 							"Session (ID:{$msgArgs['sessionId']}) "
 							. "author data (ID:{$msgArgs['authorId']}) changed"
 						);
@@ -140,7 +140,7 @@ class MessageHandler {
 						if ( !$change->isEmpty() ) {
 							$message = $this->newChange( $msgArgs['sessionId'], $change );
 						} else {
-							$this->logger->error( "Change is empty, skipping" );
+							$this->logger->warning( "Change is empty, skipping" );
 						}
 						break;
 					case 'deleteSession':
@@ -218,7 +218,6 @@ class MessageHandler {
 	 * @return string
 	 */
 	private function saveRevision( int $authorId ): string {
-		$this->logger->info( "Author (ID:$authorId) saved revision" );
 		return $this->response( EventType::CONTENT, 'saveRevision', $authorId );
 	}
 
@@ -317,7 +316,7 @@ class MessageHandler {
 		}
 		$eventData = json_decode( $rawJson, true );
 		if ( json_last_error() === JSON_ERROR_UTF16 ) {
-			$this->logger->info( 'JSON_ERROR_UTF16... fixing Surrogate Pairs' );
+			$this->logger->debug( 'JSON_ERROR_UTF16... fixing Surrogate Pairs' );
 			$cleanedJson = $this->fixSurrogatePairs( $rawJson );
 			$eventData = json_decode( $cleanedJson, true );
 		}

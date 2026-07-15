@@ -53,7 +53,7 @@ class Rebaser implements LoggerAwareInterface {
 	 * @throws Exception
 	 */
 	public function applyChange( int $sessionId, Author $author, int $backtrack, Change $change ): Change {
-		$this->logger->info( "Rebasing change", [
+		$this->logger->debug( "Rebasing change", [
 			'author' => json_encode( $author ),
 			'change' => json_encode( $change ),
 			'backtrack' => $backtrack,

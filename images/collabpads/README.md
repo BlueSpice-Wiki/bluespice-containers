@@ -18,7 +18,7 @@ The container exposes a number of [ENV variables](./config.docker.php):
 | `COLLABPADS_BACKEND_MONGO_DB_USER`              | ``         | Username for MongoDB authentication.                             |
 | `COLLABPADS_BACKEND_MONGO_DB_PASSWORD`          | ``         | Password for MongoDB authentication.                             |
 | `COLLABPADS_BACKEND_MONGO_DB_DEFAULT_AUTH_DB`   | `admin`           | Default authentication database for MongoDB.                     |
-| `COLLABPADS_BACKEND_LOG_LEVEL`                  | `warn`            | Log level (e.g., debug, info, warn, error).                      |
+| `COLLABPADS_BACKEND_LOG_LEVEL`                  | `info`            | Log level (e.g., debug, info, warn, error).                      |
 
 ### Volumes
 The container does not require any volumes to be mounted, as all configuration is done via ENV variables.
