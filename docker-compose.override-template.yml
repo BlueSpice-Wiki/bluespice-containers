@@ -397,7 +397,7 @@ services:
     command: >
       certonly --dns-cloudflare --agree-tos --no-eff-email
       --dns-cloudflare-credentials /run/secrets/cloudflare.ini
-      --email ${CERTBOT_CF_EMAIL:-} --domains *.${CERTBOT_CF_DOMAIN:-}
+      --email ${CERTBOT_CF_EMAIL:-} --domains ${CERTBOT_CF_DOMAIN:-}
     profiles: [certbotcf]
 
 secrets:
