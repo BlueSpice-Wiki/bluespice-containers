@@ -8,4 +8,4 @@ COPY --chown=opensearch:opensearch --chmod=755 ./root-fs/app/bin /app/bin
 RUN ln -sf /app/bin/removeROtag /usr/local/bin
 USER opensearch
 RUN /usr/share/opensearch/bin/opensearch-plugin install --batch ingest-attachment
-
+RUN /usr/share/opensearch/bin/opensearch-plugin remove opensearch-security
