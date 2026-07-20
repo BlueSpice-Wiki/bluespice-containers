@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 RUN mvn clean -U package
 
 FROM eclipse-temurin:25-jre-alpine
-COPY --from=build /usr/src/app/target/html2pdf-2.0.*-SNAPSHOT.jar /app/html2pdf.jar
+COPY --from=build /usr/src/app/target/html2pdf-2.1.*-SNAPSHOT.jar /app/html2pdf.jar
 WORKDIR /app
 
 EXPOSE 8080
