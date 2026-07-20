@@ -1,3 +1,4 @@
 vulnerabilities:
-  - id: CVE-2025-7458
-    reason: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
+  - id: CVE-2025-65896
+    expired_at: 2026-06-31
+    statement: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
