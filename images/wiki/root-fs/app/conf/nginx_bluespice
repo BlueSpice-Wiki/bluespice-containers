@@ -86,11 +86,11 @@ server {
 
 	location ^~ ###WIKI_BASE_PATH|/###_sp {
 			alias /app/simplesamlphp/public;
-				location ~^(?<prefix>/_sp)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
+				location ~^(?<prefix>###WIKI_BASE_PATH|/###_sp)(?<phpfile>.+?\.php)(?<pathinfo>/.*)?$ {
 					include fastcgi_params;
 					fastcgi_pass unix:/var/run/php/php-fpm.sock;
 					fastcgi_param SCRIPT_FILENAME $document_root$phpfile;
-					fastcgi_param SCRIPT_NAME /_sp/$phpfile;
+					fastcgi_param SCRIPT_NAME ###WIKI_BASE_PATH|/###_sp$phpfile;
 					fastcgi_param PATH_INFO $pathinfo if_not_empty;
 				}
 			break;

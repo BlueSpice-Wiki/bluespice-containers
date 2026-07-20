@@ -19,11 +19,13 @@ fi
 upgradeKey=$(tr -dc a-z0-9 </dev/urandom | head -c 16; echo)
 secretKey=$(tr -dc a-z0-9 </dev/urandom | head -c 64; echo)
 samlSecretSalt=$(tr -dc a-z0-9 </dev/urandom | head -c 64; echo)
+samlSessionApiToken=$(tr -dc a-z0-9 </dev/urandom | head -c 64; echo)
 :> /data/.wikienv
 echo "INTERNAL_WIKI_UPGRADEKEY=$upgradeKey" >> /data/.wikienv
 echo "INTERNAL_WIKI_SECRETKEY=$secretKey" >> /data/.wikienv
 echo "INTERNAL_SIMPLESAMLPHP_ADMIN_PASS=$adminPass" >> /data/.wikienv
 echo "INTERNAL_SIMPLESAMLPHP_SECRET_SALT=$samlSecretSalt" >> /data/.wikienv
+echo "INTERNAL_SIMPLESAMLPHP_SESSION_API_TOKEN=$samlSessionApiToken" >> /data/.wikienv
 set -a
 source /data/.wikienv
 set +a
