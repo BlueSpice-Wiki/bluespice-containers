@@ -156,8 +156,14 @@ $GLOBALS['wgMathoidCli'] = [
 
 $GLOBALS['bsgInstanceStatusCheckAllowedIP'] = trim( getenv( 'WIKI_STATUSCHECK_ALLOWED' ) );
 
-
-$GLOBALS['wgSimpleSAMLphp_InstallDir'] = '/app/simplesamlphp';
+$GLOBALS['wgSimpleSAMLphp_SAMLClient'] = 'http-client';
+$GLOBALS['wgSimpleSAMLphp_HTTPClientConfig'] = [
+	'baseUrl' => 'http://localhost:9090/_sp/',
+	// Keep aligned with `root-fs/app/simplesamlphp/config/config.php`
+	'sessionIdCookieName' => getenv('DB_NAME') . ( getenv('DB_PREFIX') ) . 'SAMLSessionID',
+	'authTokenCookieName' => getenv('DB_NAME') . ( getenv('DB_PREFIX') ) . 'SAMLAuthToken',
+	'sessionAPItoken' => getenv( 'INTERNAL_SIMPLESAMLPHP_SESSION_API_TOKEN' ) ?: ''
+];
 
 if ( getenv( 'DEV_WIKI_DEBUG' ) ) {
 	$GLOBALS['wgShowExceptionDetails'] = true;
