@@ -110,9 +110,10 @@ RUN addgroup -g $GID $GROUPNAME \
 COPY --chown=$USER:$GROUPNAME --from=builder /build/bluespice /app/bluespice/w
 COPY --chown=$USER:$GROUPNAME --from=builder /build/simplesamlphp /app/simplesamlphp
 RUN if [ -f /app/bluespice/w/extensions/SimpleSAMLphp/_simplesamlphp/public/api/session.php ]; then \
-		cp -rp \
-			/app/bluespice/w/extensions/SimpleSAMLphp/_simplesamlphp/public/api/session.php \
-			/app/simplesamlphp/public/api/session.php; \
+		mkdir -p /app/simplesamlphp/public/api && \
+		cp /app/bluespice/w/extensions/SimpleSAMLphp/_simplesamlphp/public/api/session.php \
+			/app/simplesamlphp/public/api/session.php && \
+		chown -R $USER:$GROUPNAME /app/simplesamlphp/public/api; \
 	fi
 COPY --chown=$USER:$GROUPNAME --chmod=755 ./root-fs/app/bin /app/bin
 COPY --chown=$USER:$GROUPNAME --chmod=666 ./root-fs/app/bin/config /app/bin/config
