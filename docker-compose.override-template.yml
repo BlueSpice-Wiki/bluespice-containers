@@ -225,6 +225,7 @@ services:
       VIRTUAL_PATH: /_samlidp/
       VIRTUAL_PORT: 8080
       VIRTUAL_DEST: /
+      DEV_IDP_ADMIN_PASS: ${DB_PASS}
       DEV_SHARED_IDP_HOST: ${WIKI_HOST}
       DEV_SP_HOSTS: ${WIKI_HOST}###default-sp
     profiles: [sso, samlidp]
