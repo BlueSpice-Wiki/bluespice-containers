@@ -21,6 +21,19 @@ configs:
     content: |
       ;memory_limit = 2048M
       ;opcache.memory_consumption=2048
+  filestore_s3_garage_toml:
+    content: |
+      metadata_dir = "/var/lib/garage/meta"
+      data_dir = "/var/lib/garage/data"
+      db_engine = "sqlite"
+      replication_factor = 1
+      rpc_bind_addr = "0.0.0.0:3901"
+      rpc_public_addr = "dev-filestore:3901"
+      [s3_api]
+      api_bind_addr = "0.0.0.0:9000"
+      s3_region = "eu-north-1"
+      [admin]
+      api_bind_addr = "0.0.0.0:3903"
 
 x-common-dev: &common-dev
   # optionally use certain already-built images from private registry
@@ -36,15 +49,29 @@ x-common-dev: &common-dev
     - "host.docker.internal:host-gateway"
   environment:
     DEV_WIKI_DEBUG: 1
+    DEV_WIKI_DEBUG_LOGCHANNELS: exception,error
+    # Only enable together with a s3 storage, e.g dev-filestore below
+    # Compatible only with certain wiki images
+    #FILESTORE_HOST: dev-filestore
+    #FILESTORE_PORT: 9000
+    #FILESTORE_PROTOCOL: http
+    #FILESTORE_ACCESS_KEY: ${FILESTORE_ACCESS_KEY}
+    #FILESTORE_SECRET_KEY: ${FILESTORE_SECRET_KEY}
+    #FILESTORE_BUCKET_NAME: ${FILESTORE_BUCKET_NAME:-bluespice}
+    #FILESTORE_REGION: ${FILESTORE_REGION:-eu-north-1}
   # To enable xdbug and other dev tools, one needs `up -d --build` once
   # The modified image will be applied for wiki-task as well.
   build:
     context: .
     dockerfile_inline: |
+      FROM alpine:3 AS builder
+      ADD https://github.com/wikimedia/mediawiki-extensions-SimpleSAMLphp.git#REL1_43 /build/ssp
       FROM ${BLUESPICE_WIKI_IMAGE} AS bluespice-dev
       USER root
       RUN apk add curl php84-xdebug
       COPY --from=composer:2 /usr/bin/composer /app/bin/composer
+      COPY --from=builder /build/ssp/_simplesamlphp /app/simplesamlphp
+      RUN chown -R bluespice:bluespice /app/simplesamlphp/public
       USER bluespice
     no_cache: true
 
@@ -135,7 +162,7 @@ services:
 
 
   # Development containers that will only start/end with profiles
-  # Available profiles: sso, keycloak, ldap, s3
+  # Available profiles: sso, keycloak, ldap, samlidp, s3, olds3
 
   dev-ldap:
     image: osixia/openldap:1.5.0
@@ -188,7 +215,54 @@ services:
       - "${WIKI_HOST}:host-gateway"
     profiles: [sso, keycloak]
 
+  dev-samlidp:
+    # Tutorial: https://en.wiki.bluespice.com/wiki/Development/SAML_2.0_IdP
+    # Prerequisites of running this service:
+    # - fulfill a complete setup as the tutorial
+    # - run ./bluespice-deploy up -d --build to modify the wiki images
+    image: kristophjunge/test-saml-idp
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-dev-samlidp
+    volumes:
+      - ${DATADIR}/saml-idp/saml-config.php:/var/www/simplesamlphp/config/config.php
+      - ${DATADIR}/saml-idp/saml-users.php:/var/www/simplesamlphp/config/authsources.php
+      - ${DATADIR}/saml-idp/saml-sp-metadata.php:/var/www/simplesamlphp/metadata/saml20-sp-remote.php
+    environment:
+      VIRTUAL_HOST: ${WIKI_HOST}
+      VIRTUAL_PATH: /_samlidp/
+      VIRTUAL_PORT: 8080
+      VIRTUAL_DEST: /
+      DEV_IDP_ADMIN_PASS: ${DB_PASS}
+      DEV_SHARED_IDP_HOST: ${WIKI_HOST}
+      DEV_SP_HOSTS: ${WIKI_HOST}###default-sp
+    profiles: [sso, samlidp]
+
+  dev-filestore:
+    # https://en.wiki.bluespice.com/wiki/Development/S3_filestore_service
+    image: dxflrs/garage:v2.3.0
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-dev-filestore
+    command: /garage server --single-node --default-bucket
+    environment:
+      GARAGE_CONFIG_FILE: /etc/garage.toml
+      # Before using this service, configure your keys and secrets in .env
+      # generate your own 32-byte-hex, e.g. openssl rand -hex 32
+      #GARAGE_RPC_SECRET: ${FILESTORE_RPC_SECRET}
+      #GARAGE_DEFAULT_ACCESS_KEY: ${FILESTORE_ACCESS_KEY}
+      #GARAGE_DEFAULT_SECRET_KEY: ${FILESTORE_SECRET_KEY}
+      GARAGE_DEFAULT_BUCKET: ${FILESTORE_BUCKET_NAME:-bluespice}
+    ports:
+      - "9000:9000"
+      - "3903:3903"
+    volumes:
+      - ${DATADIR}/filestore/meta:/var/lib/garage/meta
+      - ${DATADIR}/filestore/data:/var/lib/garage/data
+    configs:
+      - source: filestore_s3_garage_toml
+        target: /etc/garage.toml
+        mode: 0444
+    profiles: [s3]
+
   dev-s3:
+    # deprecated, as minio is no longer maintained
     image: minio/minio
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-dev-s3
     ports:
@@ -200,7 +274,7 @@ services:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-bioueot}
     command: server /data --console-address ":9001"
-    profiles: [s3]
+    profiles: [olds3]
 
   # Experimental containers that will only start/end with profiles
   # Available profiles: analytics, jobqueuedb, messagebroker, monitoring,
@@ -330,7 +404,7 @@ services:
     command: >
       certonly --dns-cloudflare --agree-tos --no-eff-email
       --dns-cloudflare-credentials /run/secrets/cloudflare.ini
-      --email ${CERTBOT_CF_EMAIL:-} --domains *.${CERTBOT_CF_DOMAIN:-}
+      --email ${CERTBOT_CF_EMAIL:-} --domains ${CERTBOT_CF_DOMAIN:-}
     profiles: [certbotcf]
 
 secrets:
