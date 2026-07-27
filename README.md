@@ -117,11 +117,13 @@ inside the container.
 | AI__OPENAI__BASE_URL                    | OpenAI API location                                                                                                                                    | https://api.openai.com/v1                 |
 | AI__OPENAI__MODEL                       | Model to use for LLM calls in OpenAI provider env                                                                                                      | gpt40                                     |
 | AI__OPENAI__EMBEDDING_MODEL             | Model to user for embeddings in OpenAI provider env                                                                                                    | text-embedding-3-small                    |
-| **_AI__OLLAMA__URL_**                   | Location of Ollama server (EXPERIMENTAL)                                                                                                               |                                           |
+| **AI__OLLAMA__URL_**                   | Location of Ollama server (EXPERIMENTAL)                                                                                                               |                                           |
 | AI__OLLAMA__MODEL                       | Model to use for LLM calls in OLLAMA provider env (EXPERIMENTAL)                                                                                       | llama3.3                                  |
 | AI__OLLAMA__EMBEDDING_MODEL             | Model to user for embeddings in OLLAMA provider env (EXPERIMENTAL)                                                                                     | nomic-embed-text                          |
 | **AI__LLM_PROVIDER**                    | Provider choice for RAGs' LLM, this is the provider whose AI actually produces the final response                                                      |                                           |
 | **AI__EMBEDDER_PROVIDER**               | Provider choice for RAGs' embedding provider, this provider processes embeddings and vector searches                                                   |                                           |
-| **AI__GOOGLE__API_KEY**                 | API key for Google AI API (EXPERIMENTAL)
-| AI__GOOGLE__MODEL                       | Model to use for LLM calls in Google AI (EXPERIMENTAL)
-| AI__GOOGLE__EMBEDDING_MODEL             | Embedding model for document storage and retrieval in google AI (EXPERIMENTAL)
+| **AI__GOOGLE__API_KEY**                 | API key for Google AI API (EXPERIMENTAL)																											   |										   |
+| AI__GOOGLE__MODEL                       | Model to use for LLM calls in Google AI (EXPERIMENTAL)																								   | 										   |
+| AI__GOOGLE__EMBEDDING_MODEL             | Embedding model for document storage and retrieval in google AI (EXPERIMENTAL)																		   |										   |
+| AI__MCP__URL 							  | MCP server URL																																		   |										   |
+| AI__MCP__API_KEY						  | MCP server API key																																		   |										   |
