@@ -37,7 +37,7 @@ AI__MYSQL__DB_NAME=ai-service
 
 AI__NEO4J__USERNAME=neo4j
 AI__NEO4J__PASSWORD=mysecretpass
-AI__NEO4J__URL=neo4j://localhost:7687"
+AI__NEO4J__URL="neo4j://localhost:7687"
 
 AI__AZURE__OPENAI_API_KEY=<azure_openai_key>
 AI__AZURE__OPENAI_ENDPOINT=<azure_endpoint>
