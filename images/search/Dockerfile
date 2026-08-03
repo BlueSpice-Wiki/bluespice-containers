@@ -1,4 +1,4 @@
-FROM opensearchproject/opensearch:3.5.0
+FROM opensearchproject/opensearch:3
 
 ENV discovery.type=single-node
 ENV DISABLE_INSTALL_DEMO_CONFIG=true
