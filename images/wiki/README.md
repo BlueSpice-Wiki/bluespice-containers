@@ -32,14 +32,14 @@ docker build \
 | `CACHE_HOST`                 | `cache`        | Hostname of a `bluespice/cache` compatible service *)| Yes      |
 | `CACHE_PORT`                 | `11211`/`6379` | Port of a `bluespice/cache` compatible service. Default based on `CACHE_TYPE` | Yes      |
 | `CACHE_TYPE`                 | `memcached`    | Type of cache to use (memcached or redis/valkey)    | Yes      |
-| `CHAT_HOST`                  | `chat`         | Hostname of a `bluespice/chat` compatible service **)| Yes      |
+| `CHAT_HOST`                  | `chat`         | Hostname of a `bluespice/chat` compatible service ****)| Yes      |
 | `CHAT_PORT`                  | `3000`         | Port of a `bluespice/chat` compatible service        | Yes      |
 | `CHAT_PROTOCOL`              | `http`         | Protocol of a `bluespice/chat` compatible service    | Yes      |
 | `DB_HOST`                    | `database`     | Database host                                        | Yes      |
 | `DB_NAME`                    | `bluespice`    | Database name                                        | Yes      |
 | `DB_PASS`                    | `null`         | Database password                                    | No       |
-| `DB_PREFIX`                  | `''`           | Database prefix ***)                                 | Yes      |
-| `DB_ROOT_PASS`               | ``             | Database root password ***)                          | Yes      |
+| `DB_PREFIX`                  | `''`           | Database prefix **)                                  | Yes      |
+| `DB_ROOT_PASS`               | ``             | Database root password **)                           | Yes      |
 | `DB_ROOT_USER`               | `root`         | Database root user                                   | Yes      |
 | `DB_TYPE`                    | `mysql`        | Database type                                        | Yes      |
 | `DB_USER`                    | `bluespice`    | Database user                                        | Yes      |
@@ -63,6 +63,7 @@ docker build \
 | `FORMULA_PROTOCOL`           | `http`         | Protocol of a `bluespice/formula` compatible service | Yes      |
 | `INTERNAL_CHAT_TOKEN`        | `null`         | Internal service token for `bluespice/chat`              | No, if `CHAT_HOST` is set |
 | `INTERNAL_CHAT_WIKI_ACCESS_TOKEN` | `null` | Access token `bluespice/chat` | No       |
+| `INTERNAL_SIMPLESAMLPHP_SESSION_API_TOKEN`| `null`         | Token for SAML session API endpoint. Auto-generated during installation | No      |
 | `INTERNAL_WIKI_SECRETKEY`    | `null`         | Secret key for the wiki                              | No       |
 | `INTERNAL_WIKI_TOKEN_AUTH_SALT` | `null`      | Salt for token-based service authentication              | No       |
 | `INTERNAL_WIKI_UPGRADEKEY`   | `null`         | Upgrade key for the wiki                                 | No       |
@@ -73,6 +74,8 @@ docker build \
 | `PDF_HOST`                   | `pdf`          | Hostname of a `bluespice/pdf` compatible service     | Yes      |
 | `PDF_PORT`                   | `8080`         | Port of a `bluespice/pdf` compatible service         | Yes      |
 | `PDF_PROTOCOL`               | `http`         | Protocol of a `bluespice/pdf` compatible service     | Yes      |
+| `SAML_LOG_LEVEL`             | `$WIKI_LOG_LEVEL` | Log level for SAML operations.                    | Yes      |
+| `SAML_SESSION_API_ALLOWED`   | `null`       | Allowed CIDR range for SAML session API endpoint. Will default to internal Docker network CIDR | Yes      |
 | `SEARCH_HOST`                | `search`       | Hostname of a `bluespice/search` compatible service  | Yes      |
 | `SEARCH_PASS`                | ``             | Password of a `bluespice/search` compatible service  | Yes      |
 | `SEARCH_PORT`                | `9200`         | Port of a `bluespice/search` compatible service      | Yes      |
@@ -85,9 +88,11 @@ docker build \
 | `SMTP_USER`                  | `null`         | SMTP username                                        | Yes      |
 | `TZ`                         | `UTC`          | Timezone for BlueSpice and container system time     | Yes      |
 | `WIKI_BASE_PATH`             | `''`           | Base path for the wiki. Must be aligned with proxy   | Yes      |
+| `WIKI_ARTICE_PATH`           | `wiki`         | Definition of $wgArticlePath for pretty URLs ***)    | Yes      |
+| `FARM_DEFAULT_INSTANCE`      | `''`           | Farm instance to redirect to by default ***)         | Yes      |
 | `WIKI_EMERGENCYCONTACT`      | `''`           | Emergency contact email                              | No       |
-| `WIKI_FARM_DB_PREFIX`        | `sfr_`         | Database name prefix for wiki farm instances ***)     | Yes      |
-| `WIKI_FARM_USE_SHARED_DB`    | `null`         | Store wiki farm instances in `DB_NAME` ***)           | Yes      |
+| `WIKI_FARM_DB_PREFIX`        | `sfr_`         | Database name prefix for wiki farm instances **)     | Yes      |
+| `WIKI_FARM_USE_SHARED_DB`    | `null`         | Store wiki farm instances in `DB_NAME` **)           | Yes      |
 | `WIKI_HOST`                  | `localhost`    | Host for the wiki                                    | Yes      |
 | `WIKI_INITIAL_ADMIN_PASS`    | `null`         | Initial admin password. Uses random, if not set      | Yes      |
 | `WIKI_INITIAL_ADMIN_USER`    | `Admin`        | Admin user name use during initial installation      | Yes      |
@@ -108,8 +113,12 @@ docker build \
 | `WIRE_PROTOCOL`              | `http`         | Protocol of a `bluespice/wire` compatible service    | Yes      |
 
 *) External cache can be disabled by setting `-` as `CACHE_HOST`.
-**) Functions requiring `bluespice/chat` can be disabled by setting `-` as `CHAT_HOST`.
-***) See section "Database requirements for FARM edition"
+
+**) See section "Database requirements for FARM edition"
+
+***) For a farm with non-default `WIKI_ARTICLE_PATH`, set `FAMR_DEFAULT_INSTANCE` as well, e.g `w` the root farm instance.
+
+****) Functions requiring `bluespice/chat` can be disabled by setting `-` as `CHAT_HOST`.
 
 ## Directories and Volumes
 

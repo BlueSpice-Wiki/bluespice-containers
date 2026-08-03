@@ -16,14 +16,14 @@ server {
 	rewrite ^###WIKI_BASE_PATH|/###_sp/(.*)$ ###WIKI_BASE_PATH|/###_sp/$1 last;
 	rewrite ^###WIKI_BASE_PATH|/###webdav/(.*)$ ###WIKI_BASE_PATH|/###w/webdav.php/$1?$args last;
 	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/webdav/(.*)$ ###WIKI_BASE_PATH|/###w/webdav.php/$2?sfr=$1&$args last;
-	rewrite ^###WIKI_BASE_PATH|/###wiki/(.*?).php/(.+)$ ###WIKI_BASE_PATH|/###w/$1.php?sfr=w&title=$2 last;
-	rewrite ^###WIKI_BASE_PATH|/###wiki/(.+)$ ###WIKI_BASE_PATH|/###w/index.php?title=$1&sfr=w last;
-	rewrite ^###WIKI_BASE_PATH|/###wiki/([^/]+)/?$ ###WIKI_BASE_PATH|/###w/index.php?title=$1&sfr=w last;
+	rewrite ^###WIKI_BASE_PATH|/######WIKI_ARTICLE_PATH|wiki###/(.*?).php/(.+)$ ###WIKI_BASE_PATH|/###w/$1.php?sfr=w&title=$2 last;
+	rewrite ^###WIKI_BASE_PATH|/######WIKI_ARTICLE_PATH|wiki###/(.+)$ ###WIKI_BASE_PATH|/###w/index.php?title=$1&sfr=w last;
+	rewrite ^###WIKI_BASE_PATH|/######WIKI_ARTICLE_PATH|wiki###/([^/]+)/?$ ###WIKI_BASE_PATH|/###w/index.php?title=$1&sfr=w last;
 	rewrite ^###WIKI_BASE_PATH|/###w/(.*?)$ ###WIKI_BASE_PATH|/###w/$1?sfr=w last;
 	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/index.php/(.+)$ ###WIKI_BASE_PATH|/###w/$2.php?sfr=$1&title=$3 last;
 	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/(.*?).php/(.+)$ ###WIKI_BASE_PATH|/###w/$2.php/$3?sfr=$1 last;
 	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/(.*?).php ###WIKI_BASE_PATH|/###w/$2.php?sfr=$1 last;
-	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/wiki/(.+)$ ###WIKI_BASE_PATH|/###w/index.php?title=$2&sfr=$1 last;
+	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/###WIKI_ARTICLE_PATH|wiki###/(.+)$ ###WIKI_BASE_PATH|/###w/index.php?title=$2&sfr=$1 last;
 	rewrite ^###WIKI_BASE_PATH|/###([^/]*)/(.+)$ ###WIKI_BASE_PATH|/###w/$2 last;
 	rewrite ^###WIKI_BASE_PATH|/###([^/]+)/?$ ###WIKI_BASE_PATH|/###w/index.php?sfr=$1 last;
 
@@ -104,6 +104,6 @@ server {
 	}
 
 	location = / {
-		return 301 ###WIKI_BASE_PATH|/###wiki;
+		return 301 ###WIKI_BASE_PATH|/######WIKI_RETURN_PATH|wiki###;
 	}
 }

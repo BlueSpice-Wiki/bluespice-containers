@@ -36,8 +36,7 @@ php $appDir/maintenance/install.php \
 	--lang=$lang \
 	--scriptpath=/w \
 	"$name" \
-	"$adminUserName" \
-	| tee -a /data/bluespice/logs/install-$timestamp.log
+	"$adminUserName"
 
 # We don't need the default LocalSettings.php file, as we have one hardwired in this container
 if [ -f $appDir/LocalSettings.php ]; then
