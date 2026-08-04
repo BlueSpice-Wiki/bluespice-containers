@@ -9,3 +9,4 @@ RUN ln -sf /app/bin/removeROtag /usr/local/bin
 USER opensearch
 RUN /usr/share/opensearch/bin/opensearch-plugin install --batch ingest-attachment
 RUN /usr/share/opensearch/bin/opensearch-plugin remove opensearch-security
+
