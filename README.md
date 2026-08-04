@@ -52,3 +52,4 @@ docker push bluespice/search:4.4.1
 
 ## Testing
 Install `trivy` and run `trivy image bluespice/search` to check for vulnerabilities.
+

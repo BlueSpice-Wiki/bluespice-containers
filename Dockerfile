@@ -6,6 +6,11 @@ ENV DISABLE_SECURITY_PLUGIN=true
 USER root
 COPY --chown=opensearch:opensearch --chmod=755 ./root-fs/app/bin /app/bin
 RUN ln -sf /app/bin/removeROtag /usr/local/bin
-USER opensearch
 RUN /usr/share/opensearch/bin/opensearch-plugin install --batch ingest-attachment
+RUN /usr/share/opensearch/bin/opensearch-plugin remove opensearch-security
+# Support Arbitrary User IDs. See https://github.com/opensearch-project/opensearch-build/issues/3625
+RUN chown -R 1000:0 /usr/share/opensearch /app/bin
+RUN chmod -R g=u /usr/share/opensearch /app/bin
+RUN chmod g+s /usr/share/opensearch
+USER 1000
 
