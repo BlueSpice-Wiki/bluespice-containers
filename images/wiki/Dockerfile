@@ -96,12 +96,12 @@ ENV UID=1002
 ARG USER
 ENV USER=bluespice
 ENV PATH="/app/bin:${PATH}"
-ARG GID
-ENV GID=$UID
-ARG GROUPNAME
-ENV GROUPNAME=$USER
+ARG GID=0
+ENV GID=$GID
+ARG GROUPNAME=root
+ENV GROUPNAME=$GROUPNAME
 
-RUN addgroup -g $GID $GROUPNAME \
+RUN grep -q "^${GROUPNAME}:" /etc/group || addgroup -g ${GID} ${GROUPNAME} \
 	&& adduser -u $UID -G $GROUPNAME --shell /bin/bash --disabled-password --gecos "" $USER \
 	&& addgroup $USER nginx \
 	&& mkdir -p /app/bluespice \
@@ -137,11 +137,13 @@ RUN ln -sf /usr/sbin/php-fpm$VERSION /usr/bin/php-fpm \
 	&& ln -s /app/conf/90-bluespice-overrides.ini /etc/php$VERSION/conf.d/90-bluespice-overrides.ini \
 	&& ln -s /app/conf/nginx_bluespice /etc/nginx/sites-enabled/default \
 	&& chown -R $USER:$GROUPNAME /var/run/php \
+	&& chmod -R g=u /var/run/php \
 	&& mkdir -p /etc/clamav/ \
 	&& ln -s /app/bin/config/clamd.conf /etc/clamav/clamd.conf \
 	&& touch /app/.env \
 	&& chown $USER:$GROUPNAME /app/.env \
 	&& chmod 660 /app/.env \
+	&& chmod -R g=u /app \
 	&& sed -i '1isource /app/.env' /etc/bash/bashrc
 
 ARG EDITION # Intentionally left uninitialized
