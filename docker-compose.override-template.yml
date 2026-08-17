@@ -71,7 +71,7 @@ x-common-dev: &common-dev
       RUN apk add curl php84-xdebug
       COPY --from=composer:2 /usr/bin/composer /app/bin/composer
       COPY --from=builder /build/ssp/_simplesamlphp /app/simplesamlphp
-      RUN chown -R bluespice:bluespice /app/simplesamlphp/public
+      RUN chown -R bluespice:0 /app/simplesamlphp/public && chmod -R g=u /app/simplesamlphp/public
       USER bluespice
     no_cache: true
 
@@ -395,7 +395,7 @@ services:
   # Available profiles: certbotcf
   certbot:
     image: certbot/dns-cloudflare
-    container_name: certbot
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-certbot
     secrets:
       - source: cloudflare_ini
         target: /run/secrets/cloudflare.ini
