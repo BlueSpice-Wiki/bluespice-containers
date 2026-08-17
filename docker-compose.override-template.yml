@@ -64,10 +64,14 @@ x-common-dev: &common-dev
   build:
     context: .
     dockerfile_inline: |
+      FROM alpine:3 AS builder
+      ADD https://github.com/wikimedia/mediawiki-extensions-SimpleSAMLphp.git#REL1_43 /build/ssp
       FROM ${BLUESPICE_WIKI_IMAGE} AS bluespice-dev
       USER root
       RUN apk add curl php84-xdebug
       COPY --from=composer:2 /usr/bin/composer /app/bin/composer
+      COPY --from=builder /build/ssp/_simplesamlphp /app/simplesamlphp
+      RUN chown -R bluespice:0 /app/simplesamlphp/public && chmod -R g=u /app/simplesamlphp/public
       USER bluespice
     no_cache: true
 
@@ -213,9 +217,11 @@ services:
 
   dev-samlidp:
     # Tutorial: https://en.wiki.bluespice.com/wiki/Development/SAML_2.0_IdP
+    # Prerequisites of running this service:
+    # - fulfill a complete setup as the tutorial
+    # - run ./bluespice-deploy up -d --build to modify the wiki images
     image: kristophjunge/test-saml-idp
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-dev-samlidp
-    # To run this service, one needs to fulfill a complete setup as the tutorial
     volumes:
       - ${DATADIR}/saml-idp/saml-config.php:/var/www/simplesamlphp/config/config.php
       - ${DATADIR}/saml-idp/saml-users.php:/var/www/simplesamlphp/config/authsources.php
@@ -225,6 +231,7 @@ services:
       VIRTUAL_PATH: /_samlidp/
       VIRTUAL_PORT: 8080
       VIRTUAL_DEST: /
+      DEV_IDP_ADMIN_PASS: ${DB_PASS}
       DEV_SHARED_IDP_HOST: ${WIKI_HOST}
       DEV_SP_HOSTS: ${WIKI_HOST}###default-sp
     profiles: [sso, samlidp]
@@ -388,7 +395,7 @@ services:
   # Available profiles: certbotcf
   certbot:
     image: certbot/dns-cloudflare
-    container_name: certbot
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-certbot
     secrets:
       - source: cloudflare_ini
         target: /run/secrets/cloudflare.ini
@@ -397,7 +404,7 @@ services:
     command: >
       certonly --dns-cloudflare --agree-tos --no-eff-email
       --dns-cloudflare-credentials /run/secrets/cloudflare.ini
-      --email ${CERTBOT_CF_EMAIL:-} --domains *.${CERTBOT_CF_DOMAIN:-}
+      --email ${CERTBOT_CF_EMAIL:-} --domains ${CERTBOT_CF_DOMAIN:-}
     profiles: [certbotcf]
 
 secrets:
