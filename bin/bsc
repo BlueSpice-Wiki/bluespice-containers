@@ -3,7 +3,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(dirname "$(dirname "$(readlink -f "$0")")")"
-cd "$PROJECT_ROOT/deploy/compose"
+cd "$PROJECT_ROOT/deploy/compose" || exit 1
 
 if [[ ! -f bluespice-deploy ]]; then
 	echo "no bluespice-deploy script found in $PROJECT_ROOT" >&2
