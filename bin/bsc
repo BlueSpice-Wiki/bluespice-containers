@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -euo pipefail
+
+PROJECT_ROOT="$(dirname "$(dirname "$(readlink -f "$0")")")"
+cd "$PROJECT_ROOT/deploy/compose" || exit 1
+
+if [[ ! -f bluespice-deploy ]]; then
+	echo "no bluespice-deploy script found in $PROJECT_ROOT" >&2
+	echo "Please check, whether you've checked out the correcth branch." >&2
+	echo "Exiting." >&2
+	exit 1
+fi
+
+case "${1:-}" in
+	"boot" )
+		shift
+		set -- "up" "-d" "$@"
+		;;
+	"edit-env" )
+		${EDITOR:-nano} .env
+		exit
+		;;
+	"help" | "--help" | "-h" )
+		echo "usage: bsc [PARAMS]" >&2
+		echo "" >&2
+		echo "This is the bsc (= BlueSpiceControl) tool: A thin wrapper around docker-compose to start" >&2
+		echo "and control BlueSpice without need to cd to the deploy directory. Parameters are whatever" >&2
+		echo "docker-compose accepts. Mostly, you might want to use 'boot', 'down', and 'exec <CONTAINER>'." >&2
+		echo "" >&2
+		echo "Special non-Docker commands:" >&2
+		echo "" >&2
+		echo "  boot        start containers in demon mode (alias for 'up -d')" >&2
+		echo "  edit-env    edit the .env file" >&2
+		echo "" >&2
+		echo "---" >&2
+		echo "Original help from docker compose:" >&2
+		echo "" >&2
+		./bluespice-deploy "$@"
+		exit
+		;;
+	"cp" )
+		echo "Reminder: Due to restrictions of this tool you need to add the ABSOLUTE local path, e.g.: \$(pwd)/file"
+		;;
+esac
+
+./bluespice-deploy "$@"
