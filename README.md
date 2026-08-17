@@ -59,4 +59,44 @@ if ( defined( 'MW_PHPUNIT_TEST' ) && MW_PHPUNIT_TEST ) {
 3. Inside a wiki container (e.g `./bluespice-deploy exec -it wiki-web bash`), go to `/app/bluespice/w`
 4. Run your tests, for example `composer phpunit extensions/WikiRAG/tests/phpunit/integration/`
 
+## Controlling the Docker containers with `bsc`
 
+`bsc` is a small helper script to control your running Docker instances. We
+suggest placing it in your `$PATH`, so that it can be called from everywhere,
+e.g., by symlinking it:
+
+```
+cd /usr/local/bin
+ln -s $INSTALL_DIR/bin/bsc
+```
+
+`bsc help` shows the usage instructions.
+
+It is a thin wrapper around `docker compose`. Most commands will be sent
+directly to the latter.
+
+### Start BlueSpice from everywhere
+
+Run `bsc boot`. This command will instantly spawn the Docker containers as
+daemons. It is equivalent to `docker compose up -d`.
+
+Use `bsc down` to stop the services again.
+
+### Execute code
+
+Run `bsc exec wiki-task bash` to enter the task container. Same with all the
+other containers.
+
+### Copy files
+
+Run `bsc cp $(pwd)/file.txt wiki-task:/tmp/` to copy `./file.txt` into the
+`wiki-task` container.
+
+You have to give an absolute local path to the tool, because under the hood it
+needs to `cd` into the folder with the `docker-compose.yml` files, changing the
+current working directory.
+
+### Change the `.env` configuration
+
+Run `bsc edit-env` to quickly change aspects of your setup, e.g., the data
+directory. Run `bsc restart` for the effects to take effect.
