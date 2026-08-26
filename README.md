@@ -21,10 +21,10 @@ Optionally, you might want to clone certain not-yet-published repos under `blues
 cd bluespice-containers
 ./maintenance.sh --build --buildargs EDITION=free
 ```
-Optionally, assume that you prepared access tokens `~/.github-token` and/or `~/.gitlab-token` (needed for `pro`, `farm` editions and certain images):
+Optionally, assume that you prepared access tokens `~/.github-token` and/or `~/.gitlab-token` (needed for `galaxy` editions and certain images):
 ```sh
 GITHUB_TOKEN=$(cat ~/.github-token) GITLAB_HW_TOKEN=$(cat ~/.gitlab-token) \
-./maintenance.sh --build --buildargs EDITION=farm
+./maintenance.sh --build --buildargs EDITION=galaxy
 ```
 ### Step 3: Configure the stack
 ```
