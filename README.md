@@ -21,7 +21,7 @@ Optionally, you might want to clone certain not-yet-published repos under `blues
 cd bluespice-containers
 ./maintenance.sh --build --buildargs EDITION=free
 ```
-Optionally, assume that you prepared access tokens `~/.github-token` and/or `~/.gitlab-token` (needed for `pro`, `farm` editions and certain images):
+Optionally, assume that you prepared access tokens `~/.github-token` and/or `~/.gitlab-token` (needed for `pro`, `farm` or even `galaxy` editions and certain images - modify the EDITION argument in the command according to your specific case):
 ```sh
 GITHUB_TOKEN=$(cat ~/.github-token) GITLAB_HW_TOKEN=$(cat ~/.gitlab-token) \
 ./maintenance.sh --build --buildargs EDITION=farm
