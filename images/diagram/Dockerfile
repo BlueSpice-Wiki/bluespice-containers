@@ -1,16 +1,13 @@
-ARG BASE_IMAGE=alpine:3
+FROM alpine:3 AS builder
 
-FROM $BASE_IMAGE AS builder
-
-
-ARG TOMCAT_VERSION=10.1.55
-ARG TOMCAT_SHA512SUM=f36af12391a277e5c3a802a8e1a2a1e4354cd461b547d2e1a33ac0ab88d707d3fb2591e034a17b7d3a6b965a4c977a97dbf29bb81a3867e85aeec3d8d189e22e
-ARG DRAWIO_VERSION=29.2.9
-ARG DRAWIO_SHA256SUM=2b2583f359171652aa157450e191c9cd2eae86f17960829cfe517b6d833df645
+ARG TOMCAT_VERSION=11.0.24
+ARG TOMCAT_SHA512SUM=a2fb1bd511735bd3d135b87f628d2b1f71a43aed7c4d7511e770092e571bad6d5ad9e97a580852119770477fd86d7ed156d83d3cee2854bce260725ce48934d0
+ARG DRAWIO_VERSION=31.1.2
+ARG DRAWIO_SHA256SUM=05907c7d4f987673de5222350d32e64bf1a16defbf5259be3a28d156466f85c3
 
 RUN apk add --no-cache wget tar \
-    && (wget https://downloads.apache.org/tomcat/tomcat-10/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
-        || wget https://archive.apache.org/dist/tomcat/tomcat-10/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz) \
+    && (wget https://downloads.apache.org/tomcat/tomcat-11/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+        || wget https://archive.apache.org/dist/tomcat/tomcat-11/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz) \
     && echo "$TOMCAT_SHA512SUM  apache-tomcat-$TOMCAT_VERSION.tar.gz" | sha512sum -c - \
     && mkdir -p /opt/tomcat \
     && tar xzf apache-tomcat-$TOMCAT_VERSION.tar.gz -C /opt/tomcat --strip-components 1 \
@@ -23,7 +20,7 @@ RUN wget https://github.com/jgraph/drawio/releases/download/v$DRAWIO_VERSION/dra
     && ln -sf /opt/tomcat/webapps/_diagram /opt/tomcat/webapps/ROOT \
     && rm -rf draw.war
 
-FROM $BASE_IMAGE AS main
+FROM alpine:3 AS main
 
 ARG JAVA_OPTS="-Xverify:none"
 ENV JAVA_OPTS=$JAVA_OPTS
@@ -32,10 +29,11 @@ ARG UID=1000
 ENV UID=$UID
 
 RUN apk add --no-cache openjdk21 \
-    && addgroup -g $UID $USER \
-    && adduser -G $USER -u $UID --disabled-password --gecos "" $USER
+    && adduser -G root -u $UID -D -g "" $USER
 
-COPY --from=builder --chown=tomcat:tomcat /opt/tomcat /opt/tomcat
+COPY --from=builder --chown=$UID:0 /opt/tomcat /opt/tomcat
+RUN chmod -R g=u /opt/tomcat
 EXPOSE 8080
-USER $USER
+USER $UID
 ENTRYPOINT ["/opt/tomcat/bin/catalina.sh","run" ]
+
