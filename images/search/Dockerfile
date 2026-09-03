@@ -5,13 +5,22 @@ ENV DISABLE_INSTALL_DEMO_CONFIG=true
 ENV DISABLE_SECURITY_PLUGIN=true
 USER root
 COPY --chown=opensearch:opensearch --chmod=755 ./root-fs/app/bin /app/bin
-RUN ln -sf /app/bin/removeROtag /usr/local/bin
-USER opensearch
+RUN ln -sf /app/bin/removeROtag /usr/local/bin \
+ && /usr/share/opensearch/bin/opensearch-plugin install \
+      --batch ingest-attachment \
+ && /usr/share/opensearch/bin/opensearch-plugin remove \
+      opensearch-security \
+ && mkdir -p \
+      /usr/share/opensearch/data \
+      /usr/share/opensearch/logs \
+      /usr/share/opensearch/tmp \
+ && chgrp -R 0 \
+      /usr/share/opensearch/data \
+      /usr/share/opensearch/logs \
+      /usr/share/opensearch/tmp \
+ && chmod -R g=u \
+      /usr/share/opensearch/data \
+      /usr/share/opensearch/logs \
+      /usr/share/opensearch/tmp
 
-FROM base AS branch-amd64
-FROM base AS branch-arm64
-ENV _JAVA_OPTIONS=-XX:UseSVE=0
-ARG TARGETARCH
-FROM branch-${TARGETARCH} AS final
-
-RUN /usr/share/opensearch/bin/opensearch-plugin install --batch ingest-attachment
+USER 1000
