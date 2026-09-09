@@ -171,8 +171,14 @@ $GLOBALS['wgNeoWikiNeo4jInternalWriteUrl'] = $GLOBALS['wgNeoWikiNeo4jInternalRea
 
 $GLOBALS['bsgInstanceStatusCheckAllowedIP'] = trim( getenv( 'WIKI_STATUSCHECK_ALLOWED' ) );
 
-
-$GLOBALS['wgSimpleSAMLphp_InstallDir'] = '/app/simplesamlphp';
+$GLOBALS['wgSimpleSAMLphp_SAMLClient'] = 'http-client';
+$GLOBALS['wgSimpleSAMLphp_HTTPClientConfig'] = [
+	'baseUrl' => 'http://localhost:9090/_sp/',
+	// Keep aligned with `root-fs/app/simplesamlphp/config/config.php`
+	'sessionIdCookieName' => getenv('DB_NAME') . ( getenv('DB_PREFIX') ) . 'SAMLSessionID',
+	'authTokenCookieName' => getenv('DB_NAME') . ( getenv('DB_PREFIX') ) . 'SAMLAuthToken',
+	'sessionAPItoken' => getenv( 'INTERNAL_SIMPLESAMLPHP_SESSION_API_TOKEN' ) ?: ''
+];
 
 if ( getenv( 'DEV_WIKI_DEBUG' ) ) {
 	$GLOBALS['wgShowExceptionDetails'] = true;
@@ -277,6 +283,14 @@ if ( getenv( 'EDITION' ) === 'galaxy' ) {
 	$GLOBALS['wgSharedTables'][] = 'mws_data_stash';
 	$GLOBALS['wgSharedTables'][] = 'mws_title_index';
 	$GLOBALS['wgSharedTables'][] = 'page_excerpts';
+
+	$GLOBALS['wgSharedTables'][] = 'oauth2_access_tokens';
+	$GLOBALS['wgSharedTables'][] = 'oauth2_accepted_consumer';
+	$GLOBALS['wgSharedTables'][] = 'oauth2_registered_consumer';
+
+	$GLOBALS['wgSharedTables'][] = 'uto_tasks';
+	// Galaxy has uses only groups from this table, which are shared
+	$GLOBALS['wgSharedTables'][] = 'mwstake_dynamic_config';
 }
 
 $GLOBALS['mwsgTokenAuthenticatorSalt'] = getenv( 'INTERNAL_WIKI_TOKEN_AUTH_SALT' );
@@ -341,7 +355,7 @@ else {
 	require_once "$IP/LocalSettings.BlueSpice.php";
 }
 
-$GLOBALS['wgArticlePath'] = ( trim(  getenv( 'WIKI_BASE_PATH' ) ) ) . 'wiki/$1';
+$GLOBALS['wgArticlePath'] = ( trim(  getenv( 'WIKI_BASE_PATH' ) ) ) . trim( getenv( 'WIKI_ARTICLE_PATH' ) ?: 'wiki' ) . '/$1';
 
 if ( $s3Used ) {
 	$GLOBALS['wgAWSBucketDomain'] = $GLOBALS['wgServer'] . $GLOBALS['wgUploadPath'];
@@ -373,9 +387,12 @@ if ( $s3Used ) {
 }
 
 if ( getenv( 'EDITION' ) === 'farm' || getenv( 'EDITION' ) === 'galaxy' ) {
+	// Re-set this value for farm, as Dispatcher changed values
+	$GLOBALS['wgThumbnailScriptPath'] = $GLOBALS['wgScriptPath'] . '/thumb.php';
+	
 	if( FARMER_IS_ROOT_WIKI_CALL === false ) {
 		$GLOBALS['wgScriptPath'] =  trim( getenv( 'WIKI_BASE_PATH' ) ) . FARMER_CALLED_INSTANCE;
-		$GLOBALS['wgArticlePath'] = trim( getenv( 'WIKI_BASE_PATH' ) ) . FARMER_CALLED_INSTANCE . '/wiki/$1';
+		$GLOBALS['wgArticlePath'] = trim( getenv( 'WIKI_BASE_PATH' ) ) . FARMER_CALLED_INSTANCE . '/' . trim( getenv( 'WIKI_ARTICLE_PATH' ) ?: 'wiki' ) . '/$1';
 		$GLOBALS['wgWebDAVBaseUri'] = trim( getenv( 'WIKI_BASE_PATH' ) ) . FARMER_CALLED_INSTANCE . '/webdav/';
 		// We must store L10N cache file of ROOT_WIKI and INSTANCEs independently, as they have different extensions enabled,
 		// which otherwise causes the cache to be invalidated all the time.

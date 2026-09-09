@@ -5,8 +5,25 @@ include (__DIR__ . '/config.php.dist');
 $serverUrl = bsAssembleURL( 'WIKI_PROTOCOL', 'WIKI_HOST', 'WIKI_PORT' );
 $baseUrl = $GLOBALS['wgServer'] = $serverUrl . rtrim(getenv('WIKI_BASE_PATH') ?: '', '/');
 
-// TODO calculate from environment variable
-$loglevel = SimpleSAML\Logger::WARNING;
+$loglevel = strtolower( trim( getenv( 'SAML_LOG_LEVEL' ) ?? 'error' ) );
+switch ( $loglevel ) {
+	case 'debug':
+		$loglevel = SimpleSAML\Logger::DEBUG;
+		break;
+	case 'info':
+		$loglevel = SimpleSAML\Logger::INFO;
+		break;
+	case 'notice':
+		$loglevel = SimpleSAML\Logger::NOTICE;
+		break;
+	case 'warning':
+		$loglevel = SimpleSAML\Logger::WARNING;
+		break;
+	case 'error':
+	default:
+		// Yes, it's `ERR`, not `ERROR`
+		$loglevel = SimpleSAML\Logger::ERR;
+}
 
 $customConfig = [
     'baseurlpath' => $baseUrl . '/_sp/',
@@ -73,6 +90,9 @@ $customConfig = [
 	'store.sql.username' => getenv('DB_USER'),
 	'store.sql.password' => getenv('DB_PASS'),
 	'store.sql.prefix' => ( getenv('DB_PREFIX') ) . 'SimpleSAMLphp_',
+
+	'mediawiki.sessionapi.token' => getenv( 'INTERNAL_SIMPLESAMLPHP_SESSION_API_TOKEN' ) ?: '',
+	'mediawiki.sessionapi.allowedcallers' => getenv( 'SAML_SESSION_API_ALLOWED' ) ?: '',
 ];
 
 $config = $customConfig + $config;
