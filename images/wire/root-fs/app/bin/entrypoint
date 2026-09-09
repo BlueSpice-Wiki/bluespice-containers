@@ -1,12 +1,14 @@
 #!/bin/sh
 
 # Load secrets; Omit subdirectories and non-uppercase filenames
-for secret in $(find /run/secrets/ -maxdepth 1 -type f | grep -E '/[A-Z_]+$' | xargs -n1 basename); do
-  # For grep:
-  # - WIRE_API_KEY
-  # - WIRE_TOKEN_SALT
-  export "$secret"="$(cat /run/secrets/$secret)"
-done
+if [ -d /run/secrets/ ]; then
+  for secret in $(find /run/secrets/ -maxdepth 1 -type f | grep -E '/[A-Z_]+$' | xargs -n1 basename); do
+    # For grep:
+    # - WIRE_API_KEY
+    # - WIRE_TOKEN_SALT
+    export "$secret"="$(cat /run/secrets/$secret)"
+  done
+fi
 
 echo "Starting Wire server..."
 node /app/wire/src/wire.mjs

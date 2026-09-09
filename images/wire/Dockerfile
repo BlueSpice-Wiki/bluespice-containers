@@ -15,5 +15,6 @@ WORKDIR /app
 
 COPY root-fs/* ./
 COPY --from=builder /tmp/wire ./wire
+USER 1003
 
 CMD ["/app/bin/entrypoint"]
