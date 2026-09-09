@@ -1,22 +1,9 @@
-FROM composer:2 AS workaround-erm-45965
-# Build SimpleSAMLphp from source, bypassing the original way of loading
-ENV SIMPLESAMLPHP_VERSION=2.3.11
-WORKDIR /build
-RUN git clone --depth 1 https://github.com/simplesamlphp/simplesamlphp.git -b v${SIMPLESAMLPHP_VERSION} /build/simplesamlphp && \
-	cd /build/simplesamlphp && \
-	composer require psr/http-message:^1.1 psr/container:^1.1 symfony/expression-language:^6.0 \
-		twig/twig:^3.26 twig/intl-extra:^3.26 symfony/twig-bridge:^6.4 \
-		symfony/cache:^6.4.40 symfony/routing:^6.4.40 symfony/yaml:^6.4.40 \
-		--no-cache --update-no-dev --prefer-dist --optimize-autoloader
-# The specific versions are taken from composer.json of MediaWiki REL1_43
-# To force psr/log:1.1.4, we remove simplesamlphp-test-framework (require-dev only)
-
 FROM alpine:3 AS builder
 
 # We use SimpleSAMLphp SLIM version to reduce the image size
-ENV SIMPLESAMLPHP_VERSION=2.4.4
+ENV SIMPLESAMLPHP_VERSION=2.5.2
 ENV SIMPLESAMLPHP_URL=https://github.com/simplesamlphp/simplesamlphp/releases/download/v${SIMPLESAMLPHP_VERSION}/simplesamlphp-${SIMPLESAMLPHP_VERSION}-slim.tar.gz
-ENV SIMPLESAMLPHP_SHA256=1c351342293d218447b27df9a03d2da7561d3831303524c173e8974b3168a57e
+ENV SIMPLESAMLPHP_SHA256=6bf7945e8981db9815e20af2bb17db8e44d265f0b1646bfa51e6dd755fef1ea6
 
 # HINT: This version is valid for 5.1 and 5.2; Later versions don't use this tool anymore. For the sake of reproducable builds, we hardcode the version here and adapt manually on demand
 ENV MATHOIDREMOTE_URL=https://raw.githubusercontent.com/hallowelt/docker-bluespice-formula/80786798646fe1bb105db2228a07c86f546d9f56/_client/mathoid-remote
@@ -40,7 +27,7 @@ ADD ${BLUESPICE_URL}#${BLUESPICE_VERSION} /build/bluespice
 
 RUN mkdir -p /build/simplesamlphp && \
 	tar -xzf /build/simplesamlphp.tar.gz -C /build/simplesamlphp --strip-components=1
-RUN rm -rf /build/.git
+RUN chmod -R g=u /build
 
 FROM alpine:3 AS base
 ENV LANG=C.UTF-8
@@ -96,7 +83,6 @@ RUN apk add \
 	tzdata \
 	vim \
 	vips-tools \
-	xpdf \
 	&& echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
 	&& apk add php$VERSION-pecl-excimer@testing
 RUN echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
@@ -108,27 +94,33 @@ ENV UID=1002
 ARG USER
 ENV USER=bluespice
 ENV PATH="/app/bin:${PATH}"
-ARG GID
-ENV GID=$UID
-ARG GROUPNAME
-ENV GROUPNAME=$USER
+ARG GID=0
+ENV GID=$GID
+ARG GROUPNAME=root
+ENV GROUPNAME=$GROUPNAME
 
-RUN addgroup -g $GID $GROUPNAME \
+RUN grep -q "^${GROUPNAME}:" /etc/group || addgroup -g ${GID} ${GROUPNAME} \
 	&& adduser -u $UID -G $GROUPNAME --shell /bin/bash --disabled-password --gecos "" $USER \
 	&& addgroup $USER nginx \
-	&& mkdir -p /app/bluespice \
-	&& chown $USER:$GROUPNAME /app/bluespice/ \
+	&& mkdir -p /app/bin /app/bluespice/w /app/conf /app/simplesamlphp \
+	&& chown -R $USER:$GROUPNAME /app \
+	&& chmod -R g=u /app \
 	&& chmod -R 777 /var/log
 COPY --chown=$USER:$GROUPNAME --from=builder /build/bluespice /app/bluespice/w
-#COPY --chown=$USER:$GROUPNAME --from=builder /build/simplesamlphp /app/simplesamlphp
-# original load mechanism replaced by the following workaround:
-COPY --chown=$USER:$GROUPNAME --from=workaround-erm-45965 /build/simplesamlphp /app/simplesamlphp
-COPY --chown=$USER:$GROUPNAME --chmod=755 ./root-fs/app/bin /app/bin
+COPY --chown=$USER:$GROUPNAME --from=builder /build/simplesamlphp /app/simplesamlphp
+RUN if [ -f /app/bluespice/w/extensions/SimpleSAMLphp/_simplesamlphp/public/api/session.php ]; then \
+		mkdir -p /app/simplesamlphp/public/api && \
+		cp /app/bluespice/w/extensions/SimpleSAMLphp/_simplesamlphp/public/api/session.php \
+			/app/simplesamlphp/public/api/session.php && \
+		chown -R $USER:$GROUPNAME /app/simplesamlphp/public && \
+		chmod -R g=u /app/simplesamlphp/public; \
+	fi
+COPY --chown=$USER:$GROUPNAME --chmod=775 ./root-fs/app/bin /app/bin
 COPY --chown=$USER:$GROUPNAME --chmod=666 ./root-fs/app/bin/config /app/bin/config
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/conf /app/conf
 COPY --chown=$USER:$GROUPNAME ./root-fs/app/simplesamlphp/ /app/simplesamlphp
-COPY --chown=$USER:$GROUPNAME --from=builder --chmod=755 /build/mathoid-remote /app/bin
-COPY --chown=$USER:$GROUPNAME --from=builder --chmod=755 /build/parallel-runjobs-service /app/bin
+COPY --chown=$USER:$GROUPNAME --from=builder --chmod=775 /build/mathoid-remote /app/bin
+COPY --chown=$USER:$GROUPNAME --from=builder --chmod=775 /build/parallel-runjobs-service /app/bin
 COPY ./root-fs/etc/php/8.x/fpm/php-fpm.conf /etc/php$VERSION
 COPY ./root-fs/etc/php/8.x/fpm/pool.d/www.conf /etc/php$VERSION/php-fpm.d/
 COPY ./root-fs/etc/nginx/nginx.conf /etc/nginx/nginx.conf
@@ -143,11 +135,13 @@ RUN ln -sf /usr/sbin/php-fpm$VERSION /usr/bin/php-fpm \
 	&& ln -s /app/conf/90-bluespice-overrides.ini /etc/php$VERSION/conf.d/90-bluespice-overrides.ini \
 	&& ln -s /app/conf/nginx_bluespice /etc/nginx/sites-enabled/default \
 	&& chown -R $USER:$GROUPNAME /var/run/php \
+	&& chmod -R g=u /var/run/php /app/conf /app/simplesamlphp/config /app/simplesamlphp/metadata \
 	&& mkdir -p /etc/clamav/ \
 	&& ln -s /app/bin/config/clamd.conf /etc/clamav/clamd.conf \
 	&& touch /app/.env \
 	&& chown $USER:$GROUPNAME /app/.env \
 	&& chmod 660 /app/.env \
+	&& echo "umask 0002" >> /etc/bash/bashrc \
 	&& sed -i '1isource /app/.env' /etc/bash/bashrc
 
 ARG EDITION # Intentionally left uninitialized

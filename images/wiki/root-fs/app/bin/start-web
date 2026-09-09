@@ -1,7 +1,4 @@
 #!/bin/bash
-set -o errexit
-set -o nounset
-set -o pipefail
 
 WIKI_LOG_LEVEL="${WIKI_LOG_LEVEL:-error}"
 export WIKI_LOG_LEVEL
@@ -23,6 +20,11 @@ case "${WIKI_LOG_LEVEL}" in
 esac
 
 substitutePlaceholders /app/conf/90-bluespice-overrides.ini
+if [[ -n "${FARM_DEFAULT_INSTANCE}" ]]; then
+  export WIKI_RETURN_PATH="${FARM_DEFAULT_INSTANCE}"
+else
+  export WIKI_RETURN_PATH="${WIKI_ARTICLE_PATH}"
+fi
 substitutePlaceholders /app/conf/nginx_bluespice
 
 if [[ "${WIKI_BASE_PATH:-/}" != "/" ]]; then
