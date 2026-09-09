@@ -19,7 +19,7 @@ The **BlueSpice Containers** project is a unified development setup for BlueSpic
 └── data                  (`mkdir data`)
 ```
 
-For example, `bluespice-containers` at branch `dev-5.2.x` matches BlueSpice wiki codebase built from branch `5.2.x` or dev branch `REL1_43-5.2.x`. For more on such conventions, see section [Compatibility](#compatibiliy) below.
+For example, to develop BlueSpice 5.2, one can use `bluespice-containers` at its default branch `dev-5.2.x`, then clone and build wiki codebase at dev branch `REL1_43-5.2.x`. Section [Compatibility](#compatibiliy) mentions more supported combinations.
 
 Optionally, you might want to clone certain not-yet-published repos under `bluespice-containers/images` or `bluespice-containers/webservices`. Target subdirectories should be in `bluespice-containers/.gitignore`.
 
@@ -66,11 +66,16 @@ Optionally:
 
 ## Compatibiliy
 
-Every `dev-*` branch or tag of this project works _only_ with compatible branches or tags of wiki codebase of BlueSpice.
+Each `dev-*` branch/tag of this project corresponds to a planned/released version of Bluespice, and is only compatible with corresponding branches or tags of wiki codebase of BlueSpice.
 
-|a|b|c|
-|-|-|-|
-|b|c|d|
+|`dev-*`|_raw_ wiki codebase|_built_ wiki codebase|BlueSpice versions, planned or released|
+|-|-|-|-|
+|[`dev-5.1.x`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.1.x)|`REL1_43-5.1.x`|`5.1.x`|planned patch version for BlueSpice 5.1 LTS|
+|[**`dev-5.2.x`**](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.2.x)|`REL1_43-5.2.x`|`5.2.x`|planned patch version for BlueSpice 5.2 (current minor)|
+|[`dev-5.3.x`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.3.x)|`REL1_43`|`5.3.x`|planned minor version of BlueSpice|
+|[`dev-galaxy`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-galaxy)|`main`|N/A|planned version BlueSpice Galaxy|
+|[`dev-5.1.10`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.1.10)|`5.1.x`|`5.1.10`|5.1.10 (latest released 5.1 LTS version)|
+|[`dev-5.2.6`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.2.6)|`5.2.x`|`5.2.6`|5.2.6 (latest released 5.2 verion)|
 
 ## Advanced usages
 
