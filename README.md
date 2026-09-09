@@ -21,6 +21,8 @@ The **BlueSpice Containers** project is a unified development setup for BlueSpic
 
 For example, to develop BlueSpice 5.2, one can use `bluespice-containers` at its default branch `dev-5.2.x`, then clone and build wiki codebase at dev branch `REL1_43-5.2.x`. Section [Compatibility](#compatibiliy) mentions more supported combinations.
 
+(If this is not the first `bluespice-container` stack existing on the computer, please use a _different_ workspaces other than your originally installation to avoid unwanted problems.)
+
 Optionally, you might want to clone certain not-yet-published repos under `bluespice-containers/images` or `bluespice-containers/webservices`. Target subdirectories should be in `bluespice-containers/.gitignore`.
 
 ### Step 2: Build the images
@@ -70,12 +72,12 @@ Each `dev-*` branch/tag of this project corresponds to a planned/released versio
 
 |`dev-*`|_raw_ wiki codebase|_built_ wiki codebase|BlueSpice versions, planned or released|
 |-|-|-|-|
-|[`dev-5.1.x`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.1.x)|`REL1_43-5.1.x`|`5.1.x`|planned patch version for BlueSpice 5.1 LTS|
-|[**`dev-5.2.x`**](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.2.x)|`REL1_43-5.2.x`|`5.2.x`|planned patch version for BlueSpice 5.2 (current minor)|
-|[`dev-5.3.x`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.3.x)|`REL1_43`|`5.3.x`|planned minor version of BlueSpice|
-|[`dev-galaxy`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-galaxy)|`main`|N/A|planned version BlueSpice Galaxy|
-|[`dev-5.1.10`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.1.10)|`5.1.x`|`5.1.10`|5.1.10 (latest released 5.1 LTS version)|
-|[`dev-5.2.6`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.2.6)|`5.2.x`|`5.2.6`|5.2.6 (latest released 5.2 verion)|
+|[`dev-5.1.x`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.1.x)|`REL1_43-5.1.x` [free](https://github.com/hallowelt/mediawiki/tree/REL1_43-5.1.x)/[pro](https://gitlab.hallowelt.com/BlueSpice/mediawiki/-/tree/REL1_43-5.1.x)|`5.1.x` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.1.x)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.1.x)|planned patch version for BlueSpice 5.1 LTS|
+|[**`dev-5.2.x`**](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.2.x)|`REL1_43-5.2.x` [free](https://github.com/hallowelt/mediawiki/tree/REL1_43-5.2.x)/[pro](https://gitlab.hallowelt.com/BlueSpice/mediawiki/-/tree/REL1_43-5.2.x)|`5.2.x` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.2.x)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.2.x)|planned patch version for BlueSpice 5.2 (current minor)|
+|[`dev-5.3.x`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.3.x)|`REL1_43` [free](https://github.com/hallowelt/mediawiki/tree/REL1_43)/[pro](https://gitlab.hallowelt.com/BlueSpice/mediawiki/-/tree/REL1_43)|`5.3.x` [pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.3.x)|planned minor version of BlueSpice|
+|[`dev-galaxy`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-galaxy)|`main` [galaxy](https://github.com/BlueSpice-Wiki/bluespice-galaxy/tree/main)|N/A|planned version BlueSpice Galaxy|
+|[`dev-5.1.10`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.1.10)|`5.1.x` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.1.x)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.1.x)|`5.1.10` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.1.10)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.1.10)|5.1.10 (latest released 5.1 LTS version)|
+|[`dev-5.2.6`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.2.6)|`5.2.x` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.2.x)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.2.x)|`5.2.6` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.2.6)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.2.6)|5.2.6 (latest released 5.2 verion)|
 
 ## Advanced usages
 
