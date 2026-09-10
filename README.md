@@ -10,7 +10,7 @@ The **BlueSpice Containers** project is a unified development setup for BlueSpic
 
 ## Quick start
 
-### Step 1: Create directories in your workspace
+### Step 1: Create workspace and subdirectories
 
 ```text
 .
@@ -19,11 +19,13 @@ The **BlueSpice Containers** project is a unified development setup for BlueSpic
 └── data                  (`mkdir data`)
 ```
 
-For example, to develop BlueSpice 5.2, one can use `bluespice-containers` at its default branch `dev-5.2.x`, then clone and build wiki codebase at dev branch `REL1_43-5.2.x`. Section [Compatibility](#compatibiliy) mentions more supported combinations.
-
-(If this is not the first `bluespice-container` stack existing on the computer, please use a _different_ workspaces other than your originally installation to avoid unwanted problems.)
-
-Optionally, you might want to clone certain not-yet-published repos under `bluespice-containers/images` or `bluespice-containers/webservices`. Target subdirectories should be in `bluespice-containers/.gitignore`.
+- Choice of the workspace directory:
+  - If more than one installations of BlueSpice is planned on your computer, please read [this guide](#having-multiple-installations-on-one-computer).
+- Choice of target branches:
+  - E.g. to develop BlueSpice 5.2: use default branch `dev-5.2.x`, then clone and build wiki codebase at its dev branch `REL1_43-5.2.x`.
+  - Section [Compatibility](#compatibiliy) mentions more supported combinations.
+- Add not-yet-published components
+  - Optionally, clone certain not-yet-published repos under `bluespice-containers/images` or `bluespice-containers/webservices`. Target subdirectories should be in `bluespice-containers/.gitignore`.
 
 ### Step 2: Build the images
 
@@ -97,6 +99,22 @@ if ( defined( 'MW_PHPUNIT_TEST' ) && MW_PHPUNIT_TEST ) {
 2. Inside a wiki container (e.g `./bluespice-deploy exec -it wiki-web bash`), go to `/app/bluespice/w`
 3. One can then run specific PHPUnit tests like `composer phpunit extensions/WikiRAG/tests/phpunit/integration/`
 4. To run full `composer test` for a specific extension or skin, symlink the mediawiki vendor with `ln -s ../../vendor vendor` first (operate on the host machine if needed). Then go to target extensions or skin inside a wiki container and run `composer test`.
+
+### Having multiple installations on one computer
+
+#### Best practice: One Workspace per Branch
+
+- At each branch of this project, branch-specific ignored files are generated
+  - If one simply switchs to another branch of this project in an already-setup installation, incompatibilities would arise annoyingly.
+  - It is most intuitive to organize a set of compatible `code`, `data` and `bluespice-containers` in [hierarchy of subdirectories](#step-1-create-workspace-and-subdirectories).
+- Containers from this project have names with branch-specific prefix, e.g `dev-52x-wiki-web` from branch `dev-5.2.x`.
+  - Therefore, two containers of the same type but from different branches won't collide.
+  - The containers have different native names other than [the `bluespice-deploy` stack](https://github.com/hallowelt/bluespice-deploy), so it can also co-exist well with a running `bluespice-deploy` installation.
+- A known limitation is, multiple stacks compete for the 80 and 443 ports of the host machine.
+  - Workaround A: use `./bluespice-deploy down proxy` to shutdown the proxy container of one stack occupying the ports, then the `proxy` container of another stack can start normally.
+  - Workaround B: use `docker-compose.override.yml` to bind `proxy` ports with different host ports, and use `WIKI_PORT` or even an additional layer of host proxy to serve the wikis.
+- To switch between different compatible code bases or data storages:
+  - Put down the stack then edit `deploy/compose/.env`, comment out original `CODEDIR`, `DATADIR` etc. and replace with your new target. The stack would be ready to go up then.
 
 ### Controlling the Docker containers with `bsc`
 
