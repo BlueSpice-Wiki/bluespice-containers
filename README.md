@@ -4,11 +4,11 @@ $$\text{BlueSpice} = \Big((\text{wiki codebase} + \text{runtime}) + \text{servic
 
 The **BlueSpice Containers** project is a unified development setup for BlueSpice. It features:
 
-- **Full picture of BlueSpice**: All components _outside_ the wiki codebase are collected into one single repo, making browse/grep easy
-- **Source to containers, no blackboxes**: Build all images with one command, then run containers reflecting current source in your workspace
-- **Dev setup, mostly automated**: A script wires up dev-ready configs onto the deployment stack, a few tweaks and you're ready to go.
+- **Full picture of BlueSpice**: All components _outside_ the wiki codebase are [collected](#components-of-the-project) into this single project, making browse/grep easy
+- **Source to containers, no blackboxes**: [One-command-build](#step-2-build-the-images) of all images, then run containers reflecting your current workspace
+- **Dev setup, mostly automated**: [Wire dev-ready configs](#step-3-configure-the-stack) to the stack, a few tweaks then it's ready to launch
 
-## Quick start
+## Quick Start
 
 ### Step 1: Create workspace and subdirectories
 
@@ -23,7 +23,7 @@ The **BlueSpice Containers** project is a unified development setup for BlueSpic
   - If more than one installations of BlueSpice is planned on your computer, please read [this guide](#having-multiple-installations-on-one-computer).
 - Choice of target branches:
   - E.g. to develop BlueSpice 5.2: use default branch `dev-5.2.x`, then clone and build wiki codebase at its dev branch `REL1_43-5.2.x`.
-  - Section [Compatibility](#compatibiliy) mentions more supported combinations.
+  - Find more supported combinations in the [Compatibility Policy](#branches-tags-and-compatibility-policy) section.
 - Add not-yet-published components
   - Optionally, clone certain not-yet-published repos under `bluespice-containers/images` or `bluespice-containers/webservices`. Target subdirectories should be in `bluespice-containers/.gitignore`.
 
@@ -50,7 +50,7 @@ GITHUB_TOKEN=$(cat ~/.github-token) GITLAB_HW_TOKEN=$(cat ~/.gitlab-token) \
 This script creates two files:
 
 - `deploy/compose/.env`: you need to tweak it further:
-  - `CODEDIR` and `DATADIR` should match absolute addresses of `code` and `data` in [Step 1](#step-1-create-directories-in-your-workspace)
+  - `CODEDIR` and `DATADIR` should match absolute addresses of `code` and `data` in [Step 1](#step-1-create-workspace-and-subdirectories)
   - `EDITION`, `DB_USER` and `DB_PASS` should be configured - read [official tutorial](https://en.wiki.bluespice.com/wiki/Setup:Installation_Guide/Docker) for richer details
 - `deploy/compose/docker-compose.override.yml` works out of the box
   - Optionally you can enable advanced configs here, e.g use [xdebug](https://xdebug.org/), add packages to containers and so on.
@@ -68,7 +68,9 @@ Optionally:
 - to run wiki in `https` protocol, add the `.key` and `.crt` certificate files of your domain name to `${DATADIR}/proxy/certs`, then run `./bluespice-deploy restart proxy` to load the certificate
 - use `--build` tag for the first run to utilize inline Dockerfile in the override yml
 
-## Compatibiliy
+## Branches and Components
+
+### Branches, tags and compatibility policy
 
 Each `dev-*` branch/tag of this project corresponds to a planned/released version of Bluespice, and is only compatible with corresponding branches or tags of wiki codebase of BlueSpice.
 
@@ -81,7 +83,24 @@ Each `dev-*` branch/tag of this project corresponds to a planned/released versio
 |[`dev-5.1.10`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.1.10)|`5.1.x` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.1.x)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.1.x)|`5.1.10` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.1.10)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.1.10)|5.1.10 (latest released 5.1 LTS version)|
 |[`dev-5.2.6`](https://github.com/BlueSpice-Wiki/bluespice-containers/tree/dev-5.2.6)|`5.2.x` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.2.x)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.2.x)|`5.2.6` [free](https://github.com/BlueSpice-Wiki/bluespice-free-release/tree/5.2.6)/[pro](https://gitlab.hallowelt.com/bluespicebuilds/build-pro/-/tree/5.2.6)|5.2.6 (latest released 5.2 verion)|
 
-## Advanced usages
+The `main` branch of this project serves as the source of truth of common files shared across different branches - it should always be able to merge into any `dev-*` branch cleanly. The `main` branch is itself not directly usable.
+
+### Components of the project
+
+This project is meant to collect all components outside the wiki codebase, including:
+
+- `deploy`: the script orchestrating containers, currently yaml files for docker compose, but will include helm charts for kubernetes soon.
+- `images/*`: source code of container images, target to run for the stack
+- `misc/*`: source code of compiled services, only as debugging context.
+- `webservices/*`: source code of web services, not launched by the stack by default. Serves mainly as debugging context.
+
+Here, to _collect_ means to faithfully mirror each remote source repo at target branch to subdirectories, merging also the full commit history.
+This is technically based on [`git-subtree`](https://www.geeksforgeeks.org/git/git-subtree/), "a strategy for including one Git repository as a subdirectory within another repository".
+The usages of `git-subtree` are wrapped by `maintenance.sh` respecting maps in `.env` of the project root.
+
+tba: unpublished images, component matrix
+
+## Advanced Usages
 
 ### Running tests in a wiki container
 
