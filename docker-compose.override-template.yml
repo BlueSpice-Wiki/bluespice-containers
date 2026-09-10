@@ -7,7 +7,7 @@ configs:
       ;xdebug.mode=debug,coverage,develop
       ;;; Be careful when using profile mode, as it generates
       ;;; many /tmp/cachegrind.out.xxx files endlessly
-      xdebug.start_with_request=1
+      xdebug.start_with_request=yes
       xdebug.log=/data/bluespice/logs/xdebug.log
       xdebug.log_level=0
       xdebug.output_dir=/data/bluespice/cache
@@ -34,6 +34,10 @@ configs:
       s3_region = "eu-north-1"
       [admin]
       api_bind_addr = "0.0.0.0:3903"
+
+volumes:
+  collabpads-db:
+    name: ${COMPOSE_PROJECT_NAME:-bluespice}-collabpads-database
 
 x-common-dev: &common-dev
   # optionally use certain already-built images from private registry
@@ -91,6 +95,10 @@ services:
   #       FROM ${BLUESPICE_SERVICE_REPOSITORY}/search:${VERSION}
   #       ENV _JAVA_OPTIONS=-XX:UseSVE=0
   #     no_cache: true
+  # Needed for MacOS, as dirty fs mount causes failure after restart
+  # collabpads-database:
+  #   volumes:
+  #     - collabpads-db:/data/db
 
   # optionally expose database ports for external DB apps:
   # database:
