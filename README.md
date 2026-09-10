@@ -24,8 +24,7 @@ The **BlueSpice Containers** project is a unified development setup for BlueSpic
 - Choice of target branches:
   - E.g. to develop BlueSpice 5.2: use default branch `dev-5.2.x`, then clone and build wiki codebase at its dev branch `REL1_43-5.2.x`.
   - Find more supported combinations in the [Compatibility Policy](#branches-tags-and-compatibility-policy) section.
-- Add not-yet-published components
-  - Optionally, clone certain not-yet-published repos under `bluespice-containers/images` or `bluespice-containers/webservices`. Target subdirectories should be in `bluespice-containers/.gitignore`.
+- Optionally, clone [not-yet-published components](#additional-repos-to-clone).
 
 ### Step 2: Build the images
 
@@ -95,10 +94,26 @@ This project is meant to collect all components outside the wiki codebase, inclu
 - `webservices/*`: source code of web services, not launched by the stack by default. Serves mainly as debugging context.
 
 Here, to _collect_ means to faithfully mirror each remote source repo at target branch to subdirectories, merging also the full commit history.
-This is technically based on [`git-subtree`](https://www.geeksforgeeks.org/git/git-subtree/), "a strategy for including one Git repository as a subdirectory within another repository".
-The usages of `git-subtree` are wrapped by `maintenance.sh` respecting maps in `.env` of the project root.
 
-tba: unpublished images, component matrix
+- For components already managed by this project, `git-subtree` is the underlying magic.
+  - [`git-subtree`](https://www.geeksforgeeks.org/git/git-subtree/) is "a strategy for including one Git repo as a subdirectory within another repo".
+  - The usages of `git-subtree` are wrapped by `maintenance.sh` - one rarely needs to call raw `git-subtree` commands, as it can be quite long and complicated.
+  - The called remote repos and branches respect definitions in `.env` of the project root.
+- There can also be images that are not yet published, hence not directly integrated into this project.
+  - `.gitignore` of the project root should ignore existance of such repos.
+  - Ignored webservices can be cloned to provide debug context.
+  - When [building images](#step-2-build-the-images), each `images/*` will be built as an image, including the ignored subdirs.
+
+#### Additional repos to clone
+
+In certain `dev-*` branches, unpublished image repos are _required_.
+
+|subdir|origin|`dev-5.3.x`|`dev-galaxy`|
+|-|-|-|-|
+|`images/keyvaluestore`|`git@github.com:BlueSpice-Wiki/docker-bluespice-keyvaluestore.git`|`5.3.x`|`5.3.x`|
+|`images/mcp`|`git@github.com:BlueSpice-Wiki/docker-bluespice-mcp.git`|`5.3.x`|`5.3.x`|
+|`images/prompt`|`git@github.com:BlueSpice-Wiki/docker-bluespice-prompt.git`|`5.3.x`|`5.3.x`|
+|`images/statisticsdashboard`|`git@github.com:BlueSpice-Wiki/docker-bluespice-statisticsdashboard.git`|`5.3.x`|`5.3.x`|
 
 ## Advanced Usages
 
