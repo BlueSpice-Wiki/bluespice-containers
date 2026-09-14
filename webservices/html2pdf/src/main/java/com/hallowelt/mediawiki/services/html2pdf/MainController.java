@@ -72,7 +72,7 @@ public class MainController {
 
 		@Override
 		public FSCacheValue get(String key, Callable<? extends FSCacheValue> loader) {
-			FSCacheValue cached = store.get(key);
+			FSCacheValue cached = get(key);
 			if (cached != null) {
 				return cached;
 			}
@@ -89,6 +89,10 @@ public class MainController {
 
 		@Override
 		public FSCacheValue get(String key) {
+			FSCacheValue override = fallbackFontMapping.getMetricsOverride(key);
+			if (override != null) {
+				return override;
+			}
 			return store.get(key);
 		}
 	};
@@ -183,7 +187,7 @@ public class MainController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("success", true);
 		response.put("msg", "Service is running");
-		response.put( "version", "2.1.0");
+		response.put( "version", "2.2.2");
 		return response;
 	}
 
