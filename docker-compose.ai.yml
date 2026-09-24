@@ -1,0 +1,100 @@
+services:
+
+  ai:
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-ai
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/ai:${VERSION}
+    depends_on:
+      - ai-database
+    environment:
+      AI__MYSQL__USER: ${DB_USER}
+      AI__MYSQL__PASSWORD: ${DB_PASS}
+      AI__MYSQL__HOST: ${DB_HOST}
+      AI__MYSQL__DB_NAME: ${DB_NAME}
+      AI__NEO4J__USERNAME: neo4j
+      AI__NEO4J__PASSWORD: ${AI_DB_PASS}
+      AI__NEO4J__URL: neo4j://ai-database:7687
+      AI__NEO4J__DATABASE: ${AI_DB_NAME:-bluespice}
+      # when embedder is not specified, the llm provider will be used
+      # AI__EMBEDDER_PROVIDER: ${EMBEDDER_PROVIDER} # azure, google, ionos, ollama, openai
+      AI__LLM_PROVIDER: ${LLM_PROVIDER} # azure, google, ionos, ollama, openai
+      AI__AZURE__REGION: ${AZURE_REGION:-westeurope}
+      AI__AZURE__OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
+      AI__AZURE__OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:-}
+      AI__GOOGLE__API_KEY: ${GOOGLE_API_KEY:-}
+      AI__IONOS__API_KEY: ${IONOS_API_KEY:-}
+      AI__IONOS__BASE_URL: ${IONOS_BASE_URL:-https://openai.inference.de-txl.ionos.com}
+      AI__OPENAI__API_KEY: ${OPENAI_API_KEY:-}
+      AI__OLLAMA__URL: ${OLLAMA_URL:-}
+      AI__OLLAMA__EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-mxbai-embed-large:335m}
+      AI__OLLAMA__MODEL: ${OLLAMA_LLM_MODEL:-llama3.3}
+      AI__ENVIRONMENT: ${AI__ENVIRONMENT:-production}
+      AI__MCP__URL: http://mcp:4000/mcp
+      TZ: ${TZ:-UTC}
+    secrets:
+      - AI__SECURITY__STATIC_API_TOKEN
+      - AI__MCP__API_KEY
+    volumes:
+      - ${DATADIR}/wiki/bluespice/rag:/watch
+    restart: unless-stopped
+
+  ai-database:
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-ai-database
+    image: neo4j:5
+    depends_on:
+      wiki-task:
+        condition: service_healthy
+    environment:
+      NEO4J_AUTH: neo4j/${AI_DB_PASS}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_usage__report_enabled: "false"
+    volumes:
+      - ${DATADIR}/ai-data:/data
+
+  chat:
+    depends_on:
+      - ai
+    environment:
+      CHAT_AI_CHAT_SERVICE_URL: http://ai:8000
+    secrets:
+      - CHAT_AI_CHAT_SERVICE_API_KEY
+
+  prompt:
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-prompt
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/prompt:${VERSION}
+    depends_on:
+      chat:
+        condition: service_healthy
+    environment:
+      PROMPT_WIKI_BASE_PATH: http://wiki-web:9090
+      PROMPT_BRIDGE_URL: http://chat:3000
+      VIRTUAL_HOST: ${WIKI_HOST}
+      VIRTUAL_PATH: /_prompt/
+      VIRTUAL_PORT: 3336
+      VIRTUAL_DEST: /
+    secrets:
+      - PROMPT_TOKEN_SALT
+      - PROMPT_BRIDGE_TOKEN
+    restart: unless-stopped
+
+  mcp:
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-mcp
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/mcp:${VERSION}
+    depends_on:
+      wiki-task:
+        condition: service_healthy
+    environment:
+      VIRTUAL_HOST: ${WIKI_HOST}
+      VIRTUAL_PATH: /_mcp/
+      VIRTUAL_PORT: 4000
+      VIRTUAL_DEST: /
+      MCP_WIKI_BASE_PATH: http://wiki-web:9090
+      MCP_OAUTH_ISSUER: http://wiki-web:9090/w/oauth2
+      MCP_OAUTH_AUTHORIZATION_ENDPOINT: http://wiki-web:9090/w/oauth2/authorize
+      MCP_OAUTH_TOKEN_ENDPOINT: http://wiki-web:9090/w/oauth2/access_token
+      MCP_OAUTH_SCOPES: openid profile mcp
+      MCP_OAUTH_PROXY_TOKEN_ENDPOINT: true
+    restart: unless-stopped
+    secrets:
+      - MCP_TOKEN_SALT
+      - MCP_WIKI_API_KEY
+

@@ -1,0 +1,72 @@
+services:
+
+  search:
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/search:${VERSION}
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-search
+    restart: unless-stopped
+    volumes:
+      - ${DATADIR}/search/data:/usr/share/opensearch/data
+    healthcheck:
+      test: curl -f http://localhost:9200
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  database:
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/database:${VERSION}
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-database
+    restart: unless-stopped
+    volumes:
+      - ${DATADIR}/database/logs:/config/log/mysql
+      - ${DATADIR}/database/data:/config/databases
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASS}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+    healthcheck:
+      test: mysqladmin ping
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  metadatastore:
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-metadatastore
+    restart: unless-stopped
+    image: neo4j:5
+    environment:
+      NEO4J_AUTH: neo4j/${METADATASTORE_PASS}
+    volumes:
+      - ${DATADIR}/metadatastore:/data
+
+  jobqueue:
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/keyvaluestore:${VERSION}
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-jobqueue
+    healthcheck:
+      test: redis-cli ping || exit 1
+    volumes:
+      - ${DATADIR}/keyvaluestore:/data
+    restart: unless-stopped
+    command: valkey-server /etc/valkey/valkey.conf
+
+  wiki-installer:
+    depends_on:
+        database:
+            condition: service_healthy
+        search:
+            condition: service_healthy
+
+  wiki-web:
+    depends_on:
+        database:
+            condition: service_healthy
+        search:
+            condition: service_healthy
+  wiki-task:
+    depends_on:
+        database:
+            condition: service_healthy
+        search:
+            condition: service_healthy
