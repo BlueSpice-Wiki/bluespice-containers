@@ -1,5 +1,5 @@
 # BlueSpice Galaxy "Deploy"
-<img style="display:block;margin:auto" src="https://bluespice.com/wp-content/uploads/2026/09/BlueSpice-Galaxy_Logo_Textmarke.svg" alt="BlueSpice MediaWiki logo" wigth="188" />
+<img style="display:block;margin:auto" src="https://bluespice.com/wp-content/uploads/2026/09/BlueSpice-Galaxy_Logo_Textmarke.svg" alt="BlueSpice MediaWiki logo" width="188" />
 Toolkit for containerized deployment of BlueSpice Galaxy Wiki.
 
 ## Deployment
