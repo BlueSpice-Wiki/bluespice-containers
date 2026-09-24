@@ -86,7 +86,7 @@ server {
 		deny all;
 	}
 
-	location ~ ^###WIKI_BASE_PATH|/###w/(api|dynamic_file|index|load|opensearch_desc|thumb_handler|thumb|nsfr_thumb)\.php$ {
+	location ~ ^###WIKI_BASE_PATH|/###w/(api|dynamic_file|index|load|opensearch_desc|thumb_handler|thumb)\.php$ {
 		include fastcgi.conf;
 		fastcgi_split_path_info ^(.+?\.php)(/.+)$;
 		fastcgi_param PATH_INFO $fastcgi_path_info;
