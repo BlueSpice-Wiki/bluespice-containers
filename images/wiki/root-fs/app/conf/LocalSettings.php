@@ -54,15 +54,6 @@ $GLOBALS['wgLocalisationCacheConf']['store'] = 'array';
 $GLOBALS['wgLocalisationCacheConf']['storeDirectory'] = "/tmp/cache/l10n";
 $GLOBALS['wgEnableUploads'] = true;
 $GLOBALS['wgUploadPath'] = $GLOBALS['wgScriptPath'] . '/img_auth.php';
-// Use thumb.php for on-demand thumbnail creation instead of pre-generating at parse time.
-// transformVia404 is NOT used: that approach requires the web server to serve thumbnail files
-// directly from the filesystem (so a missing file triggers a 404 → handler chain). Since all
-// image delivery here goes through img_auth.php (a PHP entrypoint), there is no direct
-// filesystem serving — a 404 would mean the file truly does not exist, not merely that the
-// thumbnail hasn't been rendered yet. thumb.php is therefore the correct mechanism.
-$GLOBALS['wgThumbnailScriptPath'] = $GLOBALS['wgScriptPath'] . '/thumb.php';
-$GLOBALS['wgGenerateThumbnailOnParse'] = false;
-$GLOBALS['wgNativeImageLazyLoading'] = true;
 $GLOBALS['wgUseImageMagick'] = true;
 $GLOBALS['wgImageMagickConvertCommand'] = "/usr/bin/magick";
 $GLOBALS['wgLanguageCode'] = trim( getenv( 'WIKI_LANG' ) );
