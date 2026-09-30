@@ -64,6 +64,7 @@ RUN apk add \
 	php$VERSION-pdo_mysql \
 	php$VERSION-pdo_pgsql \
 	php$VERSION-pdo_sqlite \
+	php$VERSION-pecl-luasandbox \
 	php$VERSION-pecl-redis \
 	php$VERSION-pgsql \
 	php$VERSION-phar \
