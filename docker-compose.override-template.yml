@@ -118,8 +118,8 @@ services:
   dev-mailhog:
     image: jcalonso/mailhog:latest
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-dev-mailhog
-    ports:
-      - "18025:8025"
+    #ports:
+    #  - "18025:8025"
     environment:
       VIRTUAL_HOST: ${WIKI_HOST}
       VIRTUAL_PORT: 8025

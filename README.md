@@ -5,8 +5,8 @@ $$\text{BlueSpice} = \Big((\text{wiki codebase} + \text{runtime}) + \text{servic
 The **BlueSpice Containers** project is a unified development setup for BlueSpice. It features:
 
 - **Full picture of BlueSpice**: All components _outside_ the wiki codebase are [collected](#components-of-the-project) into this single project, making browse/grep easy
-- **Source to containers, no blackboxes**: [One-command-build](#step-2-build-the-images) of all images, then run containers reflecting your current workspace
-- **Dev setup, mostly automated**: [Wire dev-ready configs](#step-3-configure-the-stack) to the stack, a few tweaks then it's ready to launch
+- **Containers made from source**: [Build](#step-2-build-the-images) all images with one command, then run containers reflecting your current workspace faithfully
+- **Dev setup, mostly automated**: [Wire](#step-3-configure-the-stack) dev-ready configs to the stack, a few tweaks then it's ready to launch
 
 ## Quick Start
 
@@ -24,7 +24,7 @@ The **BlueSpice Containers** project is a unified development setup for BlueSpic
 - Choice of target branches:
   - E.g. to develop BlueSpice 5.2: use default branch `dev-5.2.x`, then clone and build wiki codebase at its dev branch `REL1_43-5.2.x`.
   - Find more supported combinations in the [Compatibility Policy](#branches-tags-and-compatibility-policy) section.
-- Optionally, clone [not-yet-published components](#additional-repos-to-clone).
+- For branches of unreleased versions, clone [not-yet-published components](#additional-repos-to-clone).
 
 ### Step 2: Build the images
 
@@ -33,12 +33,14 @@ cd bluespice-containers
 ./maintenance.sh --build --buildargs EDITION=free
 ```
 
-Optionally, assume that you prepared access tokens `~/.github-token` and/or `~/.gitlab-token` (needed for `pro`, `farm` or even `galaxy` editions and certain images - modify the EDITION argument in the command according to your specific case):
+If you prepared access tokens `~/.github-token` and/or `~/.gitlab-token` (needed for `pro`, `farm` or even `galaxy` editions and certain images), use:
 
 ```sh
 GITHUB_TOKEN=$(cat ~/.github-token) GITLAB_HW_TOKEN=$(cat ~/.gitlab-token) \
 ./maintenance.sh --build --buildargs EDITION=farm
 ```
+
+`GITHUB_TOKEN` is always recommended (even without special access to private repos), as it will greatly raise GitHub rate limits for the build time.
 
 ### Step 3: Configure the stack
 
@@ -51,8 +53,7 @@ This script creates two files:
 - `deploy/compose/.env`: you need to tweak it further:
   - `CODEDIR` and `DATADIR` should match absolute addresses of `code` and `data` in [Step 1](#step-1-create-workspace-and-subdirectories)
   - `EDITION`, `DB_USER` and `DB_PASS` should be configured - read [official tutorial](https://en.wiki.bluespice.com/wiki/Setup:Installation_Guide/Docker) for richer details
-- `deploy/compose/docker-compose.override.yml` works out of the box
-  - Optionally you can enable advanced configs here, e.g use [xdebug](https://xdebug.org/), add packages to containers and so on.
+- `deploy/compose/docker-compose.override.yml` works out of the box, and is ready for [further adaption](#adapting-override-yml-file-of-docker-compose)
 
 ### Step 4: Bring up the stack
 
@@ -66,6 +67,7 @@ Optionally:
 - to run wiki on a local only host name, add it to your `/etc/hosts` file
 - to run wiki in `https` protocol, add the `.key` and `.crt` certificate files of your domain name to `${DATADIR}/proxy/certs`, then run `./bluespice-deploy restart proxy` to load the certificate
 - use `--build` tag for the first run to utilize inline Dockerfile in the override yml
+- check [advanced usages](#advanced-usages)
 
 ## Branches and Components
 
@@ -116,6 +118,11 @@ In certain `dev-*` branches, unpublished image repos are _required_.
 |`images/statisticsdashboard`|`git@github.com:BlueSpice-Wiki/docker-bluespice-statisticsdashboard.git`|`5.3.x`|`5.3.x`|
 
 ## Advanced Usages
+
+- serving BlueSpice: [multi-instance](#having-multiple-installations-on-one-computer), [shortcut controlling the stack](#controlling-the-docker-containers-with-bsc), [arm64-arch](#run-bluespice-under-arm64)
+- developing and debugging: [PHPUnit test](#running-tests-in-a-wiki-container), [Xdebug](#use-xdebug-with-ides)
+- testing env: [Test SAML IdP](https://en.wiki.bluespice.com/wiki/Development/SAML_2.0_IdP)
+- experimenting new features: [s3 storage](https://en.wiki.bluespice.com/wiki/Development/S3_filestore_service)
 
 ### Running tests in a wiki container
 
@@ -168,3 +175,18 @@ When having multiple sets of `bluespice-containers` installed on one host, one c
 - `bsc edit-env` launches an editor with your `deploy/compose/.env` file. One can quickly change aspects of your setup, e.g., the data
 directory.
   - For most changes in `deploy/compose/docker-compose.override.yml` or `deploy/compose/.env`, running `bsc restart` re-applies those changes.Though sometimes one needs to bring down the affected containers or the whole stack, then go up again to reflect the changes.
+
+### Adapting override yml file of docker compose
+
+By extending the auto-generated `deploy/compose/docker-compose.override.yml`, there are a lot of interesting possibilities open. For best practice:
+
+- **Keep local changes in the override yml**: this file is ignored by git, and can hold injection of Dockerfile, configs and secrets.
+- **Use the rule of override**: this file is always the last yaml file to load (see `deploy/compose/bluespice-deploy` script), so it [can re-decide](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/multi-container-microservice-net-applications/multi-container-applications-docker-compose#overriding-the-base-docker-compose-file) previously set values, for example, which host port to wire or which service image to use.
+- **Take example from template**: this file is generated from `docker-compose.override-template.yml`, containing tons of features that needs to be specifically enabled.
+
+We list a few most common use cases here - more to dig in the yml file itself.
+See also cases on the [official development guide](https://en.wiki.bluespice.com/wiki/dev).
+
+#### Run BlueSpice under ARM64
+
+#### Use Xdebug with IDEs
