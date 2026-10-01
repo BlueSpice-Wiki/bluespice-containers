@@ -16,7 +16,7 @@ Please follow the [installation guide](https://en.wiki5.bluespice.com/wiki/Setup
 | `DATADIR`                    | `./_volume`    | Path to persitent Volumes                            | Yes      |
 | `ANTIVIRUS`                  | `false`        | enables ClamAV antivirus service                     | Yes      |
 | `LETSENCRYPT`                | `false`        | enables LetsEcrpyt cert renew                        | Yes      |
-| `KERBEROS`                   | `false`        | enables Kerberos-Authentication                      | Yes      |
+| `ADMIN_MAIL`                 | none           | contact e-mail for LetsEncrypt certificates          | No, if `LETSENCRYPT` is `true` |
 | `TZ`                         | `UTC`          | Timezone for BlueSpice and container system time     | Yes      |
 | `CHAT`                       | `false`        | enables [Chat service connection](https://en.wiki.bluespice.com/wiki/Manual:Extension/ChatBot)                          | Yes      |
 | `AI`                         | `false`        | enables [AI service connection](https://en.wiki.bluespice.com/wiki/Manual:AI_integrations_-_Overview)                              | Yes      |
