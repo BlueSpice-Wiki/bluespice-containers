@@ -1,0 +1,9 @@
+ 9 0 * * * run-maintenance BlueSpiceWikiFarm:RunForAll --script='/extensions/BlueSpiceExtendedStatistics/maintenance/generateSnapshot.php' --args='--interval=day --skip-timecheck'
+19 0 * * 0 run-maintenance BlueSpiceWikiFarm:RunForAll --script='/extensions/BlueSpiceExtendedStatistics/maintenance/generateSnapshot.php' --args='--interval=week --skip-timecheck'
+29 0 1 * * run-maintenance BlueSpiceWikiFarm:RunForAll --script='/extensions/BlueSpiceExtendedStatistics/maintenance/generateSnapshot.php' --args='--interval=month --skip-timecheck'
+39 0 1 1 * run-maintenance BlueSpiceWikiFarm:RunForAll --script='/extensions/BlueSpiceExtendedStatistics/maintenance/generateSnapshot.php' --args='--interval=year --skip-timecheck'
+ 5 0 * * * create-statistic-snapshot --randomize --interval=day --skip-timecheck
+15 0 * * 0 create-statistic-snapshot --randomize --interval=week --skip-timecheck
+25 0 1 * * create-statistic-snapshot --randomize --interval=month --skip-timecheck
+35 0 1 1 * create-statistic-snapshot --randomize --interval=year --skip-timecheck
+#ATTENTION: There must be an empty line at the end of this file.

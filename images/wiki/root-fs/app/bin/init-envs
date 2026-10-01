@@ -88,9 +88,6 @@ export WIKI_STATUSCHECK_ALLOWED=${WIKI_STATUSCHECK_ALLOWED:-}
 export FARM_DEFAULT_INSTANCE=${FARM_DEFAULT_INSTANCE:-}
 export WIKI_ARTICLE_PATH=${WIKI_ARTICLE_PATH:-wiki}
 
-# WIKI_PROXY - more sophisticated detection
-export WIKI_PROXY=${WIKI_PROXY:-$(getent hosts proxy | awk '{ print $1 ; exit }')}
-
 # WIKI_PASSWORDSENDER - depends on WIKI_HOST
 export WIKI_PASSWORDSENDER=${WIKI_PASSWORDSENDER:-no-reply@$WIKI_HOST}
 
@@ -111,6 +108,10 @@ export SAML_LOG_LEVEL=${SAML_LOG_LEVEL:-$WIKI_LOG_LEVEL}
 export PATH=$PATH:/app/bin
 
 EOF
+
+# WIKI_PROXY is handled outside the heredoc to resolve the proxy IP only once
+WIKI_PROXY=${WIKI_PROXY:-$(getent hosts proxy | awk '{ print $1; exit }')}
+echo "export WIKI_PROXY=${WIKI_PROXY}" >> /app/.env
 
 # For b/c, in case 5.2 bluespice/helper was not used and file was not migrated therefore
 if [ -f /data/.wikienv ]; then

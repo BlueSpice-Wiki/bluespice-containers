@@ -54,13 +54,17 @@ if [[ ( $1 == "--runBackup" ) || ( "$1" == "--runAll" ) ]] && [[ ( ${BACKUP_HOUR
 	echo "backup-loop" >> /tmp/healthcheck
 	/app/bin/backup-loop > /proc/1/fd/1 2>&1  &
 fi
-if [[ ( $1 == "--runSnapshotStatistics" ) || ( "$1" == "--runAll" ) ]]; then
+
+if [[ "$1" == "--runSnapshotStatistics" || "$1" == "--runAll" ]]; then
 	echo "Starting SnapshotStatistics cronjobs"
 	echo "supercronic" >> /tmp/healthcheck
-	/usr/bin/supercronic /app/cron/snapshot-statistics > /proc/1/fd/1 2>&1  &
+	if [[ "$EDITION" == "farm" || "$EDITION" == "galaxy" ]]; then
+		/usr/bin/supercronic /app/cron/snapshot-statistics-farm > /proc/1/fd/1 2>&1 &
+	else
+		/usr/bin/supercronic /app/cron/snapshot-statistics > /proc/1/fd/1 2>&1 &
+	fi
 fi
 
 echo "ready" > /tmp/state
 
 sleep inf
-
