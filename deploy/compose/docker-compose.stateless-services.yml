@@ -28,3 +28,4 @@ services:
       - WIRE_API_KEY
       - WIRE_TOKEN_SALT
     restart: unless-stopped
+

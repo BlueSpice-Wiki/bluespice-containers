@@ -291,6 +291,9 @@ if ( getenv( 'EDITION' ) === 'galaxy' ) {
 	$GLOBALS['wgSharedTables'][] = 'uto_tasks';
 	// Galaxy has uses only groups from this table, which are shared
 	$GLOBALS['wgSharedTables'][] = 'mwstake_dynamic_config';
+
+	$GLOBALS['wgSharedTables'][] = 'issuetrackerlinks_auth_tokens';
+	$GLOBALS['wgSharedTables'][] = 'issuetrackerlinks_issues';
 }
 
 $GLOBALS['mwsgTokenAuthenticatorSalt'] = getenv( 'INTERNAL_WIKI_TOKEN_AUTH_SALT' );
