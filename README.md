@@ -194,3 +194,5 @@ See also cases on the [official development guide](https://en.wiki.bluespice.com
 #### Run BlueSpice under ARM64
 
 #### Use Xdebug with IDEs
+
+- [Documentation for PHPStorm with XDebug v3](https://github.com/BlueSpice-Wiki/bluespice-containers/wiki/PHPStorm-with-Xdebug-v3-(use-case:-BlueSpice-Galaxy))
