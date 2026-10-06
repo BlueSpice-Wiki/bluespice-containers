@@ -26,25 +26,32 @@ source .env
 
 EXTENDED_TOOLS=""
 
-if [[ "${EDITION}" == "pro" || "${EDITION}" == "farm" ]]; then
-	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.collabpads-service.yml"
-	WIKI_IMAGE=docker.bluespice.com/bluespice-${EDITION}/wiki:${VERSION}
+case "${EDITION}" in
+	glacier)
+		WIKI_IMAGE=bluespicegalaxy/wiki:${VERSION}
+		;;
+	sky|sapphire)
+		EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.collabpads-service.yml"
+		WIKI_IMAGE=docker.bluespice.com/bluespice-galaxy-${EDITION}/wiki:${VERSION}
 
-	if [[ $(docker images -q ${WIKI_IMAGE}) ]]; then
-		echo "Image ${WIKI_IMAGE} found locally."
-	elif [[ ! $(grep 'docker.bluespice.com' $HOME/.docker/config.json) ]]; then
-		echo "In order to access our ${EDITION}-Image please login to docker.bluespice.com"
-		docker login docker.bluespice.com
-		if [[ ! $(grep 'docker.bluespice.com' $HOME/.docker/config.json) ]]; then
-		echo -e "\n-------------\n"
-		echo "Please contact support@hallowelt.com for your Credentials against docker.bluespice.com"
-		echo -e "\n-------------\n"
-		exit
+		if [[ $(docker images -q ${WIKI_IMAGE}) ]]; then
+			echo "Image ${WIKI_IMAGE} found locally."
+		elif [[ ! $(grep 'docker.bluespice.com' $HOME/.docker/config.json) ]]; then
+			echo "In order to access our ${EDITION}-Image please login to docker.bluespice.com"
+			docker login docker.bluespice.com
+			if [[ ! $(grep 'docker.bluespice.com' $HOME/.docker/config.json) ]]; then
+			echo -e "\n-------------\n"
+			echo "Please contact support@hallowelt.com for your Credentials against docker.bluespice.com"
+			echo -e "\n-------------\n"
+			exit
+			fi
 		fi
-	fi
-else
-	WIKI_IMAGE=bluespice/wiki:${VERSION}
-fi
+		;;
+	*)
+		echo "Unknown EDITION '${EDITION}'. Supported editions: glacier, sky, sapphire"
+		exit 1
+		;;
+esac
 if [ "${ANTIVIRUS}" == "true" ]; then
 	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.clamav-antivirus.yml"
 fi
@@ -57,11 +64,7 @@ fi
 if [ "${LETSENCRYPT}" == "true" ]; then
 	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.proxy-letsencrypt.yml"
 fi
-if [ "${KERBEROS}" == "true" ]; then
-	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.kerberos-proxy.yml"
-else
-	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.proxy.yml"
-fi
+EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.proxy.yml"
 
 if [ -f docker-compose.override.yml ]; then
        EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.override.yml"
@@ -69,16 +72,15 @@ fi
 ##allow custom services repo for testing
 if [ -z "${BLUESPICE_SERVICE_REPOSITORY}" ] && [ -n "${SERVICES_REPOSITORY_PATH}" ]; then
 	BLUESPICE_SERVICE_REPOSITORY=${SERVICES_REPOSITORY_PATH}
-else
-	BLUESPICE_SERVICE_REPOSITORY='bluespice'
 fi
+BLUESPICE_SERVICE_REPOSITORY=${BLUESPICE_SERVICE_REPOSITORY:-bluespice}
 ##allow custom wiki image for testing
 if [ -n "${BLUESPICE_WIKI_IMAGE}" ]; then
 	WIKI_IMAGE=${BLUESPICE_WIKI_IMAGE}
 fi
 
 if [ ! -d ${DATADIR}/.secrets ]; then
-	echo "Preparing Secrets for 5.2.x"
+	echo "Preparing Secrets"
 	BLUESPICE_WIKI_IMAGE=${WIKI_IMAGE}	\
 	BLUESPICE_SERVICE_REPOSITORY=${BLUESPICE_SERVICE_REPOSITORY} \
 		docker compose \
