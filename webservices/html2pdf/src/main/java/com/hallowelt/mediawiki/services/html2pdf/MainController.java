@@ -187,7 +187,7 @@ public class MainController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("success", true);
 		response.put("msg", "Service is running");
-		response.put( "version", "2.2.2");
+		response.put( "version", "2.2.3");
 		return response;
 	}
 
@@ -219,7 +219,7 @@ public class MainController {
 			builder.useUnicodeBidiSplitter(new ICUBidiSplitter.ICUBidiSplitterFactory());
 			builder.useUnicodeBidiReorderer(new ICUBidiReorderer());
 			builder.defaultTextDirection(PdfRendererBuilder.TextDirection.LTR);
-			builder.useSVGDrawer(new BatikSVGDrawer());
+			builder.useSVGDrawer(new BatikSVGDrawer(BatikSVGDrawer.SvgScriptMode.SECURE, java.util.Set.of("data")));
 			builder.useExternalResourceAccessControl(
 				(uri, type) -> {
 					return this.allowFileEmbed(uri, type);
