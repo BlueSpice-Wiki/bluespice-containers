@@ -1,7 +1,7 @@
 vulnerabilities:
   - id: CVE-2025-14813
     statement: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
-  - id: CVE-2025-75595
+  - id: CVE-2026-75595
     statement: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
-  - id: CVE-2025-8763
+  - id: CVE-2026-8763
     statement: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
