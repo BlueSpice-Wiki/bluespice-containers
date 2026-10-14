@@ -3,3 +3,5 @@ vulnerabilities:
     statement: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
   - id: CVE-2026-59873
     statement: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
+  - id: CVE-2026-90711
+    statement: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"    
