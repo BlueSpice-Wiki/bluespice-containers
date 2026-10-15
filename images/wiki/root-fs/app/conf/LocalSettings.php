@@ -158,7 +158,7 @@ $GLOBALS['bsgInstanceStatusCheckAllowedIP'] = trim( getenv( 'WIKI_STATUSCHECK_AL
 
 $GLOBALS['wgSimpleSAMLphp_SAMLClient'] = 'http-client';
 $GLOBALS['wgSimpleSAMLphp_HTTPClientConfig'] = [
-	'baseUrl' => 'http://localhost:9090/_sp/',
+	'baseUrl' => 'http://localhost:9090' . ( trim( getenv( 'WIKI_BASE_PATH' ) ?: '/' ) ) . '_sp/',
 	// Keep aligned with `root-fs/app/simplesamlphp/config/config.php`
 	'sessionIdCookieName' => getenv('DB_NAME') . ( getenv('DB_PREFIX') ) . 'SAMLSessionID',
 	'authTokenCookieName' => getenv('DB_NAME') . ( getenv('DB_PREFIX') ) . 'SAMLAuthToken',
