@@ -3,10 +3,14 @@ ENV PATH="/app/bin:${PATH}"
 RUN apk add bash \
 	docker-cli \
 	mongodb-tools \
-	mysql-client \
+	mariadb-client \
 	openssl \
 	restic \
 	rsync \
 	supercronic \
-	vim
+	vim \
+	tini \
+	jq 
 COPY ./root-fs/app /app
+WORKDIR /app
+ENTRYPOINT ["/sbin/tini", "-s"]

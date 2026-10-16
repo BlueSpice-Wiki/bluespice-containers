@@ -1,18 +1,29 @@
 #!/bin/bash
-BACKUP_HOUR=${BACKUP_HOUR:-1}
-BACKUP_HOUR=$(echo ${BACKUP_HOUR} | sed 's/0\([0-9]\)/\1/g')
-sed -i "s/###BACKUP_HOUR###/${BACKUP_HOUR}/g" /app/cron/backup-jobs
-/usr/bin/supercronic /app/cron/backup-jobs > /proc/1/fd/1 2>&1  &
+DEFAULT_BACKUP_TIME="0 2 * * *"
 
-no-compress() {
-sed -i "s/run-backups/backup-pipeline --no-compress/g" /app/cron/backup-jobs
+validate_cron() {
+    local cron="$1"
+    local fields
+    read -ra fields <<< "$cron"
+    [[ ${#fields[@]} -eq 5 ]] || return 1
+    local field_re='^(\*|(\*\/[0-9]+)|([0-9]+([-\/][0-9]+)?(,[0-9]+([-\/][0-9]+)?)*))$'
+    for field in "${fields[@]}"; do
+        [[ "$field" =~ $field_re ]] || return 1
+    done
+    return 0
 }
+
+if [[ -n "${BLUESPICE_BACKUP_TIME:-}" ]] && validate_cron "${BLUESPICE_BACKUP_TIME}"; then
+    EFFECTIVE_BACKUP_TIME="${BLUESPICE_BACKUP_TIME}"
+else
+    if [[ -n "${BLUESPICE_BACKUP_TIME:-}" ]]; then
+        echo "WARNING: BLUESPICE_BACKUP_TIME '${BLUESPICE_BACKUP_TIME}' is not a valid cron expression, falling back to default '${DEFAULT_BACKUP_TIME}'"
+    fi
+    EFFECTIVE_BACKUP_TIME="${DEFAULT_BACKUP_TIME}"
+fi
+
+echo "${EFFECTIVE_BACKUP_TIME} /app/bin/backup-pipeline" > /app/cron/backup-jobs
+/usr/bin/supercronic /app/cron/backup-jobs > /proc/1/fd/1 2>&1  &
 
 sleep infinity
 
-while getopts ":-no-compress" option; do
-   case $option in
-      -no-compress) # rerun upgrade
-         deacttivate_restic;;
-   esac
-done

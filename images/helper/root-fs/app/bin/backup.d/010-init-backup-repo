@@ -1,10 +1,31 @@
 #!/bin/bash
-if [[ ${1} != "--no-compress" ]]; then
+mkdir -p ${BLUESPICE_DATABASE_DUMP_DIRECTORY}
 
-	if [[ ! $(restic -r /data/backup cat config  <<< ${BACKUP_PASS} )  ]]; then
-		echo "Your Backup Password is: " ${BACKUP_PASS} > /proc/1/fd/1 2>&1 ; 
-		restic -r /data/backup init <<< ${BACKUP_PASS} > /proc/1/fd/1 2>&1 ;
-	fi
-else
-	mkdir -p /data/backup 
-fi
+BACKUP_TYPE=${BACKUP_TYPE:-'tar-file'}
+
+case "${BACKUP_TYPE}" in
+	tar-file)
+		mkdir -p ${BLUESPICE_TAR_BACKUP_DIRECTORY}
+		;;
+	restic-repo)
+		mkdir -p ${BLUESPICE_BACKUP_DIRECTORY}
+
+		if [[ -n "${BLUESPICE_BACKUP_PASS}" ]]; then
+			echo -n "${BLUESPICE_BACKUP_PASS}" > /tmp/.BLUESPICE_BACKUP_PASS
+			BACKUP_PASS_FILE="/tmp/.BLUESPICE_BACKUP_PASS"
+		else
+			BACKUP_PASS_FILE="/data/.secrets/BLUESPICE_BACKUP_PASS"
+		fi
+
+		if ! restic -r ${BLUESPICE_BACKUP_DIRECTORY} cat config --password-file "${BACKUP_PASS_FILE}" > /dev/null 2>&1; then
+			restic -r ${BLUESPICE_BACKUP_DIRECTORY} init --password-file "${BACKUP_PASS_FILE}"
+		fi
+		;;
+	dump-only)
+		# Only database dumps, no TAR/Restic backup needed
+		;;
+	*)
+		echo "ERROR: BACKUP_TYPE '${BACKUP_TYPE}' is invalid. Must be one of: dump-only, tar-file, restic-repo"
+		exit 1
+		;;
+esac

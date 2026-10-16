@@ -1,12 +1,38 @@
 #!/bin/bash
 Mongo=bluespice-collabpads-database
 Mongo_DB=collabpads
-
 function check_collabpads {
     docker exec ${Mongo} mongosh --eval 'db.getMongo().getDBNames().indexOf("collabpads");'
 }
 
     if [[ $(check_collabpads) > 0 ]]; then  #does DB exist then dump
-        rm -fr ${BLUESPICE_BACKUP_DIRECTORY}/databases/collabpads_dump.gz
-        docker exec ${Mongo} mongodump --db ${Mongo_DB} --gzip --archive > ${BLUESPICE_BACKUP_DIRECTORY}/databases/collabpads_dump.gz
+        rm -fr ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/collabpads_EMPTY
+        rm -fr ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/collabpads_dump.gz
+        mongodump \
+        --host=${Mongo} \
+        --db ${Mongo_DB} --gzip \
+        --archive > ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/collabpads_dump.gz
+        
+        if [[ ${EDITION} == "farm" ]]; then
+            mkdir -p ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/mongo-sessions
+            ##Export single Session for single Instances restore
+	        jq -c '.[]' ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/instances.json | while read -r line; do
+                sfi_path=$(echo "$line" | jq -r '.sfi_path')
+
+                echo "Export data for Instance: $sfi_path"
+
+                # mongoexport-Befehl mit dem aktuellen sfi_path
+                mongoexport \
+	            --host=${Mongo} \
+                --pretty \
+                --db collabpads \
+                --collection sessions \
+                --query "{\"s_wiki_script_path\": \"/$sfi_path\"}" \
+                 --out "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/mongo-sessions/sessions_backup_${sfi_path}.json"
+
+                echo "Export for Instance $sfi_path finished."
+                done
+        fi
+    else
+        touch  ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/collabpads_EMPTY
     fi

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+TEMP_RESTORE_DIR=$(mktemp -d)
+trap "rm -rf $TEMP_RESTORE_DIR" EXIT
+
+echo "Extracting backup to temporary directory: $TEMP_RESTORE_DIR"
+tar -xzf "${RESTORE_BACKUP_FILE}" -C "$TEMP_RESTORE_DIR"
+
+# Find the extracted directory (usually ${WIKI_HOST}_${TIMESTAMP})
+EXTRACTED_DIR=$(find "$TEMP_RESTORE_DIR" -maxdepth 1 -type d ! -name "." | head -1)
+
+if [[ ! -d "$EXTRACTED_DIR" ]]; then
+	echo "ERROR: Could not find extracted backup directory"
+	exit 1
+fi
+
+echo "Found backup directory: $EXTRACTED_DIR"
+export RESTORE_BACKUP_EXTRACT_DIR="$EXTRACTED_DIR"

@@ -1,0 +1,7 @@
+backup
+images/thumb
+images/lockdir
+images/temp
+images/cache
+BlueSpiceFoundation/data/*
+cache

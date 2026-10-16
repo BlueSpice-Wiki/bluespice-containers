@@ -1,6 +1,7 @@
 #!/bin/bash
-export BLUESPICE_DATABASE_BACKUP_DIRECTORY=${BLUESPICE_DATABASE_BACKUP_DIRECTORY:-'/data/wiki/backup-databases'}
-mkdir -p ${BLUESPICE_DATABASE_BACKUP_DIRECTORY}
+export BLUESPICE_DATABASE_DUMP_DIRECTORY=${BLUESPICE_DATABASE_DUMP_DIRECTORY:-'/data/wiki/db-dumps'}
+export BLUESPICE_BACKUP_DIRECTORY=${BLUESPICE_BACKUP_DIRECTORY:-'/data/backup/restic-backup'}
+export BLUESPICE_TAR_BACKUP_DIRECTORY=${BLUESPICE_TAR_BACKUP_DIRECTORY:-'/data/backup/tar-backup'}
 for f in /app/bin/backup.d/*; do
 	if [ -f "$f" ]; then
 		echo ""

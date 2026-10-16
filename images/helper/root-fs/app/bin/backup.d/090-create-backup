@@ -1,22 +1,61 @@
 #!/bin/bash
-if [[  $(restic -r /data/backup/ cat config <<< ${BACKUP_PASS} > /dev/null 2>&1 ) ]]; then
-	restic -r /data/backup/ backup /data/wiki/ --exclude-file=/app/bin/backup.d/conf/restic_excludes.txt <<< ${BACKUP_PASS} > /proc/1/fd/1 2>&1 ;
-else
-	TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
-	mkdir -p /data/backup/${WIKI_HOST}_${TIMESTAMP}	
-	for f in /data/wiki/*; do
-	if [ -d "$f" ]; then
-		echo ""
-		echo "🔧 Backing up $f"
-		s=${f##/*/}
-		tar czf  /data/backup/${WIKI_HOST}_${TIMESTAMP}/$s.tar.gz  -C /data/wiki/ $s
-	fi
-	done
-if [[ -n ${KUBERNETES_SERVICE_HOST} ]]; then
-	cat /data/wiki/.wikienv > /tmp/.env
-	env >> /tmp/.env
-	tar cf  /data/backup/${WIKI_HOST}${TIMESTAMP}.tar  -C /data/backup/${WIKI_HOST}${TIMESTAMP} 
- 	tar -r /data/backup/${WIKI_HOST}${TIMESTAMP}.tar -C /tmp/.env
-fi
-	rm -fr /data/backup/${WIKI_HOST}${TIMESTAMP}
-fi
+BACKUP_TYPE=${BACKUP_TYPE:-'tar-file'}
+
+case "${BACKUP_TYPE}" in
+	tar-file)
+		TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+		TAR_EXCLUDE=/app/bin/backup.d/conf/tar_exclude
+		mkdir -p ${BLUESPICE_TAR_BACKUP_DIRECTORY}/${WIKI_HOST}_${TIMESTAMP}	
+		
+		if [[ "${FILE_BACKUP}" == "true" ]]; then
+			# Backup all directories in /data/wiki/
+			for f in /data/wiki/*; do
+				if [[ -d "$f" ]] ; then
+					echo ""
+					echo "🔧 Backing up $f"
+					s=${f##/*/}
+					tar czf  ${BLUESPICE_TAR_BACKUP_DIRECTORY}/${WIKI_HOST}_${TIMESTAMP}/$s.tar.gz --exclude-from="${TAR_EXCLUDE}" -C /data/wiki/ $s
+				fi
+			done
+		else
+			# Backup only database dumps
+			if [[ -d "/data/wiki/db-dumps" ]]; then
+				echo ""
+				echo "🔧 Backing up database dumps only (FILE_BACKUP=false)"
+				tar czf  ${BLUESPICE_TAR_BACKUP_DIRECTORY}/${WIKI_HOST}_${TIMESTAMP}/db-dumps.tar.gz -C /data/wiki/ db-dumps
+			fi
+		fi
+
+		tar czf ${BLUESPICE_TAR_BACKUP_DIRECTORY}/${WIKI_HOST}_${TIMESTAMP}.tar.gz -C ${BLUESPICE_TAR_BACKUP_DIRECTORY} ${WIKI_HOST}_${TIMESTAMP}
+		rm -fr ${BLUESPICE_TAR_BACKUP_DIRECTORY}/${WIKI_HOST}_${TIMESTAMP}
+		echo "Saved Backup from ${TIMESTAMP} at ${BLUESPICE_TAR_BACKUP_DIRECTORY}"
+		;;
+		
+	restic-repo)
+		if [[  $(restic -r ${BLUESPICE_BACKUP_DIRECTORY} cat config --password-file /data/.secrets/BLUESPICE_BACKUP_PASS  > /dev/null 2>&1 ) ]]; then
+			if [[ "${FILE_BACKUP}" == "true" ]]; then
+				# Backup all of /data/wiki/
+				echo "🔧 Creating Restic backup (FILE_BACKUP=true)"
+				restic -r ${BLUESPICE_BACKUP_DIRECTORY} backup /data/wiki/ --exclude-file=/app/bin/backup.d/conf/restic_excludes.txt --password-file /data/.secrets/BLUESPICE_BACKUP_PASS  > /proc/1/fd/1 2>&1 ;
+			else
+				# Backup only database dumps
+				echo "🔧 Creating Restic backup of database dumps only (FILE_BACKUP=false)"
+				restic -r ${BLUESPICE_BACKUP_DIRECTORY} backup /data/wiki/db-dumps/ --password-file /data/.secrets/BLUESPICE_BACKUP_PASS  > /proc/1/fd/1 2>&1 ;
+			fi
+		else
+			echo "ERROR: Restic repository not initialized"
+			exit 1
+		fi
+		;;
+		
+	dump-only)
+		echo "🔧 Creating database dumps only (BACKUP_TYPE=dump-only)"
+		# Database dumps are already created by 020-backup-databases
+		# Nothing additional needed here
+		;;
+		
+	*)
+		echo "ERROR: BACKUP_TYPE '${BACKUP_TYPE}' is invalid. Must be one of: dump-only, tar-file, restic-repo"
+		exit 1
+		;;
+esac
