@@ -46,6 +46,7 @@ COPY --from=builder --chown=bluespice:bluespice /tmp/ai ./ai
 
 # Set PATH to use the virtual environment
 ENV PATH="/opt/venv/bin:$PATH"
+RUN python -c "import tiktoken; tiktoken.get_encoding('cl100k_base')"
 
 # Security: Run as non-root user
 USER bluespice
