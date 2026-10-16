@@ -187,6 +187,7 @@ generate_dev_env() {
         echo ""
         cat "$sample"
         echo ""
+        [[ "$version_tag" == *galaxy* ]] && echo "EDITION=galaxy"
         echo "VERSION=$version_tag"
         echo 'BLUESPICE_WIKI_IMAGE=bluespice/wiki:$VERSION'
         echo "SMTP_HOST=dev-mailhog"
@@ -195,7 +196,11 @@ generate_dev_env() {
     } > "$dst"
     echo "Created $dst"
     echo "Please continue editing $dst to finish your setup:"
-    echo "Fill in your wanted CODEDIR, DATADIR and EDITION, DB_USER and DB_PASS"
+    if [[ "$version_tag" == *galaxy* ]]; then
+        echo "Fill in your wanted CODEDIR, DATADIR and DB_USER and DB_PASS (EDITION is already set to galaxy)"
+    else
+        echo "Fill in your wanted CODEDIR, DATADIR and EDITION, DB_USER and DB_PASS"
+    fi
 }
 
 backup_file_append() {
