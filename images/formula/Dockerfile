@@ -19,4 +19,5 @@ RUN apk update && apk add --no-cache librsvg
 COPY --from=cleanup /opt/mathoid /opt/mathoid
 COPY ./root-fs/opt/init.sh /opt/init.sh
 EXPOSE 10044
+USER 1001
 ENTRYPOINT [ "/opt/init.sh"]
