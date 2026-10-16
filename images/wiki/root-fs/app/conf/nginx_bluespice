@@ -11,6 +11,39 @@ server {
 	error_log /proc/1/fd/2 ###WIKI_LOG_LEVEL###;
 	server_tokens off;
 
+	# /.well-known/* (RFC 8615 requires these at the server root, e.g.
+	# /.well-known/jwks.json for JWT key discovery) is served by the MediaWiki
+	# REST API. A plain rewrite to /w/rest.php/.well-known/... is NOT enough,
+	# for two reasons:
+	#  - PHP's REQUEST_URI comes from $request_uri, which always holds the
+	#    ORIGINAL client URI (internal rewrites never change it), and MediaWiki
+	#    resolves REST routes from REQUEST_URI, so it must look like
+	#    /w/rest.php/.well-known/...
+	#  - the farm dispatcher needs sfr=<instance> in the query string,
+	#    otherwise it answers "302 /w" before the REST router even runs.
+	# Both are therefore forged explicitly here. Params set after
+	# "include fastcgi_params" override the included defaults
+	# (PHP-FPM keeps the last duplicate).
+	location ~ ^/\.well-known/(.+)$ {
+		include fastcgi_params;
+		fastcgi_param PATH_INFO /.well-known/$1;
+		fastcgi_param SCRIPT_FILENAME $document_root###WIKI_BASE_PATH|/###w/rest.php;
+		fastcgi_param SCRIPT_NAME ###WIKI_BASE_PATH|/###w/rest.php;
+		fastcgi_param REQUEST_URI ###WIKI_BASE_PATH|/###w/rest.php/.well-known/$1;
+		fastcgi_param QUERY_STRING sfr=w&$args;
+		fastcgi_pass unix:/var/run/php/php-fpm.sock;
+	}
+
+	# NOT a no-op, do not remove. Server-level rewrites run BEFORE location
+	# matching, so without this line a /.well-known/* request never reaches
+	# the location above: it falls through to the farm catch-all
+	#     rewrite ^/([^/]*)/(.+)$ .../w/$2 last;
+	# which mangles /.well-known/jwks.json into /w/jwks.json and dies with
+	# 403 in "location /w { deny all; }". Rewriting the URI to itself with
+	# "last" terminates the rewrite phase early, so location matching runs
+	# on the unchanged URI and picks the /.well-known/ location above.
+	rewrite ^(/\.well-known/.+)$ $1 last;
+
 	rewrite ^/favicon\.ico$ ###WIKI_BASE_PATH|/###w/skins/BlueSpiceDiscovery/resources/images/favicon.ico last;
 	rewrite ^###WIKI_BASE_PATH|/###robots\.txt$ ###WIKI_BASE_PATH|/###robots.txt last;
 	rewrite ^###WIKI_BASE_PATH|/###_sp/(.*)$ ###WIKI_BASE_PATH|/###_sp/$1 last;

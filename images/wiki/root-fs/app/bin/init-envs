@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Calculate CIDR range for internal docker virtual netowrk. Only services in this range are allowed to access the SAML session check endpoint.
-local localCIDR=$(ip -o -f inet addr show eth0 | awk '{print $4}')
-
 cat <<'EOF' >> /app/.env
 # Antivirus service defaults
 export AV_HOST=${AV_HOST:--}
@@ -46,7 +43,7 @@ export PDF_PORT=${PDF_PORT:-8080}
 export PDF_PROTOCOL=${PDF_PROTOCOL:-http}
 
 # SimpleSAMLphp Service Provider defaults
-export SAML_SESSION_API_ALLOWED=${SAML_SESSION_API_ALLOWED:-$localCIDR}
+export SAML_SESSION_API_ALLOWED=${SAML_SESSION_API_ALLOWED:-}
 export INTERNAL_SIMPLESAMLPHP_SESSION_API_TOKEN=${INTERNAL_SIMPLESAMLPHP_SESSION_API_TOKEN:-}
 
 # Search service defaults

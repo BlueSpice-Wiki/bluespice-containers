@@ -15,6 +15,8 @@ echo "🚀 BlueSpice $blueSpiceEdition $blueSpiceVersion+$blueSpiceBuildInfo"
 echo "---------------------------------------------"
 echo ""
 
+umask 0002
+
 init-envs
 source /app/.env
 
