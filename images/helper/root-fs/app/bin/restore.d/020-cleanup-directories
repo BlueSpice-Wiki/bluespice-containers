@@ -1,0 +1,68 @@
+#!/bin/bash
+
+echo "Preparing wiki directory for restore"
+
+# Only clean directories if they exist in the backup
+dirs_to_check=(
+	["images"]="/data/wiki/bluespice/images"
+	["cache"]="/data/wiki/bluespice/cache"
+	["data"]="/data/wiki/bluespice/extensions/BlueSpiceFoundation/data"
+)
+
+for backup_name in "${!dirs_to_check[@]}"; do
+	backup_archive="${RESTORE_BACKUP_EXTRACT_DIR}/${backup_name}.tar.gz"
+	target_dir="${dirs_to_check[$backup_name]}"
+	
+	if [[ -f "$backup_archive" ]]; then
+		if [[ -d "$target_dir" ]]; then
+			echo "Cleaning $target_dir (found in backup)"
+			rm -rf "$target_dir"
+		fi
+	else
+		echo "Skipping $target_dir (not in backup)"
+	fi
+done
+
+# Clean pre- and post-init-settings.php if bluespice directory is in backup
+if [[ -f "${RESTORE_BACKUP_EXTRACT_DIR}/bluespice.tar.gz" ]]; then
+	for file in "/data/wiki/bluespice/pre-init-settings.php" "/data/wiki/bluespice/post-init-settings.php"; do
+		if [[ -f "$file" ]]; then
+			echo "Removing $file"
+			rm -f "$file"
+		fi
+	done
+fi
+
+# For farm: clean only farm-instances that exist in backup
+if [[ -d "/data/wiki/bluespice/farm-instances" ]]; then
+	if [[ -n "${RESTORE_FARM_INSTANCE:-}" ]]; then
+		# Single instance restore - only clean that one if it's in backup
+		instance_archive="${RESTORE_BACKUP_EXTRACT_DIR}/${RESTORE_FARM_INSTANCE}.tar.gz"
+		if [[ -f "$instance_archive" ]]; then
+			farm_instance_dir="/data/wiki/bluespice/farm-instances/${RESTORE_FARM_INSTANCE}"
+			if [[ -d "$farm_instance_dir" ]]; then
+				echo "Cleaning farm instance: ${RESTORE_FARM_INSTANCE} (found in backup)"
+				rm -rf "$farm_instance_dir"
+			fi
+		else
+			echo "Farm instance ${RESTORE_FARM_INSTANCE} not found in backup - skipping cleanup"
+		fi
+	else
+		# Full restore - clean only instances that exist in backup
+		for instance_archive in ${RESTORE_BACKUP_EXTRACT_DIR}/*.tar.gz; do
+			if [[ -f "$instance_archive" ]]; then
+				instance_name=$(basename "$instance_archive" .tar.gz)
+				# Skip standard wiki directories that were already processed
+				if [[ ! "$instance_name" =~ ^(bluespice|simplesamlphp)$ ]]; then
+					farm_instance_dir="/data/wiki/bluespice/farm-instances/$instance_name"
+					if [[ -d "$farm_instance_dir" ]]; then
+						echo "Cleaning farm instance: $instance_name (found in backup)"
+						rm -rf "$farm_instance_dir"
+					fi
+				fi
+			fi
+		done
+	fi
+fi
+
+echo "Directory cleaning completed"

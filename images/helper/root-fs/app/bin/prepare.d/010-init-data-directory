@@ -1,0 +1,66 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+echo "Creating persistent data directories"
+mkdir -p /data/search/data/nodes/0
+mkdir -p /data/wiki
+mkdir -p /data/proxy
+mkdir -p /data/database
+
+if [[ "${EDITION}" == "pro" || "${EDITION}" == "farm" ]]; then
+  mkdir -p /data/database-collabpads
+fi
+
+echo ""
+echo "#############################################"
+echo "Init 'wiki' directory"
+
+directories=(
+  /data/wiki/bluespice/cache
+  /data/wiki/bluespice/extensions/BlueSpiceFoundation/data
+  /data/wiki/bluespice/images
+  /data/wiki/bluespice/logs/postupdate
+  /data/wiki/bluespice/logs/preupdate
+  /data/wiki/bluespice/logs
+  /data/wiki/simplesamlphp/cache
+  /data/wiki/simplesamlphp/certs
+  /data/wiki/simplesamlphp/data
+  /data/wiki/simplesamlphp/logs
+)
+
+if [[ "${EDITION}" == "farm" ]]; then
+  directories+=(
+    /data/wiki/bluespice/farm-archive
+    /data/wiki/bluespice/farm-instances
+  )
+fi
+
+for directory in "${directories[@]}"; do
+  if [ ! -d "$directory" ]; then
+    mkdir -p "$directory"
+  fi
+done
+
+declare -A files
+files[/data/wiki/bluespice/pre-init-settings.php]="<?php"
+files[/data/wiki/bluespice/post-init-settings.php]="<?php"
+files[/data/wiki/bluespice/logs/postupdate/README.md]="Do not delete files from this directory!"
+files[/data/wiki/bluespice/logs/preupdate/README.md]="Do not delete files from this directory!"
+
+for file in "${!files[@]}"; do
+  if [ ! -f "$file" ]; then
+    echo -e "${files[$file]}" > "$file"
+  fi
+done
+
+echo ""
+echo "#############################################"
+echo "Changing user permission on persistent data directories"
+
+find /data/database ! -user 911 -exec chown 911:911 {} +
+find /data/search ! -user 1000 -exec chown 1000:1000 {} +
+find /data/wiki ! -user 1002 -exec chown 1002:1002 {} +
+
+echo "Done"

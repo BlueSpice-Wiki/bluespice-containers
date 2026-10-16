@@ -1,0 +1,30 @@
+#!/bin/bash
+
+echo "Restoring wiki data from backup"
+
+if [[ -n "${RESTORE_FARM_INSTANCE:-}" ]]; then
+	# Single instance restore
+	echo "Single instance restore mode: ${RESTORE_FARM_INSTANCE}"
+	archive="${RESTORE_BACKUP_EXTRACT_DIR}/${RESTORE_FARM_INSTANCE}.tar.gz"
+	if [[ -f "$archive" ]]; then
+		echo "Extracting ${RESTORE_FARM_INSTANCE}..."
+		tar -xzf "$archive" -C /data/wiki/
+	else
+		echo "ERROR: Backup archive not found for instance ${RESTORE_FARM_INSTANCE}"
+		echo "Available archives:"
+		ls -lah "${RESTORE_BACKUP_EXTRACT_DIR}/" || true
+		exit 1
+	fi
+else
+	# Full restore
+	echo "Full restore mode: restoring all instances"
+	for archive in ${RESTORE_BACKUP_EXTRACT_DIR}/*.tar.gz; do
+		if [[ -f "$archive" ]]; then
+			dirname=$(basename "$archive" .tar.gz)
+			echo "Extracting $dirname..."
+			tar -xzf "$archive" -C /data/wiki/
+		fi
+	done
+fi
+
+echo "Wiki data restored successfully"

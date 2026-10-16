@@ -1,0 +1,65 @@
+#!/bin/bash
+
+MYSQL_SERVER=${DB_HOST:-'database'}
+MYSQL_USER=${DB_USER:-'bluespice'}
+MYSQL_PASS=${DB_PASS}
+MYSQL_DB=${DB_NAME}
+
+if [[ -z "${MYSQL_PASS}" ]]; then
+	echo "ERROR: DB_PASS not set - cannot restore database"
+	exit 1
+fi
+
+echo "Restoring MariaDB databases from backup"
+
+# Function to execute mariadb commands
+mariadb_execute() {
+	mariadb -h "${MYSQL_SERVER}" -u "${MYSQL_USER}" -p"${MYSQL_PASS}" "$@"
+}
+
+# Drop and recreate the main database
+echo "Dropping existing database: ${MYSQL_DB}"
+mariadb_execute -e "DROP DATABASE IF EXISTS ${MYSQL_DB};"
+echo "Creating new database: ${MYSQL_DB}"
+mariadb_execute -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DB};"
+
+# Restore main database dump
+if [[ -f "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.mainDB.sql" ]]; then
+	echo "Restoring main database from ${MYSQL_DB}.mainDB.sql"
+	mariadb_execute "${MYSQL_DB}" < "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.mainDB.sql"
+elif [[ -f "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.sql" ]]; then
+	echo "Restoring main database from ${MYSQL_DB}.sql"
+	mariadb_execute "${MYSQL_DB}" < "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.sql"
+else
+	echo "WARNING: No main database dump found"
+fi
+
+# Farm-specific restore
+if [[ -n "${RESTORE_FARM_INSTANCE:-}" ]]; then
+	# Single instance restore
+	echo "Restoring single farm instance: ${RESTORE_FARM_INSTANCE}"
+	instance_dump="${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${RESTORE_FARM_INSTANCE}.sql"
+	if [[ -f "$instance_dump" ]]; then
+		echo "Restoring instance database from ${RESTORE_FARM_INSTANCE}.sql"
+		mariadb_execute "${MYSQL_DB}" < "$instance_dump"
+	else
+		echo "WARNING: Instance dump not found: $instance_dump"
+	fi
+else
+	# Full farm restore - restore all instance dumps
+	if [[ -f "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/instances.json" ]]; then
+		echo "Restoring all farm instances from instances.json"
+		jq -c '.[]' "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/instances.json" | while read -r instance; do
+			sfi_path=$(echo "$instance" | jq -r '.sfi_path')
+			instance_dump="${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${sfi_path}.sql"
+			if [[ -f "$instance_dump" ]]; then
+				echo "Restoring instance ${sfi_path}"
+				mariadb_execute "${MYSQL_DB}" < "$instance_dump"
+			else
+				echo "WARNING: Instance dump not found: $instance_dump"
+			fi
+		done
+	fi
+fi
+
+echo "MariaDB restore completed"

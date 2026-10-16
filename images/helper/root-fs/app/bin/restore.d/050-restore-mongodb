@@ -1,0 +1,53 @@
+#!/bin/bash
+
+Mongo=bluespice-collabpads-database
+Mongo_DB=collabpads
+
+echo "Restoring MongoDB Collabpads from backup"
+
+# Check if full collabpads dump exists
+if [[ -f "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/collabpads_dump.gz" ]]; then
+	echo "Dropping existing collabpads database"
+	docker exec "${Mongo}" mongosh --eval "db.dropDatabase();" --db "${Mongo_DB}" 2>/dev/null || true
+	
+	echo "Restoring collabpads database from collabpads_dump.gz"
+	mongorestore \
+		--host="${Mongo}" \
+		--gzip \
+		--archive="${BLUESPICE_DATABASE_DUMP_DIRECTORY}/collabpads_dump.gz"
+	
+elif [[ -f "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/collabpads_EMPTY" ]]; then
+	echo "Collabpads database was empty in backup - skipping restore"
+else
+	echo "WARNING: No collabpads backup found"
+fi
+
+# Farm-specific session restore
+if [[ -n "${RESTORE_FARM_INSTANCE:-}" ]]; then
+	session_backup="${BLUESPICE_DATABASE_DUMP_DIRECTORY}/mongo-sessions/sessions_backup_${RESTORE_FARM_INSTANCE}.json"
+	if [[ -f "$session_backup" ]]; then
+		echo "Restoring collabpads sessions for instance ${RESTORE_FARM_INSTANCE}"
+		docker exec -i "${Mongo}" mongoimport \
+			--db "${Mongo_DB}" \
+			--collection sessions \
+			--file /dev/stdin < "$session_backup"
+	else
+		echo "WARNING: Session backup not found for instance ${RESTORE_FARM_INSTANCE}"
+	fi
+else
+	# Full restore - restore all farm instance sessions if they exist
+	if [[ -d "${BLUESPICE_DATABASE_DUMP_DIRECTORY}/mongo-sessions" ]]; then
+		echo "Restoring collabpads sessions for all farm instances"
+		for session_backup in "${BLUESPICE_DATABASE_DUMP_DIRECTORY}"/mongo-sessions/sessions_backup_*.json; do
+			if [[ -f "$session_backup" ]]; then
+				echo "Restoring sessions from $(basename "$session_backup")"
+				docker exec -i "${Mongo}" mongoimport \
+					--db "${Mongo_DB}" \
+					--collection sessions \
+					--file /dev/stdin < "$session_backup"
+			fi
+		done
+	fi
+fi
+
+echo "MongoDB restore completed"

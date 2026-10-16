@@ -5,11 +5,11 @@ MYSQL_USER=${DB_USER:-'bluespice'}
 MYSQL_PASS=${DB_PASS}
 MYSQL_DBNAME=${DB_NAME}
 
-function mysql_connect() {
-    mysql -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} $*
+function mariadb_connect() {
+    mariadb -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} $*
 }
-function mysql_dump() {
-    mysqldump -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} --single-transaction --ignore-table=$*.dpl_clview --ignore-table=$*.objectcache $*
+function mariadb_dump() {
+    mariadb-dump -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} --single-transaction --ignore-table=$*.dpl_clview --ignore-table=$*.objectcache $*
 }
 unzip -qo ${BACKUP_FILE} -d /tmp
 ## Stop proxy and Task contaimer
@@ -17,11 +17,11 @@ docker stop bluespice-proxy
 docker stop bluespice-wiki-task
 
 ##CLEAR AND RESTORE DATABASE
-mysql_connect <<EOF
+mariadb_connect <<EOF
 DROP DATABASE $MYSQL_DBNAME;
 CREATE DATABASE $MYSQL_DBNAME;
 EOF
-mysql_connect ${MYSQL_DBNAME} < /tmp/database.sql
+mariadb_connect ${MYSQL_DBNAME} < /tmp/database.sql
 
 ##CLEAR and RESTORE FILES
 rm -fr /data/wiki//bluespice/images

@@ -1,29 +1,84 @@
 #!/bin/bash
 MYSQL_SERVER=${DB_HOST:-'database'}
+MYSQL_DB=${DB_NAME}
 MYSQL_USER=${DB_USER:-'bluespice'}
 MYSQL_PASS=${DB_PASS}
 MYSQL_PREFIX=${DB_PREFIX}
 
-function mysql_connect() {
-    mysql -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} $*
-}
-function mysql_dump() {
-    mysqldump -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} --single-transaction \
-	    --ignore-table=$*.dpl_clview  \
-	    --ignore-table=$*.objectcache \
-		$*
+function mariadb_connect() {
+    mariadb -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} $*
 }
 
-#LIST DATABASES
-DATABASES=$(mysql_connect <<< "SHOW DATABASES;" | awk -F " " '{if (NR!=1) print $1}' | grep -v information_schema | grep -v mysql | grep -v sys | grep -v test | grep -v performance_schema)
+function mariadb_table_list() {
 
-# Create an array with the database names
-readarray -t aDB <<< "$DATABASES"
+    mariadb -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} $* -N -e "SELECT table_name FROM information_schema.tables \
+                        WHERE table_schema = '${MYSQL_DB}' \
+                        AND table_name LIKE '${1}%' \
+                        AND table_name NOT LIKE '%dpl_clview';"
 
-# run sql-command
-for sDB in "${aDB[@]}"; do
-    if [[ -f ${BLUESPICE_DATABASE_BACKUP_DIRECTORY}/${sDB}.sql ]]; then
-    	rm -fr ${BLUESPICE_DATABASE_BACKUP_DIRECTORY}/${sDB}.sql 
-    fi
-    mysql_dump ${sDB} > ${BLUESPICE_DATABASE_BACKUP_DIRECTORY}/${sDB}.sql 
-done
+}
+function mariadb_table_data_list() {
+
+    mariadb -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} $* -N -e "SELECT table_name FROM information_schema.tables \
+                        WHERE table_schema = '${MYSQL_DB}' \
+                        AND table_name LIKE '${1}%' \
+                        AND table_name NOT LIKE '%objectcache' \
+                        AND table_name NOT LIKE '%dpl_clview';"
+
+}
+
+
+function mariadb_dump() {
+    mariadb-dump -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} --single-transaction \
+        $*
+	    
+}
+if [ ${EDITION} == "farm" ]; then
+    if [ ${WIKI_FARM_USE_SHARED_DB} ]; then
+        ##LIST INSTANCES
+        mariadb  -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} -N -e "SELECT     JSON_ARRAYAGG( JSON_OBJECT( 'sfi_path', sfi_path, 'sfi_db_prefix', sfi_db_prefix )) AS json_array FROM ${MYSQL_DB}.simple_farmer_instances;" > ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/instances.json
+        ##DUMP MAIN
+	MAIN_TABLES=$(mariadb_table_list ${MYSQL_DB} ) 
+	MAIN_TABLES_DATA=$(mariadb_table_data_list ${MYSQL_DB} ) 
+        mariadb_dump ${MYSQL_DB} $MAIN_TABLES --no-data > ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.sql
+        mariadb_dump ${MYSQL_DB} $MAIN_TABLES_DATA --no-create-info >> ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.sql
+
+        ##DUMP INSTANCES
+         while IFS= read -r line; do
+
+            SFI_PATH=$(echo "$line" | jq -r '.sfi_path')
+            SFI_DB_PREFIX=$(echo "$line" | jq -r '.sfi_db_prefix')
+	    SFI_CREATE_LIST=$(mariadb_table_list ${SFI_DB_PREFIX})
+	    SFI_DATA_LIST=$(mariadb_table_data_list ${SFI_DB_PREFIX})
+            mariadb_dump ${SFI_DB} ${SFI_CREATE_LIST} --no-data  > ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${SFI_PATH}.sql
+            mariadb_dump ${SFI_DB} ${SFI_DATA_LIST} --no-create-info >> ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${SFI_PATH}.sql
+
+            done < <(jq -c '.[]' ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/instances.json)
+            
+
+    else
+	      ##LIST INSTANCES
+        mariadb  -h ${MYSQL_SERVER} -u ${MYSQL_USER} -p${MYSQL_PASS} -N -e "SELECT     JSON_ARRAYAGG( JSON_OBJECT( 'sfi_path', sfi_path, 'sfi_database', sfi_database )) AS json_array FROM ${MYSQL_DB}.simple_farmer_instances;" > ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/instances.json
+        ##DUMP MAIN
+        mariadb_dump -v ${MYSQL_DB} $(mariadb_table_list ${MYSQL_DB}) > ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.sql
+
+        ##DUMP INSTANCES
+         jq -c '.[]' ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/instances.json | while read -r instance; do
+            SFI_PATH=$(echo "$instance" | jq -r '.sfi_path')
+            SFI_DB=$(echo "$instance" | jq -r '.sfi_database')
+	    SFI_CREATE_LIST=$(mariadb_table_list ${SFI_DB})
+	    SFI_DATA_LIST=$(mariadb_table_data_list ${SFI_DB})
+            mariadb_dump ${SFI_DB} ${SFI_CREATE_LIST} --no-data > ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${SFI_PATH}.sql
+            mariadb_dump ${SFI_DB} ${SFI_DATA_LIST} --no-create-info >> ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${SFI_PATH}.sql
+
+         done
+      fi
+
+
+else
+	MAIN_TABLES=$(mariadb_table_list ${MYSQL_DB} ) 
+	MAIN_TABLES_DATA=$(mariadb_table_data_list ${MYSQL_DB} ) 
+        mariadb_dump ${MYSQL_DB} $MAIN_TABLES --no-data > ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.sql
+        mariadb_dump ${MYSQL_DB} $MAIN_TABLES_DATA --no-create-info >> ${BLUESPICE_DATABASE_DUMP_DIRECTORY}/${MYSQL_DB}.sql
+fi
+
