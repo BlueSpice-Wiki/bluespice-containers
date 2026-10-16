@@ -3,15 +3,22 @@ package com.hallowelt.mediawiki.services.html2pdf;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
 
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.FontStyle;
+import com.openhtmltopdf.pdfboxout.PdfBoxRawPDFontMetrics;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +27,28 @@ public class FallbackFontMapping {
 
     private static final Logger logger = LoggerFactory.getLogger(FallbackFontMapping.class);
 
+    /**
+     * Key prefix used by openhtmltopdf's {@code PdfBoxFontResolver.FontDescription}
+     * when it looks up font metrics in the cache configured via
+     * {@code CacheStore.PDF_FONT_METRICS}.  The full key is
+     * {@code font-metrics:<family>:<weight>:<style>}.
+     */
+    private static final String METRICS_CACHE_KEY_PREFIX = "font-metrics:";
+
+    /**
+     * Latin fallback font whose metrics are used as the reference geometry for
+     * all other fallback fonts.
+     */
+    private static final String REFERENCE_FONT_RESOURCE = "/fonts/noto/NotoSans-Regular.ttf";
+
     private List<BaseFontMapping.FontInfo> fontsAdded;
     private String fontFamilyNamesCache;
+    private Set<String> fallbackFamilies;
+    private PdfBoxRawPDFontMetrics referenceMetrics;
 
     public FallbackFontMapping() {
         loadFallbackFonts();
+        this.referenceMetrics = loadReferenceMetrics();
     }
 
     private void loadFallbackFonts() {
@@ -123,6 +147,60 @@ public class FallbackFontMapping {
 
         this.fontsAdded = result;
         this.fontFamilyNamesCache = toCSSFontFamilyList(result);
+        this.fallbackFamilies = result.stream()
+            .map(fi -> fi.cssName)
+            .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    /**
+     * Reads the metrics of {@link #REFERENCE_FONT_RESOURCE} exactly the way
+     * openhtmltopdf would, so that they can be substituted for the metrics of
+     * the remaining fallback fonts.
+     */
+    private PdfBoxRawPDFontMetrics loadReferenceMetrics() {
+        try (PDDocument doc = new PDDocument();
+             InputStream is = FallbackFontMapping.class.getResourceAsStream(REFERENCE_FONT_RESOURCE)) {
+            if (is == null) {
+                logger.warn("Reference fallback font not found: {}", REFERENCE_FONT_RESOURCE);
+                return null;
+            }
+            PDFont font = PDType0Font.load(doc, is, true);
+            return PdfBoxRawPDFontMetrics.fromPdfBox(font, font.getFontDescriptor());
+        } catch (IOException e) {
+            logger.error("Could not read metrics of reference fallback font", e);
+            return null;
+        }
+    }
+
+    /**
+     * Returns the metrics that should be reported for the font addressed by
+     * {@code cacheKey}, or {@code null} if the key does not belong to one of the
+     * fallback fonts.
+     *
+     * <p>openhtmltopdf sizes a line box from the <em>largest</em> ascent and
+     * descent of <em>all</em> fonts in the resolved font-family chain, and it
+     * derives those values from the font bounding box rather than from the typo
+     * metrics.  Since the complete Noto chain is appended to every font-family,
+     * scripts with tall bounding boxes (Tibetan, Devanagari, musical symbols, …)
+     * would inflate every line of plain Latin text.  The visible effect is that
+     * the content area of an inline box grows far beyond its line-height, so the
+     * backgrounds of consecutive lines overlap and descenders get painted over.
+     *
+     * <p>Reporting the Latin reference metrics for every fallback font keeps the
+     * glyph coverage of the chain intact while restoring Latin-sized line
+     * geometry.
+     */
+    public PdfBoxRawPDFontMetrics getMetricsOverride(String cacheKey) {
+        if (referenceMetrics == null || cacheKey == null
+            || !cacheKey.startsWith(METRICS_CACHE_KEY_PREFIX)) {
+            return null;
+        }
+        int familyEnd = cacheKey.indexOf(':', METRICS_CACHE_KEY_PREFIX.length());
+        if (familyEnd < 0) {
+            return null;
+        }
+        String family = cacheKey.substring(METRICS_CACHE_KEY_PREFIX.length(), familyEnd);
+        return fallbackFamilies.contains(family) ? referenceMetrics : null;
     }
 
     /**
