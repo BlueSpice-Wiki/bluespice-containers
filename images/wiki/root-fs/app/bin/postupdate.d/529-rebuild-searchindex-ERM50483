@@ -1,6 +1,17 @@
 #!/bin/bash
 
-# Due to ERM48755, we need to rebuild the search index after updates
+# Each time when a search index rebuild is needed,
+# this file should be renamed, so that a reindex is
+# triggered (only) once upon logged update.
+# Add its old name to the following list for tracking.
+
+# Past names of the search index rebuilding script:
+# 521-rebuild-searchindex-ERM42811 
+# 526-rebuild-searchindex-ERM48755
+# 529-rebuild-searchindex-ERM50483 (for version 5.2.7 - typo in name)
+
+echo "Running post-update reindexing of the search index..."
+
 if [ "${EDITION}" == "farm" ]; then
 	/app/bin/rebuild-searchindex --all
 else
