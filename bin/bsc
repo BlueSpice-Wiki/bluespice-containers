@@ -13,9 +13,11 @@ fi
 _PROFILE="${1:-__MISSING__}"
 
 if [[ -n ${PROFILE_DIR[$_PROFILE]:-} ]]; then
+	# profile detected: remove the first parameter, cd to the profile dir
+	# and re-run the local version with the rest of the parameters
 	cd "${PROFILE_DIR[$_PROFILE]}/bin"
 	shift
-	_IN_PROFILE=1 ./bsc "$@"
+	./bsc "$@"
 	exit $?
 fi
 
