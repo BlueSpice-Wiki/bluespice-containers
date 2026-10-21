@@ -2,7 +2,6 @@ name: ${COMPOSE_PROJECT_NAME:-bluespice}
 
 x-common-environment: &common-environment
   VERSION: ${VERSION}
-  EDITION: ${EDITION}
   TZ: ${TZ:-UTC}
 
   WIKI_NAME: ${WIKI_NAME}
@@ -74,7 +73,6 @@ services:
     command: ["start-task --runAll"]
     environment:
       <<: *common-environment
-      BACKUP_HOUR: ${BACKUP_HOUR}
     volumes:
       - ${DATADIR}/wiki:/data
     secrets: *common-secrets

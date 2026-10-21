@@ -1,7 +1,7 @@
 services:
 
   search:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/search:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-search:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-search
     restart: unless-stopped
     volumes:
@@ -14,7 +14,7 @@ services:
       retries: 10
 
   database:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/database:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-database:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-database
     restart: unless-stopped
     volumes:
@@ -42,7 +42,7 @@ services:
       - ${DATADIR}/metadatastore:/data
 
   jobqueue:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/keyvaluestore:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-keyvaluestore:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-jobqueue
     healthcheck:
       test: valkey-cli ping | grep -q PONG

@@ -9,7 +9,7 @@ Please follow the [installation guide](https://en.wiki5.bluespice.com/wiki/Setup
 ## Configuration
 | Variable Name                | Default Value  | Description                                          | Optional |
 |------------------------------|----------------|------------------------------------------------------|----------|
-|`BLUESPICE_SERVICE_REPOSITORY`| `bluespice`    | pull Docker images from an alternative service repo  | Yes      |
+|`BLUESPICE_SERVICE_REPOSITORY`| `docker.bluespice.com/bluespice` | pull Docker images from an alternative service repo  | Yes      |
 | `SERVICES_REPOSITORY_PATH`   | none           |a previous alias to set `BLUESPICE_SERVICE_REPOSITORY`| Yes      |
 | `BLUESPICE_WIKI_IMAGE`       |edition-specific| use an alternative image for the wiki-containers     | Yes      |
 | `COMPOSE_PROJECT_NAME`       | `bluespice`    | use an alternate-docker-compose-name                 | Yes      |

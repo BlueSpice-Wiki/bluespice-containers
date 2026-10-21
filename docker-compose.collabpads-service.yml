@@ -1,7 +1,7 @@
 services:
 
   collabpads:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/collabpads:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-collabpads:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-collabpads
     restart: unless-stopped
     depends_on:
@@ -19,7 +19,7 @@ services:
       VIRTUAL_PORT: 8081
 
   collabpads-database:
-    image: mongo:8.2
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-collabpadsdatabase:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-collabpads-database
     restart: unless-stopped
     healthcheck:
