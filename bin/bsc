@@ -2,17 +2,46 @@
 
 set -euo pipefail
 
+declare -A PROFILE_DIR
+
+if [[ -n "${XDG_CONFIG_HOME:-}" && -f "$XDG_CONFIG_HOME/bscrc" ]]; then
+   . "$XDG_CONFIG_HOME/bscrc"
+elif [[ -f "$HOME/.bscrc" ]]; then
+   . "$HOME/.bscrc"
+fi
+
+_PROFILE="${1:-__MISSING__}"
+
+if [[ -n ${PROFILE_DIR[$_PROFILE]:-} ]]; then
+	# profile detected: remove the first parameter, cd to the profile dir
+	# and re-run the local version with the rest of the parameters
+	cd "${PROFILE_DIR[$_PROFILE]}/bin"
+	shift
+	./bsc "$@"
+	exit $?
+fi
+
 PROJECT_ROOT="$(dirname "$(dirname "$(readlink -f "$0")")")"
 cd "$PROJECT_ROOT/deploy/compose" || exit 1
 
 if [[ ! -f bluespice-deploy ]]; then
 	echo "no bluespice-deploy script found in $PROJECT_ROOT" >&2
-	echo "Please check, whether you've checked out the correcth branch." >&2
+	echo "Please check, whether you've checked out the correct branch." >&2
 	echo "Exiting." >&2
 	exit 1
 fi
 
 case "${1:-}" in
+	"pwd" )
+		pwd
+		exit
+		;;
+	"profiles" )
+		for dir in "${!PROFILE_DIR[@]}"; do
+			echo -e "$dir\t=>\t${PROFILE_DIR[$dir]}"
+		done
+		exit
+		;;
 	"boot" )
 		shift
 		set -- "up" "-d" "$@"
@@ -32,6 +61,8 @@ case "${1:-}" in
 		echo "" >&2
 		echo "  boot        start containers in demon mode (alias for 'up -d')" >&2
 		echo "  edit-env    edit the .env file" >&2
+		echo "  profiles    list profiles from RC file" >&2
+		echo "  pwd         show the project directory you're in" >&2
 		echo "" >&2
 		echo "---" >&2
 		echo "Original help from docker compose:" >&2
