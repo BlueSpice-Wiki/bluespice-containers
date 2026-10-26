@@ -126,4 +126,6 @@ inside the container.
 | AI__GOOGLE__MODEL                       | Model to use for LLM calls in Google AI (EXPERIMENTAL)																								   | 										   |
 | AI__GOOGLE__EMBEDDING_MODEL             | Embedding model for document storage and retrieval in google AI (EXPERIMENTAL)																		   |										   |
 | AI__MCP__URL 							  | MCP server URL																																		   |										   |
-| AI__MCP__API_KEY						  | MCP server API key																																		   |										   |
+| AI__MCP__API_KEY                        | MCP server API key; used for MCP's OAuth endpoints (consent link, token claim/refresh), tool calls use the user's own token |  |
+| AI__MCP__OAUTH_URL                      | Base URL of the MCP service's OAuth endpoints | AI__MCP__URL without "/mcp" |
+| AI__SECURITY__USER_TOKEN_ENCRYPTION_KEY | Secret to encrypt users' OAuth tokens in the database; changing it makes users allow access again | AI__SECURITY__STATIC_API_TOKEN |
