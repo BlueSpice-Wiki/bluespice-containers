@@ -8,17 +8,31 @@ cat <<EOF
  |____/|_|\__,_|\___|____/| .__/|_|\___\___|
                           |_|
 EOF
-blueSpiceVersion=$(cat /app/bluespice/w/BLUESPICE-VERSION)
-blueSpiceEdition=$(cat /app/bluespice/w/BLUESPICE-EDITION)
-blueSpiceBuildInfo=$(cat /app/bluespice/w/BUILDINFO)
-echo "🚀 BlueSpice $blueSpiceEdition $blueSpiceVersion+$blueSpiceBuildInfo"
-echo "---------------------------------------------"
-echo ""
 
 umask 0002
 
-init-envs
+# Since 6.0 the edition is defined by the image (`INTERNAL_EDITION`)
+if [[ -n "${EDITION:-}" ]]; then
+	echo "⚠️  WARNING: EDITION='$EDITION' is not supported anymore and will be ignored. Use an image of the respective edition." >&2
+fi
+
+init-envs || exit 1
 source /app/.env
+
+# `BLUESPICE-EDITION` is only the default edition of the codebase, the actual one is `INTERNAL_EDITION`
+blueSpiceVersion=$(cat /app/bluespice/w/BLUESPICE-VERSION)
+blueSpiceBuildInfo=$(cat /app/bluespice/w/BUILDINFO)
+echo ""
+echo "🚀 BlueSpice $INTERNAL_PRODUCT $INTERNAL_EDITION $blueSpiceVersion+$blueSpiceBuildInfo"
+echo "---------------------------------------------"
+echo ""
+
+# Warn about service configuration that is not supported by the codebase (see `/app/.env.infrastructure`)
+if [[ -n "${JOBQUEUE_HOST:-}" && "${JOBQUEUE_HOST}" != "-" ]] \
+	&& [[ "${INTERNAL_ENABLE_FARM}" != "true" || "${INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE}" != "true" ]]; then
+	echo "⚠️  WARNING: JOBQUEUE_HOST is set, but $INTERNAL_PRODUCT $INTERNAL_EDITION does not support a shared job queue." >&2
+	echo "   JOBQUEUE_HOST will be ignored and the database job queue will be used." >&2
+fi
 
 substitutePlaceholders /app/bin/config/clamd.conf
 

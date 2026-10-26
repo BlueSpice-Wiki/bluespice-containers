@@ -37,7 +37,7 @@ echo "#############################################"
 echo "🌐 Starting WebFrontend"
 
 echo "" > /tmp/healthcheck
-echo "php-fpm" >> /tmp/healthcheck # Process name is `php-fpm`, not `php-fpm8.4`
+echo "php-fpm" >> /tmp/healthcheck # Process name is `php-fpm`, not `php-fpm8.5`
 echo "nginx" >> /tmp/healthcheck
 
 php-fpm -D && nginx -g "daemon off;"

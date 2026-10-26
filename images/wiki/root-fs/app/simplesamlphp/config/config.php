@@ -5,7 +5,7 @@ include (__DIR__ . '/config.php.dist');
 $serverUrl = bsAssembleURL( 'WIKI_PROTOCOL', 'WIKI_HOST', 'WIKI_PORT' );
 $baseUrl = $GLOBALS['wgServer'] = $serverUrl . rtrim(getenv('WIKI_BASE_PATH') ?: '', '/');
 
-$loglevel = strtolower( trim( getenv( 'SAML_LOG_LEVEL' ) ?? 'error' ) );
+$loglevel = strtolower( trim( getenv( 'SAML_LOG_LEVEL' ) ) ?: 'error' );
 switch ( $loglevel ) {
 	case 'debug':
 		$loglevel = SimpleSAML\Logger::DEBUG;

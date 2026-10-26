@@ -32,17 +32,18 @@ RUN chmod -R g=u /build
 FROM alpine:3 AS base
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
-ENV VERSION=84
+ENV VERSION=85
 RUN apk add \
 	bash \
 	ca-certificates \
 	clamav-clamdscan \
+	curl \
 	ghostscript \
 	imagemagick \
 	libc6-compat \
 	nginx \
 	openssl \
-	php \
+	php$VERSION \
 	php$VERSION-apcu \
 	php$VERSION-cli \
 	php$VERSION-ctype \
@@ -58,19 +59,19 @@ RUN apk add \
 	php$VERSION-ldap \
 	php$VERSION-mbstring \
 	php$VERSION-mysqli \
-	php$VERSION-opcache \
 	php$VERSION-pcntl \
 	php$VERSION-pdo \
 	php$VERSION-pdo_mysql \
 	php$VERSION-pdo_pgsql \
 	php$VERSION-pdo_sqlite \
-	php$VERSION-pecl-luasandbox \
+	php$VERSION-pecl-excimer \
 	php$VERSION-pecl-redis \
 	php$VERSION-pgsql \
 	php$VERSION-phar \
 	php$VERSION-posix \
 	php$VERSION-session \
 	php$VERSION-simplexml \
+	php$VERSION-sodium \
 	php$VERSION-sqlite3 \
 	php$VERSION-tokenizer \
 	php$VERSION-xml \
@@ -85,7 +86,7 @@ RUN apk add \
 	vim \
 	vips-tools \
 	&& echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-	&& apk add php$VERSION-pecl-excimer@testing
+	&& apk add php$VERSION-pecl-luasandbox@testing
 RUN echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
 	&& apk add openjpeg@edge
 FROM base AS bluespice-prepare
@@ -129,6 +130,7 @@ COPY ./root-fs/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 ENV BASH_ENV=/app/.env
 
 RUN ln -sf /usr/sbin/php-fpm$VERSION /usr/bin/php-fpm \
+	&& sed -i "s#/etc/php[0-9]*/#/etc/php$VERSION/#" /etc/php$VERSION/php-fpm.conf \
 	&& mkdir /var/run/php \
 	&& ln -sf /usr/bin/php$VERSION /usr/bin/php \
 	&& ln -sf /usr/bin/php$VERSION /bin/php \
@@ -145,13 +147,25 @@ RUN ln -sf /usr/sbin/php-fpm$VERSION /usr/bin/php-fpm \
 	&& echo "umask 0002" >> /etc/bash/bashrc \
 	&& sed -i '1isource /app/.env' /etc/bash/bashrc
 
-ARG EDITION # Intentionally left uninitialized
-RUN if [ -n "$EDITION" ]; then \
-		echo "EDITION=$EDITION" > /app/.env; \
-	fi
-RUN if [[ $(cat /app/bluespice/w/BLUESPICE-EDITION) == "cloud" ]] ; then \
-	apk add curl; \
-	fi
+# Infrastructure configuration is taken from `_bluespice/.env.infrastructure.<edition>` of the codebase.
+# - INTERNAL_PRODUCT: Taken from `BLUESPICE-PRODUCT`. A build arg is only used for verification
+# - INTERNAL_EDITION: Selects the edition. Defaults to `BLUESPICE-EDITION` (default edition of the codebase)
+# - Other values: Can be overridden by build args with the same name (e.g. for custom builds)
+# Values defined by the edition can not be changed at runtime (see `init-infrastructure-envs`).
+# Intentionally left uninitialized
+ARG INTERNAL_PRODUCT
+ARG INTERNAL_EDITION
+ARG INTERNAL_PARALLEL_RUNJOBS_SERVICE_MODE
+ARG INTERNAL_ENABLE_FARM
+ARG INTERNAL_ENABLE_FARM_SHARED_SEARCH
+ARG INTERNAL_ENABLE_FARM_SHARED_USER_SESSION
+ARG INTERNAL_ENABLE_FARM_SHARED_DATABASE
+ARG INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE
+ARG INTERNAL_FARM_INSTANCE_LIMIT
+ARG INTERNAL_BOOTSTRAPER
+RUN /app/bin/init-infrastructure-envs build \
+		/app/bluespice/w \
+		/app/.env.infrastructure.build
 FROM bluespice-prepare AS bluespice-final
 WORKDIR /app
 USER bluespice

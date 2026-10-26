@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# Due to ERM42811, we need to rebuild the search index after updates
-if [ "${EDITION}" == "farm" ]; then
-	/app/bin/rebuild-searchindex --all
-else
-	/app/bin/rebuild-searchindex --main
-fi

@@ -1,0 +1,213 @@
+#!/bin/bash
+# Creates the infrastructure configuration of the codebase. Runs twice:
+#
+# 1. At build time (Dockerfile):
+#      init-infrastructure-envs build /app/bluespice/w /app/.env.infrastructure.build
+#    - INTERNAL_PRODUCT is taken from `BLUESPICE-PRODUCT` of the codebase. A build arg
+#      `INTERNAL_PRODUCT` is only used to verify it.
+#    - INTERNAL_EDITION is taken from the build arg `INTERNAL_EDITION`, or from `BLUESPICE-EDITION`
+#      (default edition of the codebase).
+#    - All other values are taken from `_bluespice/.env.infrastructure.<edition>` of the codebase.
+#      Build args with the same name override them (e.g. for custom builds).
+#    Example for a codebase that contains PRO and FARM:
+#      docker build --build-arg INTERNAL_EDITION=farm ...
+#
+# 2. On container start (`init-envs`):
+#      init-infrastructure-envs runtime /app/.env.infrastructure.build /app/.env.infrastructure
+#    Environment variables of the container override the build time values, but only for the keys
+#    in `runtimeKeys` (deployment dependent). All other keys define the edition and are locked,
+#    so an image can not be switched to another edition at runtime.
+#
+# Precedence: container defaults < codebase edition file < build args < runtime environment (`runtimeKeys` only)
+#
+# The resulting `/app/.env.infrastructure` is read by `/app/conf/init.php` and sourced by `/app/.env`.
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+mode=${1:?Mode required: build|runtime}
+source=${2:?Source required}
+targetFile=${3:?Target file required}
+
+# Defaults apply to a "standalone" codebase (e.g. Classic FREE)
+keys=(
+	INTERNAL_PRODUCT
+	INTERNAL_EDITION
+	INTERNAL_PARALLEL_RUNJOBS_SERVICE_MODE
+	INTERNAL_ENABLE_FARM
+	INTERNAL_ENABLE_FARM_SHARED_SEARCH
+	INTERNAL_ENABLE_FARM_SHARED_USER_SESSION
+	INTERNAL_ENABLE_FARM_SHARED_DATABASE
+	INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE
+	INTERNAL_FARM_INSTANCE_LIMIT
+	INTERNAL_BOOTSTRAPER
+)
+declare -A values=(
+	[INTERNAL_PRODUCT]=classic
+	[INTERNAL_EDITION]=free
+	[INTERNAL_PARALLEL_RUNJOBS_SERVICE_MODE]=standalone
+	[INTERNAL_ENABLE_FARM]=false
+	[INTERNAL_ENABLE_FARM_SHARED_SEARCH]=false
+	[INTERNAL_ENABLE_FARM_SHARED_USER_SESSION]=false
+	[INTERNAL_ENABLE_FARM_SHARED_DATABASE]=false
+	[INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE]=false
+	# Maximum number of farm instances (sub-wikis). Empty or 0 means unlimited.
+	# Usually set by a build arg, e.g. `--build-arg INTERNAL_FARM_INSTANCE_LIMIT=30`
+	[INTERNAL_FARM_INSTANCE_LIMIT]=
+	[INTERNAL_BOOTSTRAPER]=/app/conf/StandardBootstrapper.php
+)
+
+# Keys that depend on the deployment (e.g. available services of the stack), not on the edition.
+# Only these can be overridden at runtime. All other keys (including unknown ones) are locked.
+runtimeKeys=(
+	INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE
+)
+
+# Reads `KEY=value` lines into `values`
+readEnvFile() {
+	local file=$1
+	local line key
+	echo "Reading $file"
+	while IFS= read -r line || [ -n "$line" ]; do
+		line=${line%$'\r'}
+		if [[ -z "${line//[[:space:]]/}" || "$line" =~ ^[[:space:]]*# ]]; then
+			continue
+		fi
+		if [[ ! "$line" =~ ^[A-Z][A-Z0-9_]*= ]]; then
+			echo "ERROR: Invalid line in $file: $line" >&2
+			exit 1
+		fi
+		key=${line%%=*}
+		if [ "$mode" == "build" ] && [[ "$key" == "INTERNAL_PRODUCT" || "$key" == "INTERNAL_EDITION" ]]; then
+			echo "ERROR: $key must not be set in $file. It is derived from the codebase" >&2
+			exit 1
+		fi
+		if [[ ! -v "values[$key]" ]]; then
+			# Unknown keys of the codebase are passed through
+			keys+=( "$key" )
+		fi
+		values[$key]=${line#*=}
+	done < "$file"
+}
+
+# Prints the content of a marker file like `BLUESPICE-PRODUCT`, normalized to lowercase
+readMarkerFile() {
+	local file=$1
+	if [ -f "$file" ]; then
+		tr -d '[:space:]' < "$file" | tr '[:upper:]' '[:lower:]'
+	fi
+}
+
+echo "Creating $targetFile"
+
+if [ "$mode" == "build" ]; then
+	codebaseDir=$source
+
+	product=$(readMarkerFile "$codebaseDir/BLUESPICE-PRODUCT")
+	if [ -n "$product" ]; then
+		values[INTERNAL_PRODUCT]=$product
+	fi
+	# Build args are available as environment variables during `RUN`
+	productArg=$(echo "${INTERNAL_PRODUCT:-}" | tr '[:upper:]' '[:lower:]')
+	if [ -n "$productArg" ] && [ "$productArg" != "${values[INTERNAL_PRODUCT]}" ]; then
+		echo "ERROR: Build arg INTERNAL_PRODUCT='$productArg' does not match the product of the codebase '${values[INTERNAL_PRODUCT]}'" >&2
+		exit 1
+	fi
+
+	edition=$(echo "${INTERNAL_EDITION:-}" | tr '[:upper:]' '[:lower:]')
+	if [ -z "$edition" ]; then
+		edition=$(readMarkerFile "$codebaseDir/BLUESPICE-EDITION")
+	fi
+
+	editionFiles=( "$codebaseDir"/_bluespice/.env.infrastructure.* )
+	if [ ! -e "${editionFiles[0]}" ]; then
+		# E.g. older releases or custom builds
+		echo "WARNING: No $codebaseDir/_bluespice/.env.infrastructure.<edition> found. Using defaults for a standalone codebase" >&2
+		if [ -n "$edition" ]; then
+			values[INTERNAL_EDITION]=$edition
+		fi
+	else
+		availableEditions=$(printf '%s\n' "${editionFiles[@]##*.env.infrastructure.}" | tr '\n' ' ')
+		if [ -z "$edition" ]; then
+			echo "ERROR: No edition selected. Set build arg INTERNAL_EDITION to one of: $availableEditions" >&2
+			exit 1
+		fi
+		editionFile="$codebaseDir/_bluespice/.env.infrastructure.$edition"
+		if [ ! -f "$editionFile" ]; then
+			echo "ERROR: Edition '$edition' is not supported by the codebase. Available editions: $availableEditions" >&2
+			exit 1
+		fi
+		values[INTERNAL_EDITION]=$edition
+		readEnvFile "$editionFile"
+	fi
+
+	for key in "${keys[@]}"; do
+		if [[ "$key" == "INTERNAL_PRODUCT" || "$key" == "INTERNAL_EDITION" ]]; then
+			continue
+		fi
+		if [ -n "${!key:-}" ] && [ "${!key}" != "${values[$key]}" ]; then
+			echo "Overriding $key from build arg: '${values[$key]}' -> '${!key}'"
+			values[$key]=${!key}
+		fi
+	done
+elif [ "$mode" == "runtime" ]; then
+	readEnvFile "$source"
+
+	for key in "${keys[@]}"; do
+		if [ -z "${!key:-}" ] || [ "${!key}" == "${values[$key]}" ]; then
+			continue
+		fi
+		if [[ " ${runtimeKeys[*]} " == *" $key "* ]]; then
+			echo "Overriding $key from environment: '${values[$key]}' -> '${!key}'"
+			values[$key]=${!key}
+		else
+			echo "WARNING: Ignoring $key='${!key}' from environment, as it is defined by the edition '${values[INTERNAL_EDITION]}' of the image" >&2
+		fi
+	done
+else
+	echo "ERROR: Invalid mode '$mode', must be 'build' or 'runtime'" >&2
+	exit 1
+fi
+
+for key in "${keys[@]}"; do
+	value=${values[$key]}
+	# Keep values simple, so the file can be sourced by bash and parsed by PHP without quoting
+	if [[ ! "$value" =~ ^[A-Za-z0-9_./:-]*$ ]]; then
+		echo "ERROR: Invalid value for $key: '$value'" >&2
+		exit 1
+	fi
+	if [[ "$key" == INTERNAL_ENABLE_* && "$value" != "true" && "$value" != "false" ]]; then
+		echo "ERROR: $key must be 'true' or 'false', got '$value'" >&2
+		exit 1
+	fi
+	if [[ "$key" == INTERNAL_FARM_INSTANCE_LIMIT && ! "$value" =~ ^[0-9]*$ ]]; then
+		echo "ERROR: $key must be a non-negative number or empty (unlimited), got '$value'" >&2
+		exit 1
+	fi
+done
+
+if [ ! -f "${values[INTERNAL_BOOTSTRAPER]}" ]; then
+	echo "ERROR: INTERNAL_BOOTSTRAPER '${values[INTERNAL_BOOTSTRAPER]}' does not exist" >&2
+	exit 1
+fi
+if [ "${values[INTERNAL_ENABLE_FARM]}" != "true" ]; then
+	for key in "${keys[@]}"; do
+		if [[ "$key" == INTERNAL_ENABLE_FARM_* && "${values[$key]}" == "true" ]] \
+			|| [[ "$key" == INTERNAL_FARM_INSTANCE_LIMIT && -n "${values[$key]}" ]]; then
+			echo "WARNING: $key has no effect, as INTERNAL_ENABLE_FARM is not 'true'" >&2
+		fi
+	done
+fi
+
+# May exist read-only from a previous container start
+rm -f "$targetFile"
+{
+	echo "# Created by init-infrastructure-envs ($mode) from $source. Do not edit!"
+	for key in "${keys[@]}"; do
+		echo "$key=${values[$key]}"
+	done
+} > "$targetFile"
+chmod 444 "$targetFile"
+
+cat "$targetFile"

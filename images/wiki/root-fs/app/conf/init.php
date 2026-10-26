@@ -94,6 +94,54 @@ function bsAssembleURL( $proto, $hostname, $port, $path = [], $username = [], $p
 	return "$protocol://$auth$host{$portSuffix}$path";
 }
 
+/**
+ * Returns a value of the infrastructure configuration of the image. It is created at build time from
+ * `_bluespice/.env.infrastructure.<edition>` of the codebase and on container start completed by
+ * deployment dependent values of the runtime environment (see `/app/bin/init-infrastructure-envs`).
+ * Falls back to the build time values, if the container was not started through `/app/bin/entrypoint`.
+ *
+ * @param string $name e.g. `INTERNAL_ENABLE_FARM`
+ * @return string Empty string if not set
+ */
+function bsInfrastructureConfig( string $name ): string {
+	static $config = null;
+	if ( $config === null ) {
+		$config = [];
+		$file = file_exists( '/app/.env.infrastructure' )
+			? '/app/.env.infrastructure'
+			: '/app/.env.infrastructure.build';
+		$lines = @file( $file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) ?: [];
+		foreach ( $lines as $line ) {
+			if ( str_starts_with( $line, '#' ) || !str_contains( $line, '=' ) ) {
+				continue;
+			}
+			[ $key, $value ] = explode( '=', $line, 2 );
+			$config[trim( $key )] = trim( $value );
+		}
+	}
+	return $config[$name] ?? '';
+}
+
+/**
+ * @param string $name e.g. `INTERNAL_ENABLE_FARM`
+ * @return bool
+ */
+function bsInfrastructureFlag( string $name ): bool {
+	return bsInfrastructureConfig( $name ) === 'true';
+}
+
+// Contract with the codebase: product and edition of the image are available as ENV variables
+// `INTERNAL_PRODUCT` and `INTERNAL_EDITION` to every PHP process (web, CLI, `docker exec`).
+// The codebase should prefer them over its `BLUESPICE-PRODUCT`/`BLUESPICE-EDITION` files, as
+// `BLUESPICE-EDITION` is only the default edition of a codebase that may serve several editions.
+// The values of the image always win, as they can not be changed at runtime.
+foreach ( [ 'INTERNAL_PRODUCT', 'INTERNAL_EDITION' ] as $bsInfrastructureEnvName ) {
+	if ( bsInfrastructureConfig( $bsInfrastructureEnvName ) !== '' ) {
+		putenv( "$bsInfrastructureEnvName=" . bsInfrastructureConfig( $bsInfrastructureEnvName ) );
+	}
+}
+unset( $bsInfrastructureEnvName );
+
 // We must not set MW_CONFIG_FILE if we are running the CLI installer
 // in `run-installation`, because otherwise it will not allow us to install
 if (

@@ -5,6 +5,9 @@ cat <<'EOF' >> /app/.env
 export AV_HOST=${AV_HOST:--}
 export AV_PORT=${AV_PORT:-3310}
 
+# File storage service defaults (S3 compatible, disabled by default)
+export FILESTORE_HOST=${FILESTORE_HOST:--}
+
 # Cache service defaults
 export CACHE_HOST=${CACHE_HOST:-cache}
 export CACHE_PORT=${CACHE_PORT:-11211}
@@ -138,3 +141,9 @@ if [ -d /run/secrets/ ]; then
     echo "export $secret=$(cat /run/secrets/$secret)" >> /app/.env
   done
 fi
+
+# Infrastructure configuration of the codebase: Build time values of the edition. Only deployment
+# dependent values can be overridden by the runtime environment (see `init-infrastructure-envs`)
+/app/bin/init-infrastructure-envs runtime /app/.env.infrastructure.build /app/.env.infrastructure || exit 1
+echo "# Infrastructure configuration loaded from /app/.env.infrastructure" >> /app/.env
+echo "set -a; source /app/.env.infrastructure; set +a" >> /app/.env

@@ -35,13 +35,14 @@ run-maintenance update \
 	--doshared \
 	| tee -a /data/bluespice/logs/update-$timestamp.log
 
-echo $version > /data/bluespice/logs/baseversion
-
-if [ "${EDITION}" == "farm" ] || [ "${EDITION}" == "galaxy" ]; then
+if [ "${INTERNAL_ENABLE_FARM}" == "true" ]; then
 	run-maintenance BlueSpiceWikiFarm:RunForAll \
 		--script='maintenance/update.php' \
 		--args='--quick --doshared' \
 		| tee -a /data/bluespice/logs/update-$timestamp.log
 fi
+
+# Only after all updates succeeded, otherwise the next start would skip the failed ones
+echo $version > /data/bluespice/logs/baseversion
 
 run-logged-update-scripts postupdate

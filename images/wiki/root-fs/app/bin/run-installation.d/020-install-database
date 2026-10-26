@@ -37,8 +37,11 @@ php $appDir/maintenance/install.php \
 	--scriptpath=/w \
 	"$name" \
 	"$adminUserName"
+installExitCode=$?
 
 # We don't need the default LocalSettings.php file, as we have one hardwired in this container
 if [ -f $appDir/LocalSettings.php ]; then
 	rm $appDir/LocalSettings.php
 fi
+
+exit $installExitCode

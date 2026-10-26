@@ -26,7 +26,12 @@ for f in /app/bin/run-installation.d/*; do
 	if [ -f "$f" ]; then
 		echo ""
 		echo "🔧 Running $f"
-		$f
+		if ! $f; then
+			echo ""
+			echo "#############################################"
+			echo "❌ Installation step $f failed"
+			exit 1
+		fi
 	fi
 done
 

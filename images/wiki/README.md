@@ -6,7 +6,7 @@ For the free edition the GitHub can be used for both.
 Example FREE edition build command:
 
 ```bash
-docker build --build-arg EDITION=free -t bluespice/wiki:latest .
+docker build -t bluespice/wiki:latest .
 ```
 
 Example custom edition build command:
@@ -19,8 +19,67 @@ docker build \
 	--secret id=GIT_AUTH_TOKEN \
 	--build-arg BLUESPICE_URL=<url-to-custom-edition-repo> \
 	--build-arg BLUESPICE_VERSION=<branch-or-tag> \
-	--build-arg EDITION=<edition> \
 	-t bluespice/wiki:latest .
+```
+
+## Infrastructure configuration of the codebase
+
+The container can run different codebases (products/editions, custom builds). A codebase may contain several editions (e.g. PRO and FARM). Each image is built for exactly one edition:
+
+- `INTERNAL_PRODUCT` is taken from `BLUESPICE-PRODUCT` of the codebase. A build arg `INTERNAL_PRODUCT` is only used to verify it.
+- `INTERNAL_EDITION` is taken from the build arg `INTERNAL_EDITION`. Without build arg, `BLUESPICE-EDITION` (the default edition of the codebase) is used.
+- All other values are taken from `_bluespice/.env.infrastructure.<edition>` of the codebase. The available editions are the existing files. They can be overridden with build args of the same name (e.g. for custom builds).
+
+`/app/bin/init-infrastructure-envs` writes the values at build time to `/app/.env.infrastructure.build` and on container start to `/app/.env.infrastructure`:
+
+    container defaults < `_bluespice/.env.infrastructure.<edition>` < `--build-arg` < runtime environment (deployment dependent values only)
+
+Values that define the edition can not be changed at runtime. Attempts are ignored with a warning. Only deployment dependent values (column "Runtime") can be overridden with environment variables of the container.
+
+The build fails if the selected edition is not available, if a value is invalid (e.g. `INTERNAL_ENABLE_FARM=yes`) or if `INTERNAL_BOOTSTRAPER` does not exist. The same checks apply on container start.
+
+| Variable                                   | Default                              | Runtime | Description |
+|--------------------------------------------|--------------------------------------|---------|-------------|
+| `INTERNAL_PRODUCT`                         | `classic`                            | No      | Product, e.g. `classic`, `galaxy` |
+| `INTERNAL_EDITION`                         | `free`                               | No      | Edition, e.g. `free`, `pro`, `farm`, `sky` |
+| `INTERNAL_PARALLEL_RUNJOBS_SERVICE_MODE`   | `standalone`                         | No      | `wiki.type` of `parallel-runjobs-service` |
+| `INTERNAL_ENABLE_FARM`                     | `false`                              | No      | Enables the wiki farm (`LocalSettings.d/Farm.Base.pre.php`) |
+| `INTERNAL_ENABLE_FARM_SHARED_SEARCH`       | `false`                              | No      | Unified search over all farm instances |
+| `INTERNAL_ENABLE_FARM_SHARED_USER_SESSION` | `false`                              | No      | Shared users, user sessions and global access control |
+| `INTERNAL_ENABLE_FARM_SHARED_DATABASE`     | `false`                              | No      | Additional shared database tables |
+| `INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE`     | `false`                              | Yes     | Redis/Valkey job queue. Requires `JOBQUEUE_HOST` |
+| `INTERNAL_FARM_INSTANCE_LIMIT`             | `''`                                 | No      | Maximum number of farm instances (sub-wikis). Empty or `0` means unlimited. Not bound to an edition, set it by build arg, e.g. `--build-arg INTERNAL_FARM_INSTANCE_LIMIT=30` |
+| `INTERNAL_BOOTSTRAPER`                     | `/app/conf/StandardBootstrapper.php` | No      | Bootstrapper of the codebase. Farms use `/app/bluespice/w/extensions/BlueSpiceWikiFarm/WikiFarm.setup.php`, which includes the Standard Bootstrapper through `$wgWikiFarmConfig_LocalSettingsAppendPath` |
+
+`INTERNAL_ENABLE_FARM_*` flags only have an effect if `INTERNAL_ENABLE_FARM=true`.
+
+`INTERNAL_PRODUCT` and `INTERNAL_EDITION` are available as ENV variables to every PHP process of the container (web, CLI, `docker exec`), see `/app/conf/init.php`. The codebase should use them instead of its `BLUESPICE-PRODUCT`/`BLUESPICE-EDITION` files, because `BLUESPICE-EDITION` is only the default edition of a codebase that may serve several editions:
+
+```php
+$edition = getenv( 'INTERNAL_EDITION' ) ?: trim( file_get_contents( "$IP/BLUESPICE-EDITION" ) );
+```
+
+Example: Build a FARM image from a codebase that contains PRO (default edition) and FARM:
+
+```bash
+docker build --build-arg INTERNAL_EDITION=farm -t bluespice/wiki:farm .
+```
+
+Example: Disable the shared job queue of a FARM image, e.g. if the stack has no Redis/Valkey service:
+
+```bash
+docker run -e INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE=false bluespice/wiki:farm
+```
+
+`/app/conf/LocalSettings.php` includes the files from `/app/conf/LocalSettings.d/` based on these flags.
+
+All settings files (including `WIKI_PRE_INIT_SETTINGS_FILE`, `WIKI_POST_INIT_SETTINGS_FILE`, `LocalSettings.custom.php` of farm instances and `_bluespice/settings.d/*.php` of the codebase) are included within the scope of a closure. They must use `$GLOBALS['wgSomething']` instead of `$wgSomething`, and `MW_INSTALL_PATH` instead of `$IP`:
+
+```php
+<?php
+$GLOBALS['wgSomething'] = 'value';          // Works
+$GLOBALS['wgHooks']['SomeHook'][] = ...;    // Works
+$wgSomething = 'value';                     // Silently ignored!
 ```
 
 ## ENV vars
@@ -49,8 +108,7 @@ docker build \
 | `DIAGRAM_PATH`               | `/_diagram/`   | Path of a `bluespice/diagram` compatible service     | Yes      |
 | `DIAGRAM_PORT`               | `$WIKI_PORT`   | Port of a `bluespice/diagram` compatible service     | Yes      |
 | `DIAGRAM_PROTOCOL`           | `$WIKI_PROTOCOL`| Protocol of a `bluespice/diagram` compatible service| Yes      |
-| `EDITION`                    | `null`         | Edition of the wiki                                  | Yes      |
-| `FILESTORE_HOST`            | `filestore`    | Hostname of a `bluespice/filestore` compatible service| Yes      |
+| `FILESTORE_HOST`            | `-`            | Hostname of a `bluespice/filestore` compatible service. `-` disables it | Yes      |
 | `FILESTORE_ACCESS_KEY`      | `''`         | Access key for `bluespice/filestore` compatible service | No, if `FILESTORE_HOST` is set       |
 | `FILESTORE_SECRET_KEY`    | `''`         | Secret key for `bluespice/filestore` compatible service | No, if `FILESTORE_HOST` is set       |
 | `FILESTORE_BUCKET_NAME`    | `<wikiid>`         | Bucket name for `bluespice/filestore` compatible service | Yes      |
@@ -68,7 +126,7 @@ docker build \
 | `INTERNAL_WIKI_TOKEN_AUTH_SALT` | `null`      | Salt for token-based service authentication              | No       |
 | `INTERNAL_WIKI_UPGRADEKEY`   | `null`         | Upgrade key for the wiki                                 | No       |
 | `INTERNAL_WIRE_API_KEY`      | `null`         | API key for `bluespice/wire` service                     | No, if `WIRE_HOST` is set |
-| `JOBQUEUE_HOST`              | `jobqueue`     | Hostname of a `bluespice/jobqueue` compatible service| Yes      |
+| `JOBQUEUE_HOST`              | `null`         | Hostname of a `bluespice/jobqueue` compatible service. Only used with `INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE=true` | Yes      |
 | `JOBQUEUE_PORT`              | `6379`         | Port of a `bluespice/jobqueue` compatible service          | Yes      |
 | `MAX_UPLOAD_SIZE`            | `1024m`        | Max upload size for single file (Allowed: m or g)    | Yes      |
 | `METADATASTORE_PROTOCOL`     | `http`         | Protocol of a `bluespice/metadatastore` compatible service      | Yes      |

@@ -20,7 +20,7 @@ directories=(
   /data/simplesamlphp/logs
 )
 
-if [ "${EDITION}" == "farm" ] || [ "${EDITION}" == "galaxy" ]; then
+if [ "${INTERNAL_ENABLE_FARM}" == "true" ]; then
 	directories=(
   /data/bluespice/cache
   /data/bluespice/extensions/BlueSpiceFoundation/data

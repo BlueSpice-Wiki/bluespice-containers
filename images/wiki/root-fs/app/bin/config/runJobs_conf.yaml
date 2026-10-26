@@ -1,9 +1,8 @@
 environment:
     php: "/usr/bin/php"
 wiki:
-    # BlueSpice Galaxy is a farm. But parallel-runjobs-service has no setting for galaxy. Therefore we hardcode it.
-    # This must be changed in a unified image for classic/galaxy
-    type: "farm"
+    # Taken from `_bluespice/.env.infrastructure.<edition>` of the codebase
+    type: "###INTERNAL_PARALLEL_RUNJOBS_SERVICE_MODE###"
     path: "/app/bluespice/w"
 database:
     dbserver: "###DB_HOST###"
