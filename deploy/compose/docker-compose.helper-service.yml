@@ -20,7 +20,7 @@ x-common-environment: &common-environment
 
 services:
   prepare:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/helper:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-helper:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-prepare
     volumes:
       - ${DATADIR}:/data
@@ -30,7 +30,7 @@ services:
       <<: *common-environment
 
   upgrade:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/helper:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-helper:${VERSION}
     depends_on:
       database:
         condition: service_healthy

@@ -1,26 +1,26 @@
 services:
   cache:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/cache:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-cache:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-cache
     restart: unless-stopped
   pdf:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/pdf:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-pdf:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-pdf
     restart: unless-stopped
 
   formula:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/formula:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-formula:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-formula
     restart: unless-stopped
 
   diagram:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/diagram:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-diagram:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-diagram
     restart: unless-stopped
 
   wire:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-wire
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/wire:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-wire:${VERSION}
     environment:
       WIRE_LOG_LEVEL: ${WIRE_LOG_LEVEL:-warning}
       WIRE_WIKI_BASE_PATH: http://wiki-web:9090
@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
   statisticsdashboard:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/statisticsdashboard:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-statisticsdashboard:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-statisticsdashboard
     environment:
       MYSQL_HOST: ${DB_HOST}

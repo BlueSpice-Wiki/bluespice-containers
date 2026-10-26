@@ -2,7 +2,7 @@ services:
 
   ai:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-ai
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/ai:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-ai:${VERSION}
     depends_on:
       - ai-database
     environment:
@@ -60,7 +60,7 @@ services:
 
   prompt:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-prompt
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/prompt:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-prompt:${VERSION}
     depends_on:
       chat:
         condition: service_healthy
@@ -78,7 +78,7 @@ services:
 
   mcp:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-mcp
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/mcp:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-mcp:${VERSION}
     depends_on:
       wiki-task:
         condition: service_healthy

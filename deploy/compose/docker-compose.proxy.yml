@@ -1,7 +1,7 @@
 services:
 
   proxy:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/proxy:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-proxy:${VERSION}
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-proxy
     restart: unless-stopped
     ports:

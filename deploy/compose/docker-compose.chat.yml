@@ -2,7 +2,7 @@ services:
 
   chat:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-chat
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/chat:${VERSION}
+    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-chat:${VERSION}
     depends_on:
       - wiki-web
     environment:
