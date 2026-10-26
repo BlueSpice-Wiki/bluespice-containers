@@ -187,7 +187,7 @@ public class MainController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("success", true);
 		response.put("msg", "Service is running");
-		response.put( "version", "2.2.2");
+		response.put( "version", "2.2.3");
 		return response;
 	}
 
