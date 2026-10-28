@@ -1,0 +1,23 @@
+# Metadata store of Extension:NeoWiki, not part of the `glacier` edition
+services:
+
+  metadatastore:
+    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-metadatastore
+    restart: unless-stopped
+    image: neo4j:5
+    environment:
+      NEO4J_AUTH: neo4j/${METADATASTORE_PASS}
+    volumes:
+      - ${DATADIR}/metadatastore:/data
+
+  wiki-installer:
+    environment:
+      METADATASTORE_PASS: ${METADATASTORE_PASS}
+
+  wiki-web:
+    environment:
+      METADATASTORE_PASS: ${METADATASTORE_PASS}
+
+  wiki-task:
+    environment:
+      METADATASTORE_PASS: ${METADATASTORE_PASS}

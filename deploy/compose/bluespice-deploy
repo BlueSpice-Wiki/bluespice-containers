@@ -1,64 +1,65 @@
 #!/bin/bash
 
-for i in "$@"; do
-  case $i in
-    --profile=upgrade)
-      UPGRADE_ACTION="/app/bin/upgrade-pipeline"
-      ;;
-    --profile=upgrade-force)
-      UPGRADE_ACTION="/app/bin/upgrade-pipeline -f"
-      ;;
-    --profile=*)
-      echo "Unknown profile ${i#*=}"
-      exit 1
-      ;;
-    *)
-      DOCKER_ARGS+=("$i")
-      ;;
-  esac
-done
-
-export UPGRADE_ACTION=${UPGRADE_ACTION:-"sleep 1"}
-
 export TZ=$(readlink /etc/localtime 2>/dev/null | sed 's|.*/zoneinfo/||')
 
 source .env
 
 EXTENDED_TOOLS=""
 
+# Images of the edition. The registry of the released images is used by default. `BLUESPICE_REGISTRY`
+# switches all images to another registry with the layout of `releng-builder`, e.g. the nightly builds:
+#   BLUESPICE_REGISTRY=docker.bluespice.com/bluespice-galaxy-daily-builds
+#   -> <BLUESPICE_REGISTRY>/<EDITION>/galaxy-wiki:<VERSION> and <BLUESPICE_REGISTRY>/galaxy-<service>:<VERSION>
 case "${EDITION}" in
 	glacier)
+		# Community edition, released on Docker Hub
 		WIKI_IMAGE=bluespice/galaxy-wiki:${VERSION}
+		SERVICE_REPOSITORY=bluespice
 		;;
 	sky|sapphire)
-		EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.collabpads-service.yml"
-		WIKI_IMAGE=docker.bluespice.com/bluespice-${EDITION}/galaxy-wiki:${VERSION}
-
-		if [[ $(docker images -q ${WIKI_IMAGE}) ]]; then
-			echo "Image ${WIKI_IMAGE} found locally."
-		elif [[ ! $(grep 'docker.bluespice.com' $HOME/.docker/config.json) ]]; then
-			echo "In order to access our ${EDITION}-Image please login to docker.bluespice.com"
-			docker login docker.bluespice.com
-			if [[ ! $(grep 'docker.bluespice.com' $HOME/.docker/config.json) ]]; then
-			echo -e "\n-------------\n"
-			echo "Please contact support@hallowelt.com for your Credentials against docker.bluespice.com"
-			echo -e "\n-------------\n"
-			exit
-			fi
-		fi
+		EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.metadatastore.yml"
+		WIKI_IMAGE=docker.bluespice.com/bluespice-galaxy/${EDITION}/galaxy-wiki:${VERSION}
+		SERVICE_REPOSITORY=docker.bluespice.com/bluespice-galaxy
 		;;
 	*)
 		echo "Unknown EDITION '${EDITION}'. Supported editions: glacier, sky, sapphire"
 		exit 1
 		;;
 esac
+if [ -n "${BLUESPICE_REGISTRY}" ]; then
+	WIKI_IMAGE=${BLUESPICE_REGISTRY}/${EDITION}/galaxy-wiki:${VERSION}
+	SERVICE_REPOSITORY=${BLUESPICE_REGISTRY}
+fi
+##allow custom images for testing
+WIKI_IMAGE=${BLUESPICE_WIKI_IMAGE:-${WIKI_IMAGE}}
+BLUESPICE_SERVICE_REPOSITORY=${BLUESPICE_SERVICE_REPOSITORY:-${SERVICE_REPOSITORY}}
+
+if [[ "${WIKI_IMAGE}" == docker.bluespice.com/* || "${BLUESPICE_SERVICE_REPOSITORY}" == docker.bluespice.com/* ]] \
+	&& [[ ! $(docker images -q ${WIKI_IMAGE}) ]] \
+	&& ! grep -qs 'docker.bluespice.com' $HOME/.docker/config.json; then
+	echo "In order to access the ${EDITION} images please login to docker.bluespice.com"
+	docker login docker.bluespice.com
+	if ! grep -qs 'docker.bluespice.com' $HOME/.docker/config.json; then
+		echo -e "\n-------------\n"
+		echo "Please contact support@hallowelt.com for your Credentials against docker.bluespice.com"
+		echo -e "\n-------------\n"
+		exit 1
+	fi
+fi
+
 if [ "${ANTIVIRUS}" == "true" ]; then
 	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.clamav-antivirus.yml"
 fi
-if [ "${CHAT}" == "true" ]; then
-	EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.chat.yml"
-	if [ "${AI}" == "true" ]; then
-		EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.ai.yml"
+if [ "${CHAT}" == "true" ] || [ "${AI}" == "true" ]; then
+	if [ "${EDITION}" == "glacier" ]; then
+		echo "CHAT and AI are not available in the ${EDITION} edition and will be ignored"
+	elif [ "${CHAT}" == "true" ]; then
+		EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.chat.yml"
+		if [ "${AI}" == "true" ]; then
+			EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.ai.yml"
+		fi
+	else
+		echo "AI requires CHAT=true and will be ignored"
 	fi
 fi
 if [ "${LETSENCRYPT}" == "true" ]; then
@@ -68,15 +69,6 @@ EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.proxy.yml"
 
 if [ -f docker-compose.override.yml ]; then
        EXTENDED_TOOLS="${EXTENDED_TOOLS} -f docker-compose.override.yml"
-fi
-##allow custom services repo for testing
-if [ -z "${BLUESPICE_SERVICE_REPOSITORY}" ] && [ -n "${SERVICES_REPOSITORY_PATH}" ]; then
-	BLUESPICE_SERVICE_REPOSITORY=${SERVICES_REPOSITORY_PATH}
-fi
-BLUESPICE_SERVICE_REPOSITORY=${BLUESPICE_SERVICE_REPOSITORY:-docker.bluespice.com/bluespice}
-##allow custom wiki image for testing
-if [ -n "${BLUESPICE_WIKI_IMAGE}" ]; then
-	WIKI_IMAGE=${BLUESPICE_WIKI_IMAGE}
 fi
 
 if [ ! -d ${DATADIR}/.secrets ]; then
@@ -89,6 +81,7 @@ if [ ! -d ${DATADIR}/.secrets ]; then
 		-f docker-compose.main.yml \
 		-f docker-compose.persistent-data-services.yml \
 		-f docker-compose.stateless-services.yml \
+		-f docker-compose.collabpads-service.yml \
 		${EXTENDED_TOOLS} \
 		up prepare
 	echo "Preparation finished"
@@ -102,5 +95,6 @@ fi
 		-f docker-compose.main.yml \
 		-f docker-compose.persistent-data-services.yml \
 		-f docker-compose.stateless-services.yml \
+		-f docker-compose.collabpads-service.yml \
 		${EXTENDED_TOOLS} \
-		${DOCKER_ARGS[*]}
+		"$@"
