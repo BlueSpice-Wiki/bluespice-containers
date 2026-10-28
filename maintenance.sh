@@ -168,7 +168,7 @@ build_docker_images() {
                 docker rmi "$(cat "$temp_file")" 2>/dev/null && \
                 rm -f "$temp_file"
             else
-                docker build -t "bluespice/$image_name:$IMAGES_VERSION_TAG" $SECRET_ARGS $BUILD_ARGS "$dir"
+                docker build -t "bluespice/galaxy-$image_name:$IMAGES_VERSION_TAG" $SECRET_ARGS $BUILD_ARGS "$dir"
             fi
         fi
     done
@@ -189,7 +189,8 @@ generate_dev_env() {
         echo ""
         [[ "$version_tag" == *galaxy* ]] && echo "EDITION=galaxy"
         echo "VERSION=$version_tag"
-        echo 'BLUESPICE_WIKI_IMAGE=bluespice/wiki:$VERSION'
+        echo 'BLUESPICE_WIKI_IMAGE=bluespice/galaxy-wiki:$VERSION'
+        echo "BLUESPICE_SERVICE_REPOSITORY=bluespice"
         echo "SMTP_HOST=dev-mailhog"
         echo "SMTP_PORT=1025"
         echo "WIKI_LOG_LEVEL=debug"

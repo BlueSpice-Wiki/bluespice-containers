@@ -76,8 +76,11 @@ x-common-dev: &common-dev
       COPY --from=composer:2 /usr/bin/composer /app/bin/composer
       COPY --from=builder /build/ssp/_simplesamlphp /app/simplesamlphp
       RUN chown -R bluespice:0 /app/simplesamlphp/public && chmod -R g=u /app/simplesamlphp/public
+      RUN printf '#!/bin/bash\n/app/bin/init-infrastructure-envs build /app/bluespice/w /app/.env.infrastructure.build || exit 1\nexec /app/bin/entrypoint "$@"\n' > /app/bin/dev-entrypoint \
+          && chmod 775 /app/bin/dev-entrypoint
       USER bluespice
     no_cache: true
+  entrypoint: ["/app/bin/dev-entrypoint"]
 
 services:
   wiki-installer:

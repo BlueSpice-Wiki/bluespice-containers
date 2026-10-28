@@ -5,7 +5,7 @@ deploy/compose/*.backup
 webservices/ai/
 webservices/chat/
 
-# for dev-5.3.x
+# for dev-5.3.x, dev-6.0.x and dev-galaxy
 images/keyvaluestore/
 images/mcp/
 images/prompt/
@@ -13,3 +13,5 @@ images/statisticsdashboard/
 webservices/mcp/
 webservices/prompt/
 
+# for dev-galaxy
+images/collabpadsdatabase/
