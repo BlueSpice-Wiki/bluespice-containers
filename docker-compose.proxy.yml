@@ -18,6 +18,7 @@ services:
   wiki-web:
     environment:
       VIRTUAL_HOST: ${WIKI_HOST}
+      # Catch-all, also with WIKI_BASE_PATH: the wiki serves root level paths like `/.well-known/` too
       VIRTUAL_PATH: /
       VIRTUAL_PORT: 9090
 

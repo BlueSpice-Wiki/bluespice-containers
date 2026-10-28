@@ -29,21 +29,6 @@ services:
     environment:
       <<: *common-environment
 
-  upgrade:
-    image: ${BLUESPICE_SERVICE_REPOSITORY}/galaxy-helper:${VERSION}
-    depends_on:
-      database:
-        condition: service_healthy
-    container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-upgrade
-    volumes:
-      - ${DATADIR}:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      <<: *common-environment
-
-    restart: no
-    command: ${UPGRADE_ACTION}
-
   search:
     depends_on:
       prepare:
@@ -52,9 +37,4 @@ services:
   database:
     depends_on:
       prepare:
-        condition: service_completed_successfully
-
-  wiki-installer:
-    depends_on:
-      upgrade:
         condition: service_completed_successfully
