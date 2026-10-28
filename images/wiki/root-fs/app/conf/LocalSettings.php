@@ -39,6 +39,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 		if ( bsInfrastructureFlag( 'INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE' ) ) {
 			require_once "$settingsDir/Farm.SharedJobQueue.pre.php";
 		}
+		if ( bsInfrastructureFlag( 'INTERNAL_ENABLE_FARM_SHARED_RESOURCES' ) ) {
+			require_once "$settingsDir/Farm.SharedResources.pre.php";
+		}
 	}
 
 	require_once trim( getenv( 'WIKI_PRE_INIT_SETTINGS_FILE' ) );
@@ -58,6 +61,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	}
 	if ( $isFarm ) {
 		require_once "$settingsDir/Farm.Base.post.php";
+		if ( bsInfrastructureFlag( 'INTERNAL_ENABLE_FARM_SHARED_SEARCH' ) ) {
+			require_once "$settingsDir/Farm.SharedSearch.post.php";
+		}
 		if ( bsInfrastructureFlag( 'INTERNAL_ENABLE_FARM_SHARED_DATABASE' ) ) {
 			require_once "$settingsDir/Farm.SharedDatabase.post.php";
 		}

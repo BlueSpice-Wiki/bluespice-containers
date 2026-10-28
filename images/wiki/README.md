@@ -48,6 +48,7 @@ The build fails if the selected edition is not available, if a value is invalid 
 | `INTERNAL_ENABLE_FARM_SHARED_USER_SESSION` | `false`                              | No      | Shared users, user sessions and global access control |
 | `INTERNAL_ENABLE_FARM_SHARED_DATABASE`     | `false`                              | No      | Additional shared database tables |
 | `INTERNAL_ENABLE_FARM_SHARED_JOBQUEUE`     | `false`                              | Yes     | Redis/Valkey job queue. Requires `JOBQUEUE_HOST` |
+| `INTERNAL_ENABLE_FARM_SHARED_RESOURCES`    | `false`                              | No      | Shared resources wiki (`-shared`) for templates, files, etc. of all farm instances |
 | `INTERNAL_FARM_INSTANCE_LIMIT`             | `''`                                 | No      | Maximum number of farm instances (sub-wikis). Empty or `0` means unlimited. Not bound to an edition, set it by build arg, e.g. `--build-arg INTERNAL_FARM_INSTANCE_LIMIT=30` |
 | `INTERNAL_BOOTSTRAPER`                     | `/app/conf/StandardBootstrapper.php` | No      | Bootstrapper of the codebase. Farms use `/app/bluespice/w/extensions/BlueSpiceWikiFarm/WikiFarm.setup.php`, which includes the Standard Bootstrapper through `$wgWikiFarmConfig_LocalSettingsAppendPath` |
 
