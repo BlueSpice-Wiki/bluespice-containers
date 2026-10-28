@@ -58,6 +58,9 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	}
 	if ( $isFarm ) {
 		require_once "$settingsDir/Farm.Base.post.php";
+		if ( bsInfrastructureFlag( 'INTERNAL_ENABLE_FARM_SHARED_DATABASE' ) ) {
+			require_once "$settingsDir/Farm.SharedDatabase.post.php";
+		}
 	}
 
 	require_once trim( getenv( 'WIKI_POST_INIT_SETTINGS_FILE' ) );
