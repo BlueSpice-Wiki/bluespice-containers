@@ -32,7 +32,7 @@ directories=(
 
 if [[ "${EDITION}" == "farm" ]]; then
   directories+=(
-    /data/wiki/bluespice/farm-archive
+    /data/wiki/bluespice/farm-archives
     /data/wiki/bluespice/farm-instances
   )
 fi

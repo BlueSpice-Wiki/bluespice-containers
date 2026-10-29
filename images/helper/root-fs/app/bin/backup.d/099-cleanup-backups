@@ -2,7 +2,7 @@
 if [[  $(restic -r ${BLUESPICE_BACKUP_DIRECTORY} stats <<< ${BACKUP_PASS} > /dev/null 2>&1 )  ]]; then
 	restic -r ${BLUESPICE_BACKUP_DIRECTORY} forget --keep-within-daily 7d --keep-within-weekly 1m --keep-within-monthly 1y --keep-within-yearly 75y  <<< ${BACKUP_PASS} > /proc/1/fd/1 2>&1 ;
 else
-	echo "deleting backups older than "${BLUESPICE_BACKUP_RETENTION} days"
+	echo "deleting backups older than ${BLUESPICE_BACKUP_RETENTION} days"
 	find ${BLUESPICE_TAR_BACKUP_DIRECTORY} -iname "${WIKI_HOST}_*.tar.gz" -ctime +${BLUESPICE_BACKUP_RETENTION} -exec rm -fr {} \;
 fi
 ##Clean up Backups from mediawiki-adm after the first run of the new BackupCycle
