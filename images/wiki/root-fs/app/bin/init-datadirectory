@@ -26,7 +26,7 @@ if [ "${EDITION}" == "farm" ]; then
   /data/bluespice/extensions/BlueSpiceFoundation/data
   /data/bluespice/images
   /data/bluespice/farm-instances
-  /data/bluespice/farm-archive
+  /data/bluespice/farm-archives
   /data/bluespice/logs/postupdate
   /data/bluespice/logs/preupdate
   /data/bluespice/logs
