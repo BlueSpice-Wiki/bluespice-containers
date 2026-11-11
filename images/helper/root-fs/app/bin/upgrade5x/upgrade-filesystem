@@ -7,7 +7,7 @@ cd /data/wiki/bluespice
 		rsync -avz _sf_instances/ farm-instances
 		echo "Moving _sf_archive" | tee -a ${LOGFILE}
 		touch _sf_archive/empty.txt
-		rsync -avz _sf_archive/ farm-archive
+		rsync -avz _sf_archive/ farm-archives
 		mkdir -p ${Upgrade_Directory}
 		echo "archive empty directories" | tee -a ${LOGFILE}
 		tar czf ${Upgrade_Directory}/_sf_backup.tar.gz _sf_instances _sf_archive
