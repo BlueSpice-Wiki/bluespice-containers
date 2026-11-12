@@ -9,8 +9,8 @@ ENV SIMPLESAMLPHP_SHA256=38d81fc60f358b46a58df38617b02f97f57793dcbf8e491c1abcedb
 ENV MATHOIDREMOTE_URL=https://raw.githubusercontent.com/hallowelt/docker-bluespice-formula/80786798646fe1bb105db2228a07c86f546d9f56/_client/mathoid-remote
 ENV MATHOIDREMOTE_SHA256=9a562346e8fcc662f2d4b1c2a674c23862782365807d30de317a1fe77affc36a
 
-ENV PARALLELRUNJOBSSERVICE_URL=https://github.com/hallowelt/misc-parallel-runjobs-service/releases/download/2.1.2/parallel-runjobs-service
-ENV PARALLELRUNJOBSSERVICE_SHA256=bbc69676654eb974381beae4ac9d17c37d0f8c0037e75714124e7265d840091e
+ENV PARALLELRUNJOBSSERVICE_URL=https://github.com/hallowelt/misc-parallel-runjobs-service/releases/download/2.1.3/parallel-runjobs-service
+ENV PARALLELRUNJOBSSERVICE_SHA256=59ecb51988c1b3d26ae00ee1ea6d5e6624122b1ae51fd864c5a7e2ff2547b087
 
 ARG BLUESPICE_VERSION=5.1.x
 ARG BLUESPICE_URL=https://github.com/BlueSpice-Wiki/bluespice-free-release.git
