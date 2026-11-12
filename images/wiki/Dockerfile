@@ -1,18 +1,16 @@
 FROM alpine:3 AS builder
 
 # We use SimpleSAMLphp SLIM version to reduce the image size
-ENV SIMPLESAMLPHP_VERSION=2.5.2
+ENV SIMPLESAMLPHP_VERSION=2.5.3.1
 ENV SIMPLESAMLPHP_URL=https://github.com/simplesamlphp/simplesamlphp/releases/download/v${SIMPLESAMLPHP_VERSION}/simplesamlphp-${SIMPLESAMLPHP_VERSION}-slim.tar.gz
-ENV SIMPLESAMLPHP_SHA256=6bf7945e8981db9815e20af2bb17db8e44d265f0b1646bfa51e6dd755fef1ea6
+ENV SIMPLESAMLPHP_SHA256=38d81fc60f358b46a58df38617b02f97f57793dcbf8e491c1abcedb6706ffe3c
 
 # HINT: This version is valid for 5.1 and 5.2; Later versions don't use this tool anymore. For the sake of reproducable builds, we hardcode the version here and adapt manually on demand
 ENV MATHOIDREMOTE_URL=https://raw.githubusercontent.com/hallowelt/docker-bluespice-formula/80786798646fe1bb105db2228a07c86f546d9f56/_client/mathoid-remote
 ENV MATHOIDREMOTE_SHA256=9a562346e8fcc662f2d4b1c2a674c23862782365807d30de317a1fe77affc36a
 
-ENV MEDIAWIKIADM_SHA256=1e5609d76f0c3ade1a33fd0bf204463747c8b99d86a49004ce00d50d8886666f
-
-ENV PARALLELRUNJOBSSERVICE_URL=https://github.com/hallowelt/misc-parallel-runjobs-service/releases/download/2.0.1/parallel-runjobs-service
-ENV PARALLELRUNJOBSSERVICE_SHA256=ec8ea7e8a79242baba862448bcba952376267c0db19785d6266ab9a01a29e241
+ENV PARALLELRUNJOBSSERVICE_URL=https://github.com/hallowelt/misc-parallel-runjobs-service/releases/download/2.1.3/parallel-runjobs-service
+ENV PARALLELRUNJOBSSERVICE_SHA256=59ecb51988c1b3d26ae00ee1ea6d5e6624122b1ae51fd864c5a7e2ff2547b087
 
 ARG BLUESPICE_VERSION=5.2.x
 ARG BLUESPICE_URL=https://github.com/BlueSpice-Wiki/bluespice-free-release.git

@@ -4,6 +4,7 @@
 set -o nounset
 set -o pipefail
 
+/app/bin/parallel-runjobs-service --version
 parallel_runjobs_pid=0
 while true; do
 	# Check if the process is not running
