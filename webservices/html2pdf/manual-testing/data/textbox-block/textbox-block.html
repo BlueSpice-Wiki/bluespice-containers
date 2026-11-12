@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Textbox accessibility reproducer: block layout</title>
+    <style>
+        .cd-textbox { padding: 14px; margin: 2em 0 1em; display: block; position: relative; width: 100%; clear: both; }
+        .icon-col.has-icon { display: block; float: left; width: 30px; }
+        .icon-col.has-icon::before { content: "i"; font-size: 1.6em; }
+        .text-col { margin-left: 40px; }
+        .boxheader { font-weight: bold; display: block; }
+        .cd-textbox-note { border-left: solid 4px #2b80ea; background: #dfecfc; }
+    </style>
+</head>
+<body>
+    <h1>Company history: note-box isolation</h1>
+    <div class="cd-textbox cd-textbox-note">
+        <div class="icon-col has-icon"></div>
+        <div class="text-col"><span class="boxheader">Please note</span><span class="boxtext">Historical photographs are archived separately. Check the publication rules before external use.</span></div>
+    </div>
+</body>
+</html>

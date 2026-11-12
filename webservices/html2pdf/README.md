@@ -60,7 +60,7 @@ curl http://localhost:8080/Html2PDF/v1/
 ```
 will return somthing like:
 ```
-{"msg":"Service is running","success":true,"version":"2.2.3"}
+{"msg":"Service is running","success":true,"version":"2.2.5"}
 ```
 
 ## Fonts and Multi-Script Support
@@ -94,6 +94,23 @@ still run into issues for one of the following reasons:
 To mitigate these problems you will need to provide your own fonts and carefully
 craft your `font-family` CSS declarations, so that each glyph is found reliably.
 
+## SVG Data Images
+
+SVG images may embed other SVGs using `data:` URLs. A custom Batik data protocol
+handler preserves the document URL when resolving fragment-only references such
+as `<use xlink:href="#box"/>` inside those images. Both percent-encoded and base64
+data URLs are supported. Scripts and HTTP/file resource requests from SVG remain
+disabled.
+
+When an SVG contains an image reference blocked by that policy, the service logs
+the omission and renders the rest of the drawing with that sub-image left blank.
+The original SVG is not modified. This also applies to images inside embedded
+SVGs; unrelated rendering errors are not suppressed.
+
+Embedded GIF images are decoded from streams using Java ImageIO, since Batik's
+default GIF decoder cannot load data URLs. GIF87a and GIF89a are supported,
+including transparency; animated GIFs contribute their first frame to the PDF.
+
 ## "bshtml2pdf" compatibility
 The old "bshtml2pdf" service ran servlets on a Tomcat server and hat `/BShtml2PDF` as the base URL. This service runs standalone and therefore lacks the `/BShtml2PDF` base URL. The client implementation must be adjusted accordingly.
 
@@ -113,3 +130,19 @@ docker run -p 8080:8080 -e APP_PATH=/BShtml2PDF webservice-htmlpdf
 
 ## TODO
 * Implement proper support for custom fonts (e.g. from inline CSS)
+
+## Creating Releases
+
+To create a new release, please update the version number in this file and in
+`pom.xml`. As soon as this change is merged, build the `.jar` file
+from within the `main` branch:
+
+```
+docker build -t webservice-pdf-release-builder .
+docker run --rm --detach --name webservice-pdf-release webservice-pdf-release-builder
+docker cp webservice-pdf-release:/app/html2pdf.jar /tmp/
+docker stop webservice-pdf-release
+sha256sum /tmp/html2pdf.jar
+```
+
+Then append `/tmp/html2pdf.jar` and its hash sum to the new release on Github.

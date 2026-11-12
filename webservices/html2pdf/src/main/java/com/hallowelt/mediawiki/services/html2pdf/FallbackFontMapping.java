@@ -30,10 +30,10 @@ public class FallbackFontMapping {
     /**
      * Key prefix used by openhtmltopdf's {@code PdfBoxFontResolver.FontDescription}
      * when it looks up font metrics in the cache configured via
-     * {@code CacheStore.PDF_FONT_METRICS}.  The full key is
-     * {@code font-metrics:<family>:<weight>:<style>}.
+    * {@code CacheStore.PDF_FONT_METRICS}.  The full key is
+    * {@code font-metrics2:<family>:<weight>:<style>}.
      */
-    private static final String METRICS_CACHE_KEY_PREFIX = "font-metrics:";
+    private static final String METRICS_CACHE_KEY_PREFIX = "font-metrics2:";
 
     /**
      * Latin fallback font whose metrics are used as the reference geometry for
@@ -43,7 +43,7 @@ public class FallbackFontMapping {
 
     private List<BaseFontMapping.FontInfo> fontsAdded;
     private String fontFamilyNamesCache;
-    private Set<String> fallbackFamilies;
+    private Set<String> metricOverrideFamilies;
     private PdfBoxRawPDFontMetrics referenceMetrics;
 
     public FallbackFontMapping() {
@@ -147,7 +147,7 @@ public class FallbackFontMapping {
 
         this.fontsAdded = result;
         this.fontFamilyNamesCache = toCSSFontFamilyList(result);
-        this.fallbackFamilies = result.stream()
+        this.metricOverrideFamilies = result.stream()
             .map(fi -> fi.cssName)
             .collect(Collectors.toCollection(HashSet::new));
     }
@@ -174,8 +174,8 @@ public class FallbackFontMapping {
 
     /**
      * Returns the metrics that should be reported for the font addressed by
-     * {@code cacheKey}, or {@code null} if the key does not belong to one of the
-     * fallback fonts.
+    * {@code cacheKey}, or {@code null} if the key does not belong to a font
+    * whose metrics need normalization.
      *
      * <p>openhtmltopdf sizes a line box from the <em>largest</em> ascent and
      * descent of <em>all</em> fonts in the resolved font-family chain, and it
@@ -200,7 +200,7 @@ public class FallbackFontMapping {
             return null;
         }
         String family = cacheKey.substring(METRICS_CACHE_KEY_PREFIX.length(), familyEnd);
-        return fallbackFamilies.contains(family) ? referenceMetrics : null;
+        return metricOverrideFamilies.contains(family) ? referenceMetrics : null;
     }
 
     /**

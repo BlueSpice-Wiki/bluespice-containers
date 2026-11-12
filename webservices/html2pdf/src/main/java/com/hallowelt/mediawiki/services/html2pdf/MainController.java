@@ -1,7 +1,9 @@
 package com.hallowelt.mediawiki.services.html2pdf;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +21,8 @@ import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +46,9 @@ import jakarta.servlet.http.Part;
 @RestController
 public class MainController {
 
+	@Autowired(required = false)
+	private BuildProperties buildProperties;
+
 	private File tempPathFile = null;
 
 	private FallbackFontMapping fallbackFontMapping = new FallbackFontMapping();
@@ -58,9 +65,8 @@ public class MainController {
 
 	/**
 	 * Persistent font metrics cache shared across all PDF render requests.
-	 * Populated by the static classpath fonts (Base 14 and Noto fallback fonts).
-	 * User-uploaded fonts referenced via CSS {@code @font-face} do not interact
-	 * with this cache and are therefore never stored here.
+	 * Used by the static classpath fonts, fallback fonts, and CSS {@code @font-face}
+	 * fonts. Metrics overrides are applied on lookup before cached metrics are used.
 	 */
 	private final FSCacheEx<String, FSCacheValue> fontMetricsCache = new FSCacheEx<String, FSCacheValue>() {
 		private final ConcurrentHashMap<String, FSCacheValue> store = new ConcurrentHashMap<>();
@@ -160,6 +166,8 @@ public class MainController {
 	);
 
 	public MainController() {
+		org.apache.batik.util.ParsedURL.registerHandler(new SvgDataProtocolHandler());
+		org.apache.batik.ext.awt.image.spi.ImageTagRegistry.getRegistry().register(new GifImageRegistryEntry());
 		String tempPath = System.getProperty("html2pdf.temp.dir");
 		if (tempPath == null) {
 			tempPath = System.getenv("HTML2PDF_TEMP_DIR");
@@ -187,8 +195,34 @@ public class MainController {
 		Map<String, Object> response = new HashMap<>();
 		response.put("success", true);
 		response.put("msg", "Service is running");
-		response.put( "version", "2.2.3");
+		response.put("version", getServiceVersion());
+		response.put("buildId", getBuildId());
+		response.put("buildTime", getBuildTime());
 		return response;
+	}
+
+	private String getServiceVersion() {
+		return buildProperties != null ? buildProperties.getVersion() : "development";
+	}
+
+	private String getBuildId() {
+		String id = buildProperties != null ? buildProperties.get("id") : null;
+		return id != null ? id : "unversioned";
+	}
+
+	private String getBuildTime() {
+		return buildProperties != null && buildProperties.getTime() != null
+				? buildProperties.getTime().toString() : "unknown";
+	}
+
+	private String getPdfProducer() {
+		return "Html2PDF " + getServiceVersion() + "; build=" + getBuildId() + "; built=" + getBuildTime();
+	}
+
+	private void setBuildHeaders(HttpServletResponse response) {
+		response.setHeader("X-Html2PDF-Version", getServiceVersion());
+		response.setHeader("X-Html2PDF-Build-Id", getBuildId());
+		response.setHeader("X-Html2PDF-Build-Time", getBuildTime());
 	}
 
 	// Returns application/pdf
@@ -198,60 +232,102 @@ public class MainController {
 			@RequestParam("documentToken") String documentToken,
 			@RequestParam(name = "debug", required = false, defaultValue = "false") boolean debug,
 			HttpServletResponse response) {
+		setBuildHeaders(response);
 		logger.info(String.format(
-				"Start creating PDF for (%s/%s)", wikiId, documentToken));
+				"Start creating PDF for (%s/%s), %s", wikiId, documentToken, getPdfProducer()));
 
+		File renderedFile = null;
 		try {
 			File wikiIdPath = new File(tempPathFile, wikiId);
 			File basePathFile = new File(wikiIdPath, documentToken);
 			File documentFile = new File(basePathFile, documentToken + ".html");
 
-			PdfRendererBuilder builder = new PdfRendererBuilder();
-
-			builder.useCacheStore(CacheStore.PDF_FONT_METRICS, fontMetricsCache);
-
-			BaseFontMapping.registerFonts(builder);
-			fallbackFontMapping.registerFallbackFonts(builder);
-
-			builder.useFastMode();
-			builder.usePdfUaAccessibility(true);
-			builder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U);
-			builder.useUnicodeBidiSplitter(new ICUBidiSplitter.ICUBidiSplitterFactory());
-			builder.useUnicodeBidiReorderer(new ICUBidiReorderer());
-			builder.defaultTextDirection(PdfRendererBuilder.TextDirection.LTR);
-			builder.useSVGDrawer(new BatikSVGDrawer(BatikSVGDrawer.SvgScriptMode.SECURE, java.util.Set.of("data")));
-			builder.useExternalResourceAccessControl(
-				(uri, type) -> {
-					return this.allowFileEmbed(uri, type);
-				},
-				ExternalResourceControlPriority.RUN_AFTER_RESOLVING_URI);
-			builder.useExternalResourceAccessControl(
-				(uri, type) -> {
-					return this.allowFileEmbed(uri, type);
-				},
-				ExternalResourceControlPriority.RUN_BEFORE_RESOLVING_URI);
-
 			logger.info("Document File: " + documentFile.getAbsolutePath());
-			Document doc = html5ParseDocument(documentFile);
-			builder.withW3cDocument(doc, documentFile.toURI().toASCIIString());
-
-			logger.debug("Start building PDF");
-			builder.toStream(response.getOutputStream());
-			builder.run();
-			logger.debug("Done building PDF");
+			try {
+				renderedFile = render(documentFile, true);
+			} catch (Exception e) {
+				logger.warn(String.format(
+					"Error creating accessible PDF for (%s/%s), retrying without PDF/UA accessibility",
+					wikiId, documentToken), e);
+				renderedFile = render(documentFile, false);
+			}
 
 			response.setContentType("application/pdf");
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + documentToken + ".pdf\"");
 			response.setHeader("Cache-Control", "no-cache");
 			response.setHeader("Pragma", "no-cache");
 			response.setHeader("Expires", "0");
+			response.setContentLengthLong(renderedFile.length());
+			Files.copy(renderedFile.toPath(), response.getOutputStream());
 
 			if (!debug) {
 				deleteDirectory(basePathFile);
 			}
 		} catch (Exception e) {
 			logger.error("Error creating PDF", e);
+			if (!response.isCommitted()) {
+				try {
+					response.reset();
+					setBuildHeaders(response);
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "PDF rendering failed.");
+				} catch (IOException responseError) {
+					logger.error("Could not send PDF rendering error response", responseError);
+				}
+			}
+		} finally {
+			if (renderedFile != null) {
+				try {
+					Files.deleteIfExists(renderedFile.toPath());
+				} catch (IOException cleanupError) {
+					logger.warn("Could not remove temporary PDF", cleanupError);
+				}
+			}
 		}
+	}
+
+	private File render(File documentFile, boolean accessible) throws Exception {
+		PdfRendererBuilder builder = new PdfRendererBuilder();
+		builder.withProducer(getPdfProducer());
+
+		builder.useCacheStore(CacheStore.PDF_FONT_METRICS, fontMetricsCache);
+
+		BaseFontMapping.registerFonts(builder);
+		fallbackFontMapping.registerFallbackFonts(builder);
+
+		builder.useFastMode();
+		if (accessible) {
+			builder.usePdfUaAccessibility(true);
+		}
+		builder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_U);
+		builder.useUnicodeBidiSplitter(new ICUBidiSplitter.ICUBidiSplitterFactory());
+		builder.useUnicodeBidiReorderer(new ICUBidiReorderer());
+		builder.defaultTextDirection(PdfRendererBuilder.TextDirection.LTR);
+		builder.useSVGDrawer(new BatikSVGDrawer(BatikSVGDrawer.SvgScriptMode.SECURE, java.util.Collections.singleton("data")));
+		builder.useExternalResourceAccessControl(
+			(uri, type) -> {
+				return this.allowFileEmbed(uri, type);
+			},
+			ExternalResourceControlPriority.RUN_AFTER_RESOLVING_URI);
+		builder.useExternalResourceAccessControl(
+			(uri, type) -> {
+				return this.allowFileEmbed(uri, type);
+			},
+			ExternalResourceControlPriority.RUN_BEFORE_RESOLVING_URI);
+
+		Document doc = html5ParseDocument(documentFile);
+		builder.withW3cDocument(doc, documentFile.toURI().toASCIIString());
+
+		logger.debug("Start building PDF");
+		File renderedFile = File.createTempFile("render-", ".pdf", tempPathFile);
+		try (FileOutputStream output = new FileOutputStream(renderedFile)) {
+			builder.toStream(output);
+			builder.run();
+		} catch (Exception e) {
+			Files.deleteIfExists(renderedFile.toPath());
+			throw e;
+		}
+		logger.debug("Done building PDF");
+		return renderedFile;
 	}
 
 	private Document html5ParseDocument(File htmlFile) throws IOException {
@@ -448,7 +524,11 @@ public class MainController {
 			}
 		}
 
-		doc.select("head").prepend("<style>" + baseFontFaceCSS + "html{font-family:serif-fallback," + fallbackFontMapping.getFontFamilyNames() + "}</style>");
+		// openhtmltopdf's built-in UA stylesheet sets generic families on these elements; override them
+		String noto = fallbackFontMapping.getFontFamilyNames();
+		doc.select("head").prepend("<style>" + baseFontFaceCSS + "html{font-family:serif-fallback," + noto + "}"
+			+ "pre,tt,code,kbd,samp{font-family:monospace-fallback," + noto + "}"
+			+ "button,textarea,input,select{font-family:sans-serif-fallback," + noto + "}</style>");
 	}
 
 	/**
