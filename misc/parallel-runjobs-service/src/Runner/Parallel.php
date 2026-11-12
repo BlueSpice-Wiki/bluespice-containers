@@ -35,6 +35,10 @@ class Parallel extends Single {
 				$this->queue = new DatabaseQueue( $config, $logger );
 				break;
 			case 'redis':
+				if ( !extension_loaded( 'redis' ) ) {
+					$this->logger->error( 'Queue "redis" requires the PHP extension "redis", which is not loaded' );
+					exit( 1 );
+				}
 				$this->queue = new RedisQueue( $config, $logger );
 				break;
 			default:
@@ -50,7 +54,7 @@ class Parallel extends Single {
 	 */
 	private function assignToSlot( int $slot, string $instance ): void {
 		$process = $this->getProcess( [ '--sfr=' . $instance ] );
-		$this->logger->debug( "Starting for \"$instance\"" );
+		$this->logger->info( "Starting for \"$instance\"" );
 		$process->start();
 		$this->slots[$slot] = [
 			'instance' => $instance,
@@ -79,16 +83,21 @@ class Parallel extends Single {
 				}
 				continue;
 			}
-			$this->logger->debug( "Finished for \"{$slot['instance']}\"" );
+			$duration = time() - $slot['startedAt'];
 			$processOutput = $slot['process']->getOutput();
 			if ( $processOutput ) {
 				$this->logger->debug( $processOutput );
 			}
-			if ( $slot['process']->getExitCode() !== 0 ) {
+			$exitCode = $slot['process']->getExitCode();
+			if ( $exitCode !== 0 ) {
 				$this->queue->onFailure( $slot['instance'] );
-				$this->logger->error( "Process failed\n" . $slot['process']->getErrorOutput() );
+				$this->logger->error(
+					"Process for \"{$slot['instance']}\" failed after {$duration}s with exit code $exitCode\n" .
+					$slot['process']->getErrorOutput()
+				);
 			} else {
 				$this->queue->onSuccess( $slot['instance'] );
+				$this->logger->info( "Finished for \"{$slot['instance']}\" in {$duration}s" );
 			}
 			$this->slots[$index] = null;
 			return $index;
@@ -101,19 +110,24 @@ class Parallel extends Single {
 	 */
 	public function start() {
 		$maxParallel = $this->config->getFarmConfig()['maxparallel'];
-		$this->logger->notice( "Running in parallel, $maxParallel at a time" );
+		$this->logger->notice(
+			"Ready, running farm instances from \"{$this->config->getQueue()}\" queue, $maxParallel in parallel"
+		);
 
 		$this->slots = array_fill( 0, $maxParallel, null );
 
 		while ( true ) {
 			$freeSlot = $this->getFreeSlot();
-			if ( $freeSlot !== null ) {
-				$next = $this->queue->getNext();
-				if ( $next ) {
-					$this->assignToSlot( $freeSlot, $next );
-				} else {
-					sleep( $this->config->getJobConfig()['cooldown'] );
-				}
+			if ( $freeSlot === null ) {
+				// All slots busy, avoid busy-waiting
+				usleep( 250000 );
+				continue;
+			}
+			$next = $this->queue->getNext();
+			if ( $next ) {
+				$this->assignToSlot( $freeSlot, $next );
+			} else {
+				sleep( $this->config->getJobConfig()['cooldown'] );
 			}
 		}
 	}
