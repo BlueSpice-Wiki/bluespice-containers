@@ -315,6 +315,64 @@ class Html2PdfApplicationTests {
 		}
 	}
 
+	@ParameterizedTest
+	@ValueSource(strings = { "math-native", "math-native-pdfcreator", "math-mathoid" })
+	void rendersMathML(String fixture) throws Exception {
+		String html = Files.readString(Path.of("manual-testing", "data", fixture, fixture + ".html"));
+		org.jsoup.nodes.Document withoutMath = Jsoup.parse(html, "", Parser.xmlParser());
+		withoutMath.select("math, default|math, img.mwe-math-fallback-image-inline").remove();
+
+		int mathInk = darkPixelsOnFirstPage(renderFixture(fixture, html), fixture);
+		int textInk = darkPixelsOnFirstPage(renderFixture(fixture + "-nomath", withoutMath.outerHtml()), fixture + "-nomath");
+
+		// Formulas are drawn as vector graphics, so only the rasterized output tells
+		// whether they were actually rendered (and not silently dropped)
+		assertTrue(mathInk > textInk + 1500,
+				fixture + ": MathML should be rendered; dark pixels with math " + mathInk + ", without " + textInk);
+	}
+
+	private byte[] renderFixture(String token, String html) throws Exception {
+		File tempDirectory = (File) ReflectionTestUtils.getField(controller, "tempPathFile");
+		assertNotNull(tempDirectory);
+		String wikiId = "math-" + UUID.randomUUID();
+		Path wikiDirectory = tempDirectory.toPath().resolve(wikiId);
+		try {
+			Path documentDirectory = Files.createDirectories(wikiDirectory.resolve(token));
+			File document = documentDirectory.resolve(token + ".html").toFile();
+			Files.writeString(document.toPath(), html);
+			// Call the renderer directly, as `renderPDF` would silently retry without PDF/UA
+			File rendered = ReflectionTestUtils.invokeMethod(controller, "render", document, true);
+			assertNotNull(rendered);
+			try {
+				return Files.readAllBytes(rendered.toPath());
+			} finally {
+				Files.deleteIfExists(rendered.toPath());
+			}
+		} finally {
+			FileSystemUtils.deleteRecursively(wikiDirectory);
+		}
+	}
+
+	private static int darkPixelsOnFirstPage(byte[] pdfBytes, String name) throws Exception {
+		try (PDDocument pdf = Loader.loadPDF(pdfBytes)) {
+			java.awt.image.BufferedImage image = new org.apache.pdfbox.rendering.PDFRenderer(pdf).renderImage(0, 2f);
+			String debugDir = System.getProperty("html2pdf.math-debug-dir");
+			if (debugDir != null) {
+				javax.imageio.ImageIO.write(image, "png", new File(debugDir, name + ".png"));
+			}
+			int dark = 0;
+			for (int row = 0; row < image.getHeight(); row++) {
+				for (int column = 0; column < image.getWidth(); column++) {
+					java.awt.Color color = new java.awt.Color(image.getRGB(column, row));
+					if (color.getRed() + color.getGreen() + color.getBlue() < 384) {
+						dark++;
+					}
+				}
+			}
+			return dark;
+		}
+	}
+
 	private static boolean containsStructureType( PDStructureNode node, String structureType ) {
 		for ( Object kid : node.getKids() ) {
 			if ( kid instanceof PDStructureElement element ) {

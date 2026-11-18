@@ -33,6 +33,7 @@ import com.openhtmltopdf.bidi.support.ICUBidiReorderer;
 import com.openhtmltopdf.bidi.support.ICUBidiSplitter;
 import com.openhtmltopdf.extend.FSCacheEx;
 import com.openhtmltopdf.extend.FSCacheValue;
+import com.openhtmltopdf.mathmlsupport.MathMLDrawer;
 import com.openhtmltopdf.outputdevice.helper.ExternalResourceControlPriority;
 import com.openhtmltopdf.outputdevice.helper.ExternalResourceType;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -164,6 +165,28 @@ public class MainController {
 		"(?<![a-zA-Z0-9-])(sans-serif|serif|monospace|cursive|fantasy)(?!-fallback)(?![a-zA-Z0-9-])",
 		Pattern.CASE_INSENSITIVE
 	);
+
+	private static final String MATHML_NAMESPACE = "http://www.w3.org/1998/Math/MathML";
+
+	/**
+	 * Maps Extension:Math's column alignment CSS classes to MathML {@code columnalign} values.
+	 */
+	private static final Map<String, String> MATHML_COLUMN_ALIGN = Map.of(
+		"mwe-math-columnalign-l", "left",
+		"mwe-math-columnalign-c", "center",
+		"mwe-math-columnalign-r", "right"
+	);
+
+	/**
+	 * Font families for MathML elements. The MathML drawer loads all fonts of
+	 * the listed families, so the (large) fallback font chain is deliberately
+	 * not appended here.
+	 */
+	private static final String MATH_CSS = "math{font-family:'" + BaseFontMapping.MATH_FONT_FAMILY + "','"
+		+ BaseFontMapping.MATH_TEXT_FONT_FAMILY + "','"
+		+ BaseFontMapping.MATH_TEXT_FONT_FAMILY + "-Italic','"
+		+ BaseFontMapping.MATH_TEXT_FONT_FAMILY + "-Bold','"
+		+ BaseFontMapping.MATH_TEXT_FONT_FAMILY + "-BoldItalic'}";
 
 	public MainController() {
 		org.apache.batik.util.ParsedURL.registerHandler(new SvgDataProtocolHandler());
@@ -303,6 +326,7 @@ public class MainController {
 		builder.useUnicodeBidiReorderer(new ICUBidiReorderer());
 		builder.defaultTextDirection(PdfRendererBuilder.TextDirection.LTR);
 		builder.useSVGDrawer(new BatikSVGDrawer(BatikSVGDrawer.SvgScriptMode.SECURE, java.util.Collections.singleton("data")));
+		builder.useMathMLDrawer(new MathMLDrawer());
 		builder.useExternalResourceAccessControl(
 			(uri, type) -> {
 				return this.allowFileEmbed(uri, type);
@@ -524,11 +548,144 @@ public class MainController {
 			}
 		}
 
+		normalizeMathML(doc);
+
 		// openhtmltopdf's built-in UA stylesheet sets generic families on these elements; override them
 		String noto = fallbackFontMapping.getFontFamilyNames();
 		doc.select("head").prepend("<style>" + baseFontFaceCSS + "html{font-family:serif-fallback," + noto + "}"
 			+ "pre,tt,code,kbd,samp{font-family:monospace-fallback," + noto + "}"
-			+ "button,textarea,input,select{font-family:sans-serif-fallback," + noto + "}</style>");
+			+ "button,textarea,input,select{font-family:sans-serif-fallback," + noto + "}"
+			+ MATH_CSS + "</style>");
+	}
+
+	/**
+	 * Prepares MathML (as emitted by MediaWiki's Extension:Math) for rendering
+	 * by the MathML drawer.
+	 *
+	 * <ul>
+	 *   <li>Serializing HTML with PHP's {@code DOMDocument::saveXML} (as done by
+	 *       Extension:PDFCreator) turns {@code <math xmlns="…MathML">} into
+	 *       {@code <default:math>} and hoists an {@code xmlns:default}
+	 *       declaration to an ancestor. The renderer only recognizes un-prefixed
+	 *       {@code <math>} elements, so all elements bound to the MathML
+	 *       namespace by a prefix are renamed to their local name.</li>
+	 *   <li>Legacy "mathml" mode output (rendered by Mathoid) hides the MathML
+	 *       inside {@code .mwe-math-mathml-a11y} and displays a fallback image
+	 *       from {@code Special:MathShowImage}. That image is not available any
+	 *       more once Mathoid is gone (e.g. from stale parser cache entries), so
+	 *       the MathML is shown and the fallback image removed.</li>
+	 * </ul>
+	 *
+	 * @param doc The document to normalize.
+	 */
+	private void normalizeMathML(org.jsoup.nodes.Document doc) {
+		for (org.jsoup.nodes.Element el : doc.getAllElements()) {
+			String tagName = el.tagName();
+			int colon = tagName.indexOf(':');
+			if (colon < 0) {
+				continue;
+			}
+			String prefix = tagName.substring(0, colon);
+			if (!MATHML_NAMESPACE.equals(resolveNamespacePrefix(el, prefix))) {
+				continue;
+			}
+			el.tagName(tagName.substring(colon + 1), MATHML_NAMESPACE);
+			if (el.tagName().equals("math")) {
+				el.attr("xmlns", MATHML_NAMESPACE);
+			}
+		}
+		// Drop now unused prefix declarations, so they do not end up in the W3C DOM
+		for (org.jsoup.nodes.Element el : doc.getAllElements()) {
+			List<String> unused = new ArrayList<>();
+			for (org.jsoup.nodes.Attribute attr : el.attributes()) {
+				if (attr.getKey().startsWith("xmlns:") && MATHML_NAMESPACE.equals(attr.getValue())) {
+					unused.add(attr.getKey());
+				}
+			}
+			unused.forEach(el::removeAttr);
+		}
+
+		// "native" mode uses CSS classes instead of the `columnalign` attribute, as MathML Core lacks it
+		for (org.jsoup.nodes.Element cell : doc.select("mtd[class~=mwe-math-columnalign-]:not([columnalign])")) {
+			for (String className : cell.classNames()) {
+				String align = MATHML_COLUMN_ALIGN.get(className);
+				if (align != null) {
+					cell.attr("columnalign", align);
+					break;
+				}
+			}
+		}
+
+		// The renderer stretches a bare solidus to the height of its container
+		for (org.jsoup.nodes.Element operator : doc.select("mo:not([stretchy])")) {
+			if (operator.text().trim().equals("/")) {
+				operator.attr("stretchy", "false");
+			}
+		}
+
+		// mhchem (`<chem>`) uses zero-width phantoms as invisible bases for sub- and superscripts. The
+		// renderer ignores the size attributes of `<mpadded>`, which would result in visible gaps.
+		for (org.jsoup.nodes.Element padded : doc.select("mpadded[width=0]")) {
+			if (padded.childrenSize() == 1 && padded.child(0).tagName().equals("mphantom")) {
+				padded.replaceWith(new org.jsoup.nodes.Element("mrow", MATHML_NAMESPACE));
+			}
+		}
+		// The renderer puts subscript and superscript side by side, unless they share the same base
+		for (org.jsoup.nodes.Element sub : doc.select("msub")) {
+			org.jsoup.nodes.Element sup = sub.nextElementSibling();
+			if (sup == null || !sup.tagName().equals("msup") || sub.childrenSize() != 2 || sup.childrenSize() != 2
+					|| !isEmptyMathML(sub.child(0)) || !isEmptyMathML(sup.child(0))) {
+				continue;
+			}
+			org.jsoup.nodes.Element subsup = new org.jsoup.nodes.Element("msubsup", MATHML_NAMESPACE);
+			subsup.appendChild(new org.jsoup.nodes.Element("mrow", MATHML_NAMESPACE));
+			subsup.appendChild(sub.child(1));
+			subsup.appendChild(sup.child(1));
+			sup.remove();
+			sub.replaceWith(subsup);
+		}
+		// ... and positions scripts relative to the height of their base. The phantom base stands for the
+		// preceding element, so it gets used as actual base.
+		for (org.jsoup.nodes.Element script : doc.select("msub, msup, msubsup")) {
+			org.jsoup.nodes.Element previous = script.previousElementSibling();
+			if (previous != null && script.childrenSize() > 1 && isEmptyMathML(script.child(0))) {
+				script.child(0).replaceWith(previous);
+			}
+		}
+
+		for (org.jsoup.nodes.Element wrapper : doc.select("span.mwe-math-element")) {
+			Elements a11y = wrapper.select("> .mwe-math-mathml-a11y");
+			if (a11y.isEmpty() || a11y.select("math").isEmpty()) {
+				continue;
+			}
+			wrapper.select("> img.mwe-math-fallback-image-inline, > img.mwe-math-fallback-image-display").remove();
+			for (org.jsoup.nodes.Element el : a11y) {
+				el.removeAttr("style");
+			}
+		}
+	}
+
+	/**
+	 * Whether a MathML element consists of nothing but (nested) empty {@code <mrow>}s.
+	 */
+	private static boolean isEmptyMathML(org.jsoup.nodes.Element el) {
+		return el.text().isBlank() && el.select("*:not(mrow)").isEmpty();
+	}
+
+	/**
+	 * Resolves an XML namespace prefix by walking up the ancestors of
+	 * {@code el}.
+	 *
+	 * @return the namespace URI, or {@code null} if the prefix is not declared
+	 */
+	private static String resolveNamespacePrefix(org.jsoup.nodes.Element el, String prefix) {
+		String key = "xmlns:" + prefix;
+		for (org.jsoup.nodes.Element current = el; current != null; current = current.parent()) {
+			if (current.hasAttr(key)) {
+				return current.attr(key);
+			}
+		}
+		return null;
 	}
 
 	/**
