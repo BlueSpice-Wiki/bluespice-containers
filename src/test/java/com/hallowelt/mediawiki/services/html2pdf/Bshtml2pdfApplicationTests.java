@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.io.File;
 import java.nio.file.Files;
@@ -316,13 +318,26 @@ class Html2PdfApplicationTests {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { "math-native", "math-native-pdfcreator", "math-mathoid" })
-	void rendersMathML(String fixture) throws Exception {
+	@CsvSource(delimiter = '|', value = {
+		"math-native | f(n)={ n/2, if n is even 3n+1, if n is odd | SO42−+Ba2+⟶BaSO4↓",
+		"math-native-pdfcreator | f(n)={ n/2, if n is even 3n+1, if n is odd | SO42−+Ba2+⟶BaSO4↓",
+		"math-mathoid | f left parenthesis n right parenthesis equals StartLayout | SO Subscript 4 Superscript 2 minus"
+	})
+	void rendersMathML(String fixture, String mathAlt, String chemAlt) throws Exception {
 		String html = Files.readString(Path.of("manual-testing", "data", fixture, fixture + ".html"));
 		org.jsoup.nodes.Document withoutMath = Jsoup.parse(html, "", Parser.xmlParser());
 		withoutMath.select("math, default|math, img.mwe-math-fallback-image-inline").remove();
 
-		int mathInk = darkPixelsOnFirstPage(renderFixture(fixture, html), fixture);
+		byte[] pdfBytes = renderFixture(fixture, html);
+		try (PDDocument pdf = Loader.loadPDF(pdfBytes)) {
+			List<String> alternateTexts = new ArrayList<>();
+			collectAlternateTexts(pdf.getDocumentCatalog().getStructureTreeRoot(), alternateTexts);
+			assertEquals(2, alternateTexts.size(), "Each formula needs an alternate text: " + alternateTexts);
+			assertTrue(alternateTexts.get(0).startsWith(mathAlt), alternateTexts.get(0));
+			assertTrue(alternateTexts.get(1).startsWith(chemAlt), alternateTexts.get(1));
+		}
+
+		int mathInk = darkPixelsOnFirstPage(pdfBytes, fixture);
 		int textInk = darkPixelsOnFirstPage(renderFixture(fixture + "-nomath", withoutMath.outerHtml()), fixture + "-nomath");
 
 		// Formulas are drawn as vector graphics, so only the rasterized output tells
@@ -370,6 +385,17 @@ class Html2PdfApplicationTests {
 				}
 			}
 			return dark;
+		}
+	}
+
+	private static void collectAlternateTexts(PDStructureNode node, List<String> alternateTexts) {
+		for (Object kid : node.getKids()) {
+			if (kid instanceof PDStructureElement element) {
+				if ("Figure".equals(element.getStructureType()) && element.getAlternateDescription() != null) {
+					alternateTexts.add(element.getAlternateDescription());
+				}
+				collectAlternateTexts(element, alternateTexts);
+			}
 		}
 	}
 

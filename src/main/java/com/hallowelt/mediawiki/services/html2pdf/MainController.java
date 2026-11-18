@@ -171,6 +171,8 @@ public class MainController {
 	/**
 	 * Maps Extension:Math's column alignment CSS classes to MathML {@code columnalign} values.
 	 */
+	private static final java.util.Set<String> MATHML_SEPARATED_ELEMENTS = java.util.Set.of("mtable", "mtr", "mtd");
+
 	private static final Map<String, String> MATHML_COLUMN_ALIGN = Map.of(
 		"mwe-math-columnalign-l", "left",
 		"mwe-math-columnalign-c", "center",
@@ -663,6 +665,45 @@ public class MainController {
 				el.removeAttr("style");
 			}
 		}
+
+		// Formulas are drawn as graphics; PDF/UA requires an alternate text for them, which is taken
+		// from the `alt` attribute. Legacy "mathml" mode provides a spoken description in `alttext`,
+		// "native" mode provides nothing, so we fall back to the plain text of the formula.
+		for (org.jsoup.nodes.Element math : doc.select("math:not([alt])")) {
+			String alt = math.attr("alttext").trim();
+			if (alt.isEmpty()) {
+				alt = getMathMLPlainText(math);
+			}
+			if (!alt.isEmpty()) {
+				math.attr("alt", alt);
+			}
+		}
+	}
+
+	/**
+	 * Concatenates the text of a MathML element, separating table cells and rows
+	 * (e.g. of {@code \begin{cases}}) by spaces.
+	 */
+	private static String getMathMLPlainText(org.jsoup.nodes.Element math) {
+		StringBuilder text = new StringBuilder();
+		math.traverse(new org.jsoup.select.NodeVisitor() {
+			@Override
+			public void head(org.jsoup.nodes.Node node, int depth) {
+				if (node instanceof org.jsoup.nodes.TextNode textNode) {
+					text.append(textNode.getWholeText());
+				} else if (MATHML_SEPARATED_ELEMENTS.contains(node.nodeName())) {
+					text.append(' ');
+				}
+			}
+
+			@Override
+			public void tail(org.jsoup.nodes.Node node, int depth) {
+				if (MATHML_SEPARATED_ELEMENTS.contains(node.nodeName())) {
+					text.append(' ');
+				}
+			}
+		});
+		return text.toString().replace('\u00A0', ' ').replaceAll("\\s+", " ").trim();
 	}
 
 	/**
