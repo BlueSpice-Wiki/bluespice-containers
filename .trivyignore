@@ -1,7 +1,0 @@
-# brotli-libs 1.2.0-r1 -> 1.2.1-r0; fixed in Alpine, waiting for upstream linuxserver/mariadb rebuild
-CVE-2026-111497 exp:2026-11-16
-
-# perl 5.42.2-r1 -> 5.42.3-r0; fixed in Alpine 3.24, waiting for upstream linuxserver/mariadb rebuild
-# perl is only pulled in by mariadb-server-utils / mariadb-client-perl helper scripts
-CVE-2026-42496 exp:2026-11-16
-CVE-2026-8376 exp:2026-11-16
