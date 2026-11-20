@@ -38,10 +38,22 @@ generic fallbacks:
 | Standard Symbols PS | StandardSymbolsPS                        | GPL or AFPL (URW++)                        |
 | D050000L            | D050000L                                 | LaTeX Project Public License (LPPL)         |
 | Noto                | noto/*                                   | SIL Open Font                              |
+| STIX Two Math       | STIXTwoMath-Regular                      | SIL Open Font                              |
+| STIX Two Text       | STIXTwoText-Regular, -Bold, -Italic,     | SIL Open Font                              |
+|                     | -BoldItalic                              |                                             |
 
-Font sources: [URW++ Core 35 Fonts](https://github.com/ArtifexSoftware/urw-base35-fonts), [D050000L](https://ctan.org/pkg/d050000l), [Noto](https://notofonts.github.io/)
+Font sources: [URW++ Core 35 Fonts](https://github.com/ArtifexSoftware/urw-base35-fonts), [D050000L](https://ctan.org/pkg/d050000l), [Noto](https://notofonts.github.io/), [STIX Two](https://github.com/stipub/stixfonts)
 
 Please refer to the respective repositories for full license texts.
+
+## MathML
+
+`<math>` elements are rendered by the OpenHTMLtoPDF MathML module (JEuclid) using the
+STIX Two fonts. This covers the output of MediaWiki's Extension:Math for both `<math>`
+and `<chem>` tags (`native` mode, as well as the legacy `mathml` mode based on Mathoid).
+Some quirks of that output are normalized before rendering (see
+`MainController::normalizeMathML`). Example documents can be found in
+`manual-testing/data/math-*`.
 
 ## Manual testing
 To test the service manually, run:
