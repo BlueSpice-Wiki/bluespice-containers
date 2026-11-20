@@ -51,6 +51,17 @@ composer update
 php test.php data/doc1/
 ```
 
+### Large document
+To test with a large document (~3000 pages, ~800 MB of embedded attachments), generate the
+test data first (it is not checked in) and then run the test as usual:
+```bash
+cd manual-testing
+php generate-large-doc.php            # [targetFolder] [pageCount] [attachmentCount] [attachmentSizeMB]
+php test.php data/large-doc/
+```
+Uploads are split into several requests to stay within the service's multipart limits.
+Make sure the service has enough heap and disk space for the rendering.
+
 ## Liveness probing and version check
 To check if the service is responsive one can execute a HTTP request against the `servlet.context-path` (default `/Html2PDF/v1/`)
 
