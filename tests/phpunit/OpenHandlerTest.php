@@ -72,7 +72,7 @@ class OpenHandlerTest extends TestCase {
 	/**
 	 * @var string
 	 */
-	private $accessToken = 'some-access-token';
+	private $accessToken = '0123456789abcdef0123456789abcdef';
 
 	/**
 	 * In case of successful execution:
@@ -205,5 +205,89 @@ class OpenHandlerTest extends TestCase {
 			$authorDAOMock, $sessionDAOMock, $this->serverConfigs, $httpClientMock, $loggerMock
 		);
 		$openHandler->handle( $connectionMock, $connectionListMock );
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function provideMaliciousDocNames(): array {
+		$token = '0123456789abcdef0123456789abcdef';
+		return [
+			'userinfo redirect' => [ "@evil.example|$token|Page" ],
+			'host suffix' => [ ".evil.example|$token|Page" ],
+			'port injection' => [ ":8443|$token|Page" ],
+			'protocol relative' => [ "//evil.example|$token|Page" ],
+			'backslash' => [ "\\evil.example|$token|Page" ],
+			'path traversal' => [ "/w/..|$token|Page" ],
+			'query injection' => [ "/w?x=|$token|Page" ],
+			'fragment injection' => [ "/w#|$token|Page" ],
+			'missing leading slash' => [ "w|$token|Page" ],
+			'invalid token' => [ "/w|../../evil|Page" ],
+			'empty token' => [ "/w||Page" ],
+			'empty page' => [ "/w|$token|" ],
+			'missing parts' => [ "/w|$token" ],
+		];
+	}
+
+	/**
+	 * @dataProvider provideMaliciousDocNames
+	 * @covers \MediaWiki\Extension\CollabPads\Backend\Handler\OpenHandler::handle
+	 * @param string $docName
+	 */
+	public function testRejectsMaliciousDocName( string $docName ) {
+		$httpClientMock = $this->createMock( Client::class );
+		$httpClientMock->expects( $this->never() )->method( 'get' );
+
+		$uriMock = $this->createMock( Uri::class );
+		$uriMock->method( 'getQuery' )->willReturn( 'docName=' . urlencode( $docName ) );
+
+		$httpRequestMock = $this->createMock( Request::class );
+		$httpRequestMock->method( 'getUri' )->willReturn( $uriMock );
+
+		$connectionMock = $this->createMock( ConnectionInterface::class );
+		$connectionMock->httpRequest = $httpRequestMock;
+		$connectionMock->resourceId = $this->connectionId;
+		$connectionMock->expects( $this->once() )->method( 'close' );
+		$connectionMock->expects( $this->never() )->method( 'send' );
+
+		$openHandler = new OpenHandler(
+			$this->createMock( MongoDBAuthorDAO::class ),
+			$this->createMock( MongoDBCollabSessionDAO::class ),
+			[ 'baseurl' => 'http://wiki.example' ] + $this->serverConfigs,
+			$httpClientMock,
+			$this->createMock( LoggerInterface::class )
+		);
+		$openHandler->handle( $connectionMock, $this->createMock( ConnectionList::class ) );
+	}
+
+	/**
+	 * @covers \MediaWiki\Extension\CollabPads\Backend\Handler\OpenHandler::handle
+	 */
+	public function testAclUrlIsBuiltFromValidatedParts() {
+		$httpClientMock = $this->createMock( Client::class );
+		$httpClientMock->expects( $this->once() )->method( 'get' )
+			->with( 'http://wiki.example/w/rest.php/collabpads/acl/Some%3APage%7CSub%20page/' . $this->accessToken )
+			->willThrowException( new \Exception( 'stop' ) );
+
+		$uriMock = $this->createMock( Uri::class );
+		$uriMock->method( 'getQuery' )->willReturn(
+			'docName=' . urlencode( "/w|{$this->accessToken}|Some:Page/Sub page" )
+		);
+
+		$httpRequestMock = $this->createMock( Request::class );
+		$httpRequestMock->method( 'getUri' )->willReturn( $uriMock );
+
+		$connectionMock = $this->createMock( ConnectionInterface::class );
+		$connectionMock->httpRequest = $httpRequestMock;
+		$connectionMock->resourceId = $this->connectionId;
+
+		$openHandler = new OpenHandler(
+			$this->createMock( MongoDBAuthorDAO::class ),
+			$this->createMock( MongoDBCollabSessionDAO::class ),
+			[ 'baseurl' => 'http://wiki.example/' ] + $this->serverConfigs,
+			$httpClientMock,
+			$this->createMock( LoggerInterface::class )
+		);
+		$openHandler->handle( $connectionMock, $this->createMock( ConnectionList::class ) );
 	}
 }
