@@ -1,0 +1,5 @@
+==MATH==
+<math>f(n) = \begin{cases} n/2, & \text{if }n\text{ is even} \\ 3n+1, & \text{if }n\text{ is odd} \end{cases}</math>
+----
+==CHEM==
+<chem>SO4^2- + Ba^2+ -> BaSO4 v</chem>

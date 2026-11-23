@@ -14,6 +14,17 @@ import java.util.Map;
 public class BaseFontMapping {
 
 	/**
+	 * Font family used to render MathML ({@code <math>}) elements.
+	 */
+	public static final String MATH_FONT_FAMILY = "STIX Two Math";
+
+	/**
+	 * Companion text font family of {@link #MATH_FONT_FAMILY}, used as fallback
+	 * within MathML elements (e.g. for {@code <mtext>}).
+	 */
+	public static final String MATH_TEXT_FONT_FAMILY = "STIX Two Text";
+
+	/**
 	 * Structured font entry associating a PDF/CSS font family name with the
 	 * corresponding classpath resource and the SVG rendering metadata (base
 	 * family name, weight, style) needed to build {@code @font-face} rules.
@@ -80,7 +91,14 @@ public class BaseFontMapping {
 
 		// Symbol & Dingbats
 		new FontInfo("Symbol",      "Symbol",      400, FontStyle.NORMAL, "/fonts/StandardSymbolsPS.ttf"),
-		new FontInfo("ZapfDingbats", "ZapfDingbats", 400, FontStyle.NORMAL, "/fonts/D050000L.ttf")
+		new FontInfo("ZapfDingbats", "ZapfDingbats", 400, FontStyle.NORMAL, "/fonts/D050000L.ttf"),
+
+		// MathML (STIX Two)
+		new FontInfo(MATH_FONT_FAMILY, MATH_FONT_FAMILY, 400, FontStyle.NORMAL, "/fonts/STIXTwoMath-Regular.ttf"),
+		new FontInfo(MATH_TEXT_FONT_FAMILY, MATH_TEXT_FONT_FAMILY, 400, FontStyle.NORMAL, "/fonts/STIXTwoText-Regular.ttf"),
+		new FontInfo(MATH_TEXT_FONT_FAMILY + "-Bold", MATH_TEXT_FONT_FAMILY, 700, FontStyle.NORMAL, "/fonts/STIXTwoText-Bold.ttf"),
+		new FontInfo(MATH_TEXT_FONT_FAMILY + "-Italic", MATH_TEXT_FONT_FAMILY, 400, FontStyle.ITALIC, "/fonts/STIXTwoText-Italic.ttf"),
+		new FontInfo(MATH_TEXT_FONT_FAMILY + "-BoldItalic", MATH_TEXT_FONT_FAMILY, 700, FontStyle.ITALIC, "/fonts/STIXTwoText-BoldItalic.ttf")
 	);
 
 	/**

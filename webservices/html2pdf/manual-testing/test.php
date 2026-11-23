@@ -14,7 +14,32 @@ $stylesheetsFolder = $sourceFolder . '/stylesheets';
 $documentId = basename( $sourceFolder );
 $document = $sourceFolder . "/$documentId.html";
 
+// Keep requests below the service's multipart limits
+// (`APP_MULTIPART_MAX_PART_COUNT`: 100, `APP_MULTIPART_MAX_REQUEST_SIZE`: 500MB)
+const MAX_FILES_PER_REQUEST = 40;
+const MAX_BYTES_PER_REQUEST = 400 * 1024 * 1024;
+
 function doUpload( $documentId, $files, $type ) {
+	$batch = [];
+	$batchSize = 0;
+	foreach ( $files as $file ) {
+		$fileSize = filesize( $file );
+		if ( $batch && (
+			count( $batch ) >= MAX_FILES_PER_REQUEST || $batchSize + $fileSize > MAX_BYTES_PER_REQUEST
+		) ) {
+			doUploadBatch( $documentId, $batch, $type );
+			$batch = [];
+			$batchSize = 0;
+		}
+		$batch[] = $file;
+		$batchSize += $fileSize;
+	}
+	if ( $batch ) {
+		doUploadBatch( $documentId, $batch, $type );
+	}
+}
+
+function doUploadBatch( $documentId, $files, $type ) {
 	$postData = [
 		[
 			'name' => 'wikiId',
@@ -35,7 +60,7 @@ function doUpload( $documentId, $files, $type ) {
 		echo "Uploading $type/$filename\n";
 		$postData[] = [
 			'name' => $filename,
-			'contents' => file_get_contents( $file ),
+			'contents' => GuzzleHttp\Psr7\Utils::tryFopen( $file, 'r' ),
 			'filename' => $filename
 		];
 		$postData[] = [
@@ -82,14 +107,17 @@ $postData = [
 ];
 $createPdfUrl = $GLOBALS['serviceUrl'] . '/RenderPDF';
 $guzzle = new GuzzleHttp\Client();
+$pdfFileName = str_replace( '.html', '.pdf', $document );
+// Stream the response directly to disk, as it may be very large
 $response = $guzzle->request('POST', $createPdfUrl, [
-	'form_params' => $postData
+	'form_params' => $postData,
+	'sink' => $pdfFileName,
+	'http_errors' => false
 ]);
 $status = $response->getStatusCode();
 if ( $status !== 200 ) {
-	echo "Failed to create PDF\n";
-	var_dump( $response->getBody() );
+	echo "Failed to create PDF (HTTP $status)\n";
+	echo file_get_contents( $pdfFileName ) . "\n";
+	exit( 1 );
 }
-$body = $response->getBody();
-$pdfFileName = str_replace( '.html', '.pdf', $document );
-file_put_contents( $pdfFileName, $body );
+echo "Created $pdfFileName (" . round( filesize( $pdfFileName ) / 1024 / 1024, 1 ) . " MB)\n";
