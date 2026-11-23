@@ -6,9 +6,7 @@
 # Add its old name to the following list for tracking.
 
 # Past names of the search index rebuilding script:
-# 511-rebuild-searchindex-ERM39476 
-# 5110-rebuild-searchindex-ERM48755
-# 529-rebuild-searchindex-ERM50483 (for version 5.1.11 - typo in name)
+# 5112-rebuild-searchindex-ERM49192
 
 echo "Running post-update reindexing of the search index..."
 
