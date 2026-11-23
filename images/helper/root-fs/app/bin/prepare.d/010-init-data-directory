@@ -55,12 +55,4 @@ for file in "${!files[@]}"; do
   fi
 done
 
-echo ""
-echo "#############################################"
-echo "Changing user permission on persistent data directories"
-
-find /data/database ! -user 911 -exec chown 911:911 {} +
-find /data/search ! -user 1000 -exec chown 1000:1000 {} +
-find /data/wiki ! -user 1002 -exec chown 1002:1002 {} +
-
 echo "Done"
