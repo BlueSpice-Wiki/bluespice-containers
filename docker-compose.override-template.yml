@@ -72,7 +72,7 @@ x-common-dev: &common-dev
       ADD https://github.com/wikimedia/mediawiki-extensions-SimpleSAMLphp.git#REL1_43 /build/ssp
       FROM ${BLUESPICE_WIKI_IMAGE} AS bluespice-dev
       USER root
-      RUN apk add curl php84-xdebug
+      RUN apk add curl php84-xdebug ripgrep
       COPY --from=composer:2 /usr/bin/composer /app/bin/composer
       COPY --from=builder /build/ssp/_simplesamlphp /app/simplesamlphp
       RUN chown -R bluespice:0 /app/simplesamlphp/public && chmod -R g=u /app/simplesamlphp/public
@@ -80,34 +80,47 @@ x-common-dev: &common-dev
     no_cache: true
 
 services:
-  wiki-installer:
-    <<: *common-dev
-  wiki-web:
-    <<: *common-dev
-  wiki-task:
-    <<: *common-dev
-
-  # Needed for opensearch when running on arm64: 
-  # search:
+  # Default containers of a BlueSpice stack
+  cache:
+    restart: no
+  # collabpads:
+  #   restart: no
+  #   environment:
+  #     COLLABPADS_BACKEND_LOG_LEVEL: debug
+  # Needed for MacOS, as dirty fs mount causes failure after restart
+  # collabpads-database:
+  #   volumes:
+  #     - collabpads-db:/data/db
+  database:
+    restart: no
+  # optionally expose database ports for external DB apps:
+  #   ports:
+  #     - "3306:3306"
+  diagram:
+    restart: no
+  pdf:
+    restart: no
+  proxy:
+    restart: no
+  search:
+    restart: no
+  # Needed for opensearch when running on arm64:
   #   build:
   #     context: .
   #     dockerfile_inline: |
   #       FROM ${BLUESPICE_SERVICE_REPOSITORY}/search:${VERSION}
   #       ENV _JAVA_OPTIONS=-XX:UseSVE=0
   #     no_cache: true
-  # Needed for MacOS, as dirty fs mount causes failure after restart
-  # collabpads-database:
-  #   volumes:
-  #     - collabpads-db:/data/db
-
-  # optionally expose database ports for external DB apps:
-  # database:
-  #   ports:
-  #     - "3306:3306"
-
-  # collabpads:
-  #   environment:
-  #     COLLABPADS_BACKEND_LOG_LEVEL: debug
+  wiki-installer:
+    <<: *common-dev
+  wiki-web:
+    <<: *common-dev
+    restart: no
+  wiki-task:
+    <<: *common-dev
+    restart: no
+  wire:
+    restart: no
 
   # Development containers that starts by defaults
   # - dev-mailhog
@@ -125,6 +138,7 @@ services:
       VIRTUAL_PORT: 8025
       VIRTUAL_PATH: /_mailhog/
       VIRTUAL_DEST: /
+    restart: no
 
   dev-dbadmin:
     image: phpmyadmin:latest
@@ -137,6 +151,7 @@ services:
       VIRTUAL_HOST: ${WIKI_HOST}
       VIRTUAL_PATH: /_dbadmin/
       VIRTUAL_DEST: /
+    restart: no
 
   dev-searchdashboards:
     image: opensearchproject/opensearch-dashboards:2.11.1
@@ -150,6 +165,7 @@ services:
       VIRTUAL_PORT: 5601
       VIRTUAL_PATH: /_searchdashboards/
       VIRTUAL_DEST: /
+    restart: no
 
   dev-mongodbadmin:
     image: mongo-express
@@ -162,6 +178,7 @@ services:
       VIRTUAL_HOST: ${WIKI_HOST}
       VIRTUAL_PORT: 8081
       VIRTUAL_PATH: /_mongodbadmin/
+    restart: no
 
 
   # Any service below will be called only when its profile is specified
@@ -182,6 +199,7 @@ services:
       LDAP_ADMIN_PASSWORD: admin
     volumes:
       - ${DATADIR}/ldap:/var/lib/ldap
+    restart: no
     profiles: [sso, ldap]
 
   dev-ldapadmin:
@@ -195,6 +213,7 @@ services:
       VIRTUAL_DEST: /
     depends_on:
       - dev-ldap
+    restart: no
     profiles: [sso, ldap]
 
   dev-keycloak:
@@ -221,6 +240,7 @@ services:
       - ${DATADIR}/keycloak:/opt/keycloak/data
     extra_hosts:
       - "${WIKI_HOST}:host-gateway"
+    restart: no
     profiles: [sso, keycloak]
 
   dev-samlidp:
@@ -242,6 +262,7 @@ services:
       DEV_IDP_ADMIN_PASS: ${DB_PASS}
       DEV_SHARED_IDP_HOST: ${WIKI_HOST}
       DEV_SP_HOSTS: ${WIKI_HOST}###default-sp
+    restart: no
     profiles: [sso, samlidp]
 
   dev-filestore:
@@ -267,6 +288,7 @@ services:
       - source: filestore_s3_garage_toml
         target: /etc/garage.toml
         mode: 0444
+    restart: no
     profiles: [s3]
 
   dev-s3:
@@ -282,6 +304,7 @@ services:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-bioueot}
     command: server /data --console-address ":9001"
+    restart: no
     profiles: [olds3]
 
   # Experimental containers that will only start/end with profiles
@@ -294,7 +317,6 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-analytics
     # The executing user of this image is root - for production this is not preferrable
     image: matomo:5.7
-    restart: always
     volumes:
       - ${DATADIR}/analytics/config:/var/www/html/config
       - ${DATADIR}/analytics/logs:/var/www/html/logs
@@ -321,6 +343,7 @@ services:
     depends_on:
         database:
             condition: service_healthy
+    restart: no
     profiles: [analytics, matomo]
 
   jobqueuedb:
@@ -334,6 +357,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    restart: no
     profiles: [jobqueuedb, redis]
     # to enable, wiki-task should depend on a healthy jobqueue db:
     #  wiki-task:
@@ -347,6 +371,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${MESSAGEBROKER_USER:-admin}
       RABBITMQ_DEFAULT_PASS: ${MESSAGEBROKER_PASS:-a3robun}
+    restart: no
     profiles: [messagebroker, rabbitmq]
 
   monitoring:
@@ -359,6 +384,7 @@ services:
       VIRTUAL_PORT: 3000
       VIRTUAL_PATH: /_monitoring/
       VIRTUAL_DEST: /
+    restart: no
     profiles: [monitoring, grafana]
 
   monitoring-loki:
@@ -369,6 +395,7 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ${DATADIR}/monitoring-loki:/etc/loki
+    restart: no
     profiles: [monitoring, loki]
 
   monitoring-promtail:
@@ -379,24 +406,26 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
       - ${DATADIR}/monitoring-promtail:/etc/promtail
     command: -config.file=/etc/promtail/config.yaml
+    restart: no
     profiles: [monitoring, promtail]
 
   postgres:
     container_name: ${COMPOSE_PROJECT_NAME:-bluespice}-postgres
     image: postgres:16-alpine
-    restart: always
     environment:
-      #POSTGRES_USER: {$DB_USER}
-      #POSTGRES_PASSWORD: {$DB_PASS}
-      POSTGRES_DB: testdb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME:-testdb}
     volumes:
       - ${DATADIR}/postgres/data:/var/lib/postgresql/data
     # No ports exposed - only available internally via service name "postgres"
+    # To access the container bash, use `-u postgres` user instead of root
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U testuser -d testdb"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME:-testdb}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: no
     profiles: [postgres]
 
   # Third party service containers that will only start/end with profiles
