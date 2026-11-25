@@ -1,3 +1,26 @@
 vulnerabilities:
   - id: CVE-2025-65896
     reason: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
+
+  # kerberos protocol library comes with alpine default
+  # does not affect AI instances
+  - id: CVE-2026-107364
+  - id: CVE-2026-112315
+  - id: CVE-2026-112316
+  - id: CVE-2026-112317
+  - id: CVE-2026-112318
+  - id: CVE-2026-112319
+  - id: CVE-2026-112320
+  - id: CVE-2026-112321
+  - id: CVE-2026-112322
+  - id: CVE-2026-112323
+  - id: CVE-2026-118380
+  - id: CVE-2026-119079
+  - id: CVE-2026-40355
+  - id: CVE-2026-40356
+  - id: CVE-2026-71199
+  - id: CVE-2026-71200
+
+#vulnerabilities:
+#  - id: CVE-2025-7458
+#    reason: "https://en.wiki.bluespice.com/wiki/Security:Security_Advisories"
