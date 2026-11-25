@@ -173,14 +173,33 @@ cd /usr/local/bin
 ln -s $INSTALL_DIR/bin/bsc
 ```
 
-When having multiple sets of `bluespice-containers` installed on one host, one can consider symlinking the `bsc` of each to a different alias. Most frequent usages of this script are:
+Anticipated most frequent uses of this script are:
 
 - `bsc boot` (alias of `bsc up -d`) brings up all service containers, and `bsc down` put down everything.
 - `bsc exec wiki-task bash` connects to the shell of the wiki-task container - same for other containers (some only accept `sh`).
 - `bsc cp $(pwd)/file.txt wiki-task:/tmp/`, for example, copies `./file.txt` into the `wiki-task` container. _Always use absolute path._
 - `bsc edit-env` launches an editor with your `deploy/compose/.env` file. One can quickly change aspects of your setup, e.g., the data
 directory.
-  - For most changes in `deploy/compose/docker-compose.override.yml` or `deploy/compose/.env`, running `bsc restart` re-applies those changes.Though sometimes one needs to bring down the affected containers or the whole stack, then go up again to reflect the changes.
+  - For most changes in `deploy/compose/docker-compose.override.yml` or `deploy/compose/.env`, running `bsc restart` re-applies those changes. Though sometimes one needs to bring down the affected containers or the whole stack, then go up again to reflect the changes.
+
+When having multiple sets of `bluespice-containers` installed on one host, create a `.bscrc` file in your home directory with the following content:
+
+```bash
+PROFILE_DIR[galaxy]=$HOME/workspace/galaxy/bluespice-containers
+PROFILE_DIR[5.2]=$HOME/workspace/5.2.X/bluespice-containers
+PROFILE_DIR[future-edition]=$HOME/workspace/galaxy-1.1/bluespice-containers
+```
+
+(Edit the paths to match your local setup.) This allows you to use the profile keys like this:
+
+```
+bsc galaxy boot
+bsc 5.2 edit-env
+bsc future-edition ps
+bsc profiles # to list all available profiles
+```
+
+> *Attention!* If you run `bsc galaxy boot` and then `bsc ps`, the output will be empty! The tool is dumb and will act really only on the containers that you tell it. The first command changes into the folder of the `galaxy` profile. The second command stays in the main installation path of `bsc` (the one you used to symlink `bsc`).
 
 ### Adapting override yml file of docker compose
 
