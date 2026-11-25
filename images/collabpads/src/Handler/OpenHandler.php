@@ -69,11 +69,15 @@ class OpenHandler {
 		$queryArgs = [];
 
 		parse_str( $conn->httpRequest->getURI()->getQuery(), $queryArgs );
-		$this->logger->debug( 'Opening connection for: ' . $queryArgs['docName'] );
+		$docName = $queryArgs['docName'] ?? '';
+		if ( !is_string( $docName ) ) {
+			$docName = '';
+		}
+		$this->logger->debug( 'Opening connection for: ' . $docName );
 
-		$configs = $this->createCurlRequest( $conn, $queryArgs['docName'] );
+		$configs = $this->createCurlRequest( $conn, $docName );
 		if ( !$configs['access'] ) {
-			$this->logger->warning( 'Access denied for: ' . $queryArgs['docName'] );
+			$this->logger->warning( 'Access denied for: ' . $docName );
 			$conn->close();
 			return;
 		}
@@ -148,13 +152,44 @@ class OpenHandler {
 	 */
 	private function createCurlRequest( ConnectionInterface $conn, string $pageTitle ): array {
 		$docNameParts = explode( '|', $pageTitle, 3 );
+		if ( count( $docNameParts ) !== 3 ) {
+			$this->logger->warning( 'Malformed document name' );
+			return [
+				'access' => false
+			];
+		}
 
-		$scriptPath = $docNameParts[0];
-		$accessToken = $docNameParts[1];
-		$pageName = $docNameParts[2];
+		[ $scriptPath, $accessToken, $pageName ] = $docNameParts;
 
-		$url = $this->serverConfigs['baseurl'] . $scriptPath . "/rest.php/collabpads/acl/" .
-			str_replace( "/", "|", $pageName ) . '/' . $accessToken;
+		if ( !$this->isValidScriptPath( $scriptPath ) ) {
+			$this->logger->warning( 'Invalid script path in document name' );
+			return [
+				'access' => false
+			];
+		}
+		if ( $accessToken === '' || !ctype_xdigit( $accessToken ) ) {
+			$this->logger->warning( 'Invalid access token in document name' );
+			return [
+				'access' => false
+			];
+		}
+		if ( $pageName === '' ) {
+			$this->logger->warning( 'Empty page name in document name' );
+			return [
+				'access' => false
+			];
+		}
+
+		$baseUrl = rtrim( $this->serverConfigs['baseurl'], '/' );
+		$url = $baseUrl . $scriptPath . "/rest.php/collabpads/acl/" .
+			rawurlencode( str_replace( "/", "|", $pageName ) ) . '/' . rawurlencode( $accessToken );
+
+		if ( !$this->isSameOrigin( $baseUrl, $url ) ) {
+			$this->logger->warning( "ACL URL does not point to configured wiki: {$url}" );
+			return [
+				'access' => false
+			];
+		}
 		$this->logger->debug( "Calling: {$url}" );
 
 		try {
@@ -197,6 +232,53 @@ class OpenHandler {
 		$response['wikiScriptPath'] = $scriptPath;
 
 		return $response;
+	}
+
+	/**
+	 * The script path is sent by the client and is appended to the configured
+	 * base URL. Only allow a plain absolute path (or an empty string), so that
+	 * the resulting URL can not be redirected to another host, e.g. by values
+	 * like "@evil.example", ".evil.example", ":1234" or "//evil.example".
+	 *
+	 * @param string $scriptPath
+	 * @return bool
+	 */
+	private function isValidScriptPath( string $scriptPath ): bool {
+		if ( $scriptPath === '' ) {
+			return true;
+		}
+		if ( !preg_match( '#^(/[A-Za-z0-9._~-]+)+$#', $scriptPath ) ) {
+			return false;
+		}
+		foreach ( explode( '/', substr( $scriptPath, 1 ) ) as $segment ) {
+			if ( $segment === '.' || $segment === '..' ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Defense in depth: make sure the final URL still targets the configured wiki
+	 *
+	 * @param string $baseUrl
+	 * @param string $url
+	 * @return bool
+	 */
+	private function isSameOrigin( string $baseUrl, string $url ): bool {
+		$base = parse_url( $baseUrl );
+		$target = parse_url( $url );
+		if ( !is_array( $base ) || !is_array( $target ) ) {
+			return false;
+		}
+		foreach ( [ 'scheme', 'host', 'port', 'user', 'pass' ] as $part ) {
+			if ( ( $base[$part] ?? null ) !== ( $target[$part] ?? null ) ) {
+				return false;
+			}
+		}
+		$basePath = $base['path'] ?? '';
+		$targetPath = $target['path'] ?? '';
+		return $basePath === '' || str_starts_with( $targetPath, $basePath . '/' );
 	}
 
 	/**
